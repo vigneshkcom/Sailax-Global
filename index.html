@@ -414,7 +414,7 @@ body {
   letter-spacing: 0.03em;
 }
 
-/* Stage Rows - SUBTLE DESIGN */
+/* Stage Rows */
 .stage-row {
   display: flex;
   align-items: center;
@@ -428,7 +428,6 @@ body {
   height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
-  opacity: 0.6;
 }
 
 .stage-name {
@@ -453,7 +452,6 @@ body {
 .stage-fill {
   height: 100%;
   border-radius: 4px;
-  opacity: 0.7;
 }
 
 .stage-stats {
@@ -465,7 +463,7 @@ body {
   flex-shrink: 0;
 }
 
-/* Volume Table - COMPACT */
+/* Volume Table */
 .volume-card {
   margin-bottom: 30px;
 }
@@ -585,40 +583,56 @@ body {
   text-decoration: none;
 }
 
-/* Print Styles - OPTIMIZED */
+/* ============================================
+   PRINT STYLES - FIXED COLOR RENDERING
+   ============================================ */
 @media print {
   #upload-screen { display: none !important; }
-  .dashboard-header { position: static; background: white; border-bottom: 1px solid #ddd; padding: 10px 20px; }
-  .btn-outline, .btn-pdf, .view-toggle, .file-chip, .filter-presets, .btn-outline, .filters-bar .separator, .filter-group label { display: none !important; }
-  
-  /* SHOW THE PDF COVER - THIS WAS THE ISSUE */
+
+  .dashboard-header {
+    position: static;
+    background: white;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 20px;
+  }
+
+  .btn-outline,
+  .btn-pdf,
+  .view-toggle,
+  .file-chip,
+  .filter-presets,
+  .filters-bar .separator,
+  .filter-group label {
+    display: none !important;
+  }
+
+  /* PDF Cover */
   #pdf-cover {
     display: block !important;
     margin-bottom: 5px !important;
     padding: 5px 0 8px 0 !important;
     border-bottom: 1px solid #ddd !important;
   }
-  
-  /* Force the cover to be visible */
+
   #pdf-cover img {
     display: block !important;
     margin: 0 auto 4px !important;
   }
-  
+
   #pdf-cover div {
     display: block !important;
   }
-  
-  .filters-bar { 
-    page-break-inside: avoid; 
-    border: none; 
-    background: transparent; 
+
+  .filters-bar {
+    page-break-inside: avoid;
+    border: none;
+    background: transparent;
     box-shadow: none;
     padding: 0;
     margin-top: 5px;
     margin-bottom: 15px;
   }
-  
+
   .filter-group input[type="date"] {
     border: none;
     background: transparent;
@@ -626,78 +640,79 @@ body {
     font-size: 11px;
     color: var(--text);
   }
-  
-  .filter-group input[type="date"]:first-of-type {
-    margin-right: 15px;
-  }
-  
-  .card { 
-    page-break-inside: avoid; 
-    break-inside: avoid; 
-    border: 1px solid #eee; 
+
+  .card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    border: 1px solid #eee;
     box-shadow: none;
     padding: 12px;
     margin-bottom: 12px;
   }
-  
+
   .kpi-grid {
     gap: 8px;
     margin-bottom: 12px;
   }
-  
-  .kpi-card { 
-    border: 1px solid #eee; 
+
+  .kpi-card {
+    border: 1px solid #eee;
     padding: 8px;
   }
-  
+
   .kpi-value {
     font-size: 20px;
   }
-  
+
   .kpi-label {
     font-size: 9px;
   }
-  
+
   body { background: white; }
   .main-content { margin: 5px auto; padding: 0 10px; }
-  
-  /* FORCE COLORS TO PRINT - STRONGER RULES */
+
+  /* Force ALL elements to print colors accurately */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
-  
+
+  /* ---- STAGE BARS: FIXED ----
+     Do NOT override background here — inline styles on .stage-fill
+     and .stage-dot carry the actual hex color. Just ensure they print. */
   .stage-fill {
-    opacity: 0.9 !important;
-    background: currentColor !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-  }
-  
-  .stage-dot {
     opacity: 1 !important;
+    /* No background override — preserves inline style="background: #hex" */
+  }
+
+  .stage-dot {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+    opacity: 1 !important;
+    /* No background override — preserves inline style="background: #hex" */
   }
-  
+
   .stage-bar {
-    background: #f0f0f0 !important;
+    background: #ebebeb !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  
-  .volume-table th, .volume-table td {
+
+  .volume-table th,
+  .volume-table td {
     padding: 3px 2px;
     font-size: 9px;
   }
-  
+
   .volume-table .total-row {
     background: #f5f5f5 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  
+
   @page {
     margin: 1cm;
     @bottom-center {
@@ -706,11 +721,11 @@ body {
       color: #666;
     }
   }
-  
-  /* Hide scrollbars */
+
   body { overflow: visible !important; }
   .volume-table-wrap { overflow: visible !important; }
 }
+</style>
 </head>
 <body>
 
@@ -808,7 +823,7 @@ body {
       </div>
     </div>
 
-    <!-- Stage Breakdown Only -->
+    <!-- Stage Breakdown -->
     <div class="card" style="margin-bottom: 20px;">
       <div class="card-title">Stage Breakdown</div>
       <div id="stageContainer"></div>
@@ -840,7 +855,7 @@ body {
       </div>
       <div class="footer-contact">
         <div>+61 451 898 761</div>
-        <div>vignesh@sailaxglobal.com</div>
+        <div><a href="mailto:vignesh@sailaxglobal.com">vignesh@sailaxglobal.com</a></div>
       </div>
     </div>
   </footer>
@@ -852,10 +867,23 @@ let pipelineFile = null;
 let contactsFile = null;
 let viewMode = 'weekly';
 
-// Subtle color palette for stages - more muted
+// Distinct, saturated color palette so bars are clearly visible in print
 const stageColors = [
-  '#6b7280', '#9ca3af', '#d1d5db', '#9f7aea', '#f9a8d4',
-  '#fcd34d', '#6ee7b7', '#93c5fd', '#c4b5fd', '#fdba74'
+  '#2563eb', // blue
+  '#10b981', // emerald
+  '#f59e0b', // amber
+  '#ef4444', // red
+  '#8b5cf6', // violet
+  '#06b6d4', // cyan
+  '#f97316', // orange
+  '#84cc16', // lime
+  '#ec4899', // pink
+  '#14b8a6', // teal
+  '#a855f7', // purple
+  '#6366f1', // indigo
+  '#fb923c', // light orange
+  '#22c55e', // green
+  '#e11d48', // rose
 ];
 
 // File upload handlers
@@ -912,7 +940,6 @@ async function loadDashboard() {
       parseCSV(contactsFile)
     ]);
 
-    // Find column indices
     const pHeaders = pipeline[0].map(h => h.toLowerCase());
     const cHeaders = contacts[0].map(h => h.toLowerCase());
 
@@ -925,7 +952,6 @@ async function loadDashboard() {
       throw new Error('Required columns not found. Need: Contact ID and Stage in pipeline, Contact ID and Created Time in contacts.');
     }
 
-    // Create contact map
     const contactMap = {};
     contacts.slice(1).forEach(row => {
       if (row[cContactIdx] && row[cCreatedIdx]) {
@@ -933,7 +959,6 @@ async function loadDashboard() {
       }
     });
 
-    // Merge data
     mergedData = [];
     pipeline.slice(1).forEach(row => {
       const contactId = row[pContactIdx];
@@ -944,21 +969,18 @@ async function loadDashboard() {
       }
     });
 
-    // Update chips
     document.getElementById('chip-pipeline').innerText = `📋 ${pipelineFile.name.slice(0, 20)}...`;
     document.getElementById('chip-contacts').innerText = `👤 ${contactsFile.name.slice(0, 20)}...`;
 
-    // Set initial dates
     const dates = mergedData.map(d => d.created).sort();
     if (dates.length) {
       document.getElementById('fromDate').value = dates[0];
       document.getElementById('toDate').value = dates[dates.length - 1];
     }
 
-    // Show dashboard
     document.getElementById('upload-screen').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
-    
+
     render();
   } catch (error) {
     alert('Error loading files: ' + error.message);
@@ -968,8 +990,7 @@ async function loadDashboard() {
 function getFilteredData() {
   const from = document.getElementById('fromDate').value;
   const to = document.getElementById('toDate').value;
-  
-  return mergedData.filter(d => 
+  return mergedData.filter(d =>
     (!from || d.created >= from) && (!to || d.created <= to)
   );
 }
@@ -977,35 +998,24 @@ function getFilteredData() {
 function render() {
   const filtered = getFilteredData();
   const total = filtered.length;
-  
-  // Update total count
+
   document.getElementById('totalCount').innerHTML = `<strong>${total}</strong> contacts`;
-  
-  // KPI: Total
   document.getElementById('kpi-total').innerText = total;
-  
-  // KPI: Unique stages
+
   const stages = [...new Set(filtered.map(d => d.stage))];
   document.getElementById('kpi-stages').innerText = stages.length;
-  
-  // KPI: Top stage (with Spam Lead deprioritized)
+
   if (total > 0) {
     const stageCounts = {};
     filtered.forEach(d => stageCounts[d.stage] = (stageCounts[d.stage] || 0) + 1);
-    
-    // Sort stages: first by count (desc), but prioritize "No Answer" over "Spam Lead" if counts are equal
+
     const sortedStages = Object.entries(stageCounts).sort((a, b) => {
-      // If counts are different, sort by count
       if (b[1] !== a[1]) return b[1] - a[1];
-      
-      // If counts are equal, prioritize "No Answer" over "Spam Lead"
       if (a[0] === 'No Answer' && b[0] === 'Spam Lead') return -1;
       if (a[0] === 'Spam Lead' && b[0] === 'No Answer') return 1;
-      
-      // Otherwise, sort alphabetically
       return a[0].localeCompare(b[0]);
     });
-    
+
     const topStage = sortedStages[0];
     document.getElementById('kpi-topstage').innerText = topStage[0];
     document.getElementById('kpi-topcount').innerText = `${topStage[1]} contacts`;
@@ -1013,8 +1023,7 @@ function render() {
     document.getElementById('kpi-topstage').innerText = '—';
     document.getElementById('kpi-topcount').innerText = '0 contacts';
   }
-  
-  // KPI: Date range
+
   if (filtered.length) {
     const dates = filtered.map(d => d.created).sort();
     const first = new Date(dates[0]);
@@ -1027,46 +1036,43 @@ function render() {
     document.getElementById('kpi-firstdate').innerText = 'No data';
   }
 
-  // Stage breakdown
   renderStages(filtered);
-  
-  // Volume table
   renderVolume(filtered);
 }
 
 function renderStages(data) {
   const stageCounts = {};
   data.forEach(d => stageCounts[d.stage] = (stageCounts[d.stage] || 0) + 1);
-  
-  // Sort stages with same priority: by count, but "No Answer" before "Spam Lead" if equal
+
   const sorted = Object.entries(stageCounts).sort((a, b) => {
     if (b[1] !== a[1]) return b[1] - a[1];
     if (a[0] === 'No Answer' && b[0] === 'Spam Lead') return -1;
     if (a[0] === 'Spam Lead' && b[0] === 'No Answer') return 1;
     return a[0].localeCompare(b[0]);
   });
-  
+
   const max = Math.max(...sorted.map(s => s[1]), 1);
   const total = data.length;
-  
+
   const container = document.getElementById('stageContainer');
-  
+
   if (sorted.length === 0) {
     container.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 20px;">No data available</div>';
     return;
   }
-  
+
   container.innerHTML = sorted.map(([stage, count], index) => {
     const percent = total > 0 ? ((count / total) * 100).toFixed(1) : '0';
     const width = (count / max) * 100;
     const color = stageColors[index % stageColors.length];
-    
+
+    // Inline styles carry the color — do NOT override in print CSS
     return `
       <div class="stage-row">
-        <span class="stage-dot" style="background: ${color};"></span>
+        <span class="stage-dot" style="background-color: ${color};"></span>
         <span class="stage-name" title="${stage}">${stage}</span>
         <div class="stage-bar">
-          <div class="stage-fill" style="width: ${width}%; background: ${color};"></div>
+          <div class="stage-fill" style="width: ${width}%; background-color: ${color};"></div>
         </div>
         <span class="stage-stats">${count} · ${percent}%</span>
       </div>
@@ -1090,17 +1096,15 @@ function formatWeek(weekStart) {
   return `${start.toLocaleDateString('en-AU', options)} – ${end.toLocaleDateString('en-AU', options)}`;
 }
 
-function formatDate(dateStr) {
+function formatDateLabel(dateStr) {
   const d = new Date(dateStr + 'T12:00:00');
   return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
 }
 
 function renderVolume(data) {
-  // Group by stage
   const stageSet = [...new Set(data.map(d => d.stage))];
   const stageOrder = [...stageSet].sort();
-  
-  // Group by time period
+
   const groups = {};
   data.forEach(d => {
     const key = viewMode === 'weekly' ? getWeekStart(d.created) : d.created;
@@ -1111,12 +1115,10 @@ function renderVolume(data) {
     groups[key][d.stage]++;
     groups[key].total++;
   });
-  
-  // Sort keys
+
   let keys = Object.keys(groups).sort();
   if (viewMode === 'daily') keys = keys.reverse();
-  
-  // Render header
+
   const head = document.getElementById('volumeHead');
   head.innerHTML = `
     <tr>
@@ -1125,34 +1127,32 @@ function renderVolume(data) {
       ${stageOrder.map(s => `<th>${s}</th>`).join('')}
     </tr>
   `;
-  
-  // Render body
+
   const body = document.getElementById('volumeBody');
-  
+
   if (keys.length === 0) {
     body.innerHTML = '<tr><td colspan="' + (stageOrder.length + 2) + '" style="text-align: center; padding: 20px;">No data in selected period</td></tr>';
     return;
   }
-  
+
   const rows = keys.map(key => {
     const group = groups[key];
     return `
       <tr>
-        <td>${viewMode === 'weekly' ? formatWeek(key) : formatDate(key)}</td>
+        <td>${viewMode === 'weekly' ? formatWeek(key) : formatDateLabel(key)}</td>
         <td><strong>${group.total}</strong></td>
         ${stageOrder.map(s => `<td>${group[s] || '—'}</td>`).join('')}
       </tr>
     `;
   }).join('');
-  
-  // Calculate totals
+
   const totals = { total: 0 };
   stageOrder.forEach(s => totals[s] = 0);
   keys.forEach(key => {
     totals.total += groups[key].total;
     stageOrder.forEach(s => totals[s] += groups[key][s] || 0);
   });
-  
+
   const totalRow = `
     <tr class="total-row">
       <td>Total</td>
@@ -1160,18 +1160,18 @@ function renderVolume(data) {
       ${stageOrder.map(s => `<td><strong>${totals[s] || '—'}</strong></td>`).join('')}
     </tr>
   `;
-  
+
   body.innerHTML = rows + totalRow;
 }
 
 function setPreset(preset, btn) {
   document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  
+
   const today = new Date();
-  const to = today.toISOString().slice(0, 10);
+  let to = today.toISOString().slice(0, 10);
   let from;
-  
+
   switch(preset) {
     case '7d':
       const seven = new Date(today);
@@ -1195,7 +1195,7 @@ function setPreset(preset, btn) {
       }
       break;
   }
-  
+
   if (from) document.getElementById('fromDate').value = from;
   document.getElementById('toDate').value = to;
   render();
@@ -1225,15 +1225,13 @@ function generatePDF() {
   const from = document.getElementById('fromDate').value;
   const to = document.getElementById('toDate').value;
   const total = document.getElementById('kpi-total').innerText;
-  
-  // Format dates for display
-  const formatDate = (dateStr) => {
+
+  const fmtDate = (dateStr) => {
     if (!dateStr) return '—';
     const d = new Date(dateStr + 'T12:00:00');
     return d.toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric' });
   };
-  
-  // Create a much more compact cover element
+
   const cover = document.createElement('div');
   cover.id = 'pdf-cover';
   cover.style.cssText = `
@@ -1242,25 +1240,22 @@ function generatePDF() {
     padding: 8px 0 12px 0;
     border-bottom: 1px solid #e2e7f0;
   `;
-  
+
   cover.innerHTML = `
     <img src="https://sailax.co.uk/assets/logo.png" style="height: 32px; width: auto; margin-bottom: 6px;">
     <div style="font-size: 12px; color: #5f6c86; margin-bottom: 8px;">Pipeline Performance Report</div>
     <div style="display: flex; justify-content: center; gap: 20px; font-size: 11px; color: #1a2639;">
-      <div>${formatDate(from)} – ${formatDate(to)}</div>
-      <div>Generated: ${formatDate(new Date().toISOString().slice(0,10))}</div>
+      <div>${fmtDate(from)} – ${fmtDate(to)}</div>
+      <div>Generated: ${fmtDate(new Date().toISOString().slice(0,10))}</div>
       <div><strong>${total}</strong> contacts</div>
     </div>
   `;
-  
-  // Insert cover and print
+
   const mainContent = document.querySelector('.main-content');
   mainContent.insertBefore(cover, mainContent.firstChild);
-  
-  // Print
+
   window.print();
-  
-  // Remove cover
+
   cover.remove();
 }
 </script>
