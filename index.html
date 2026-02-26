@@ -591,21 +591,44 @@ body {
   .dashboard-header { position: static; background: white; border-bottom: 1px solid #ddd; padding: 10px 20px; }
   .btn-outline, .btn-pdf, .view-toggle, .file-chip, .filter-presets, .btn-outline, .filters-bar .separator, .filter-group label { display: none !important; }
   
+  /* SHOW THE PDF COVER - THIS WAS THE ISSUE */
+  #pdf-cover {
+    display: block !important;
+    margin-bottom: 5px !important;
+    padding: 5px 0 8px 0 !important;
+    border-bottom: 1px solid #ddd !important;
+  }
+  
+  /* Force the cover to be visible */
+  #pdf-cover img {
+    display: block !important;
+    margin: 0 auto 4px !important;
+  }
+  
+  #pdf-cover div {
+    display: block !important;
+  }
+  
   .filters-bar { 
     page-break-inside: avoid; 
     border: none; 
     background: transparent; 
     box-shadow: none;
     padding: 0;
-    margin-bottom: 20px;
+    margin-top: 5px;
+    margin-bottom: 15px;
   }
   
   .filter-group input[type="date"] {
     border: none;
     background: transparent;
     padding: 0;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text);
+  }
+  
+  .filter-group input[type="date"]:first-of-type {
+    margin-right: 15px;
   }
   
   .card { 
@@ -613,94 +636,81 @@ body {
     break-inside: avoid; 
     border: 1px solid #eee; 
     box-shadow: none;
-    padding: 15px;
-    margin-bottom: 15px;
+    padding: 12px;
+    margin-bottom: 12px;
   }
   
   .kpi-grid {
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 8px;
+    margin-bottom: 12px;
   }
   
   .kpi-card { 
     border: 1px solid #eee; 
-    padding: 12px;
+    padding: 8px;
   }
   
   .kpi-value {
-    font-size: 22px;
+    font-size: 20px;
+  }
+  
+  .kpi-label {
+    font-size: 9px;
   }
   
   body { background: white; }
-  .main-content { margin: 10px auto; padding: 0 15px; }
+  .main-content { margin: 5px auto; padding: 0 10px; }
   
-  .stage-bar {
-    background: #f0f0f0;
-  }
-  
-  .stage-fill {
-    opacity: 0.7;
-  }
-  
-  .volume-table {
-    font-size: 10px;
-  }
-  
-  .volume-table th, .volume-table td {
-    padding: 4px 2px;
-  }
-  
-  @page {
-    margin: 1.2cm;
-    @bottom-center {
-      content: "Sailax Global · Unit 9-35/37 Jesica Rd, Campbellfield VIC 3061 · +61 451 898 761 · vignesh@sailaxglobal.com";
-      font-size: 8pt;
-      color: #999;
-    }
-  }
-  
-  #pdf-cover {
-    display: block !important;
-    margin-bottom: 20px;
-  }
-  
-  /* Hide scrollbars in print */
-  body { overflow: visible !important; }
-  .volume-table-wrap { overflow: visible !important; }
-  
-  /* FORCE COLORS TO PRINT - THIS IS THE FIX */
+  /* FORCE COLORS TO PRINT - STRONGER RULES */
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
   
-  /* Ensure stage bars show colors */
   .stage-fill {
-    opacity: 0.8 !important;
+    opacity: 0.9 !important;
+    background: currentColor !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
   
   .stage-dot {
-    opacity: 0.9 !important;
+    opacity: 1 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
   
-  /* Make stage colors more vibrant in print */
-  .stage-row .stage-fill {
-    opacity: 0.8 !important;
+  .stage-bar {
+    background: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   
-  /* Ensure table borders don't hide colors */
-  .volume-table td {
-    background-color: transparent !important;
+  .volume-table th, .volume-table td {
+    padding: 3px 2px;
+    font-size: 9px;
   }
-}
   
+  .volume-table .total-row {
+    background: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  @page {
+    margin: 1cm;
+    @bottom-center {
+      content: "Sailax Global · Unit 9-35/37 Jesica Rd, Campbellfield VIC 3061 · +61 451 898 761 · vignesh@sailaxglobal.com";
+      font-size: 8pt;
+      color: #666;
+    }
+  }
+  
+  /* Hide scrollbars */
+  body { overflow: visible !important; }
+  .volume-table-wrap { overflow: visible !important; }
 }
-</style>
 </head>
 <body>
 
