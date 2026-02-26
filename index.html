@@ -639,7 +639,7 @@ body {
   }
   
   .stage-fill {
-    opacity: 0.5;
+    opacity: 0.7;
   }
   
   .volume-table {
@@ -658,6 +658,46 @@ body {
       color: #999;
     }
   }
+  
+  #pdf-cover {
+    display: block !important;
+    margin-bottom: 20px;
+  }
+  
+  /* Hide scrollbars in print */
+  body { overflow: visible !important; }
+  .volume-table-wrap { overflow: visible !important; }
+  
+  /* FORCE COLORS TO PRINT - THIS IS THE FIX */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
+  /* Ensure stage bars show colors */
+  .stage-fill {
+    opacity: 0.8 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  .stage-dot {
+    opacity: 0.9 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Make stage colors more vibrant in print */
+  .stage-row .stage-fill {
+    opacity: 0.8 !important;
+  }
+  
+  /* Ensure table borders don't hide colors */
+  .volume-table td {
+    background-color: transparent !important;
+  }
+}
   
   #pdf-cover {
     display: block !important;
