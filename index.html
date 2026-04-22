@@ -151,7 +151,7 @@ section { padding: 5.5rem 2.5rem; }
   display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; gap: 0.5rem;
 }
 .header-logo-link { display: inline-flex; align-items: center; }
-.header-logo-img { height: 34px; width: auto; }
+.header-logo-img { height: 48px; width: auto; }
 .header-right { display: flex; align-items: center; gap: 0.75rem; }
 .header-phone {
   display: flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.9rem;
@@ -164,7 +164,7 @@ section { padding: 5.5rem 2.5rem; }
 @media (max-width: 640px) {
   .header-phone { display: none; }
   .site-header { padding: 0 1.25rem; }
-  .header-logo-img { height: 30px; }
+  .header-logo-img { height: 42px; }
 }
 
 /* ══════════════════════════════════════
@@ -377,19 +377,6 @@ section { padding: 5.5rem 2.5rem; }
 }
 
 /* ══════════════════════════════════════
-   WHY SAILAX
-══════════════════════════════════════ */
-.why-sec { background: var(--off-white); padding: 5.5rem 2.5rem; border-top: 1px solid var(--border); }
-.why-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.25rem; }
-.w-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.85rem 1.5rem; transition: transform 0.28s ease, box-shadow 0.28s ease; }
-.w-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--brand-bd); }
-.w-icon { width: 42px; height: 42px; border-radius: var(--radius-sm); background: var(--brand-bg); border: 1.5px solid var(--brand-bd); display: flex; align-items: center; justify-content: center; color: var(--brand-dark); margin-bottom: 1rem; flex-shrink: 0; }
-.w-card h3 { font-size: 0.95rem; margin-bottom: 0.5rem; }
-.w-card p  { font-size: 0.84rem; line-height: 1.75; }
-@media (max-width: 900px) { .why-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 540px) { .why-grid { grid-template-columns: 1fr; } }
-
-/* ══════════════════════════════════════
    FAQ
 ══════════════════════════════════════ */
 .faq-sec { background: var(--off-white); padding: 5.5rem 2.5rem; border-top: 1px solid var(--border); }
@@ -466,8 +453,10 @@ section { padding: 5.5rem 2.5rem; }
    FOOTER
 ══════════════════════════════════════ */
 footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 2.5rem; }
-.footer-brand-name { font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--brand); margin-bottom: 0.6rem; }
-.footer-brand p { font-size: 0.75rem; color: rgba(31,42,36,0.62); max-width: 220px; line-height: 1.65; }
+.footer-logo-img { height: 40px; width: auto; margin-bottom: 1rem; display: block; }
+.footer-contact-info p,
+.footer-contact-info a { font-size: 0.8rem; color: rgba(31,42,36,0.8); display: block; margin-bottom: 0.45rem; text-decoration: none; }
+.footer-contact-info a:hover { color: var(--brand); }
 .footer-col h4 { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(31,42,36,0.62); margin-bottom: 0.9rem; }
 .footer-col a, .footer-col p { font-size: 0.8rem; color: rgba(31,42,36,0.8); display: block; margin-bottom: 0.45rem; text-decoration: none; }
 .footer-col a:hover { color: var(--brand); }
@@ -476,11 +465,11 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
 
 /* ── Mobile padding ── */
 @media (max-width: 640px) {
-  .grant-sec,.diff-sec,.benefits-sec,.process-sec,.why-sec,.faq-sec,.cta-sec { padding-left: 0; padding-right: 0; }
+  .grant-sec,.diff-sec,.benefits-sec,.process-sec,.faq-sec,.cta-sec { padding-left: 0; padding-right: 0; }
   .wrap { padding-left: 1.5rem; padding-right: 1.5rem; }
   section { padding-left: 0; padding-right: 0; }
-  .grant-sec .wrap,.diff-sec .wrap,.benefits-sec .wrap,.process-sec .wrap,.why-sec .wrap,.faq-sec .wrap { padding-left: 1.5rem; padding-right: 1.5rem; }
-  .g-card, .diff-col, .b-card, .w-card { padding: 1.5rem 1.25rem; }
+  .grant-sec .wrap,.diff-sec .wrap,.benefits-sec .wrap,.process-sec .wrap,.faq-sec .wrap { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .g-card, .diff-col, .b-card { padding: 1.5rem 1.25rem; }
   .form-card-body { padding: 1.75rem; }
   .form-input, .form-select { padding: 0.85rem 1rem; font-size: 1rem; }
   .btn-form { padding: 1rem; font-size: 0.9rem; }
@@ -520,11 +509,11 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
         Up to £9,000 available through the Boiler Upgrade Scheme
         <span>&nbsp;·&nbsp; government-backed</span>
       </div>
-      <p class="hero-sub reveal reveal-d2">Switch your home to a cleaner, more efficient heating system — with significant government grant support applied directly to your installation cost. Sailax manages the entire process for UK homeowners.</p>
+      <p class="hero-sub reveal reveal-d2">Upgrade your home to a cleaner, more efficient heating system — with significant government grant support applied directly to your installation cost. Sailax manages the entire process for UK homeowners.</p>
       <div class="hero-checks reveal reveal-d3">
         <div class="hero-check">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/></svg>
-          From £1,500 net cost for eligible homeowners after grant support
+          From £1,500 net cost for eligible homeowners, after grant support
         </div>
         <div class="hero-check">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/></svg>
@@ -829,59 +818,6 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
   </div>
 </section>
 
-<!-- ════════════════ WHY SAILAX ════════════════ -->
-<section class="why-sec">
-  <div class="wrap">
-    <div class="eyebrow reveal">Why Sailax</div>
-    <h2 class="reveal" style="margin-bottom:0.7rem;">What makes a Sailax installation different</h2>
-    <p class="section-sub reveal">We're a residential specialist — not a generalist contractor. Everything we do is built around UK homeowners, the Boiler Upgrade Scheme, and getting the installation right.</p>
-    <div class="why-grid">
-      <div class="w-card reveal">
-        <div class="w-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>Full BUS Grant Management</h3>
-        <p>We manage the Boiler Upgrade Scheme application from start to finish. You don't need to navigate the scheme yourself — we handle the paperwork and apply the grant directly.</p>
-      </div>
-      <div class="w-card reveal reveal-d1">
-        <div class="w-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.5"/></svg>
-        </div>
-        <h3>Residential Focus Only</h3>
-        <p>We work exclusively with UK homeowners — not commercial properties, not new builds. This focus means we understand residential installations and the specific challenges they present.</p>
-      </div>
-      <div class="w-card reveal reveal-d2">
-        <div class="w-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
-        </div>
-        <h3>Proper Home Assessment First</h3>
-        <p>We don't quote from a distance. We assess your property in person before recommending anything — so the system we design is right for your specific home.</p>
-      </div>
-      <div class="w-card reveal reveal-d3">
-        <div class="w-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" stroke="currentColor" stroke-width="1.5"/></svg>
-        </div>
-        <h3>No-Pressure Approach</h3>
-        <p>We give you honest information and let you decide. If a heat pump isn't right for your property right now, we'll tell you — rather than push you towards something that doesn't serve you.</p>
-      </div>
-      <div class="w-card reveal reveal-d4">
-        <div class="w-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <h3>Quality Installation</h3>
-        <p>A heat pump only performs as well as it's installed. We take the time to get it right — every system is commissioned properly and thoroughly tested before handover.</p>
-      </div>
-      <div class="w-card reveal reveal-d5">
-        <div class="w-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z" fill="currentColor"/></svg>
-        </div>
-        <h3>Support After Completion</h3>
-        <p>We don't disappear once the job is done. Our team is reachable if you have questions — whether that's the day after installation or months down the line.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ════════════════ FAQ ════════════════ -->
 <section class="faq-sec" id="faq">
   <div class="wrap">
@@ -1048,14 +984,12 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
 <!-- ════════════════ FOOTER ════════════════ -->
 <footer>
   <div class="footer-brand">
-    <div class="footer-brand-name">Sailax</div>
-    <p>Residential heat pump specialists helping UK homeowners switch to cleaner, more efficient heating — with full Boiler Upgrade Scheme grant guidance included.</p>
-  </div>
-  <div class="footer-col">
-    <h4>Contact</h4>
-    <p>1 City Rd, London EC1V 2PU, UK</p>
-    <a href="tel:+447457411858">+44 7457 411 858</a>
-    <a href="mailto:info@sailax.co.uk">info@sailax.co.uk</a>
+    <img src="assets/logo.png" class="footer-logo-img" alt="Sailax">
+    <div class="footer-contact-info">
+      <p>1 City Rd, London EC1V 2PU, UK</p>
+      <a href="tel:+447457411858">+44 7457 411 858</a>
+      <a href="mailto:info@sailax.co.uk">info@sailax.co.uk</a>
+    </div>
   </div>
   <div class="footer-col">
     <h4>Quick Links</h4>
@@ -1130,8 +1064,7 @@ function handleSubmit() {
     err.hidden = false;
     return;
   }
-  document.getElementById('form-body').style.display = 'none';
-  document.getElementById('success-state').style.display = 'block';
+  window.location.href = 'thank-you/';
 }
 
 /* Marquee */
