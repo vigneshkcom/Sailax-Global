@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enquiry Received — Sailax UK</title>
+<meta name="description" content="Thank you for your enquiry. The Sailax team will be in touch within one working day.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --brand:       #3F8F6C;
+  --brand-dark:  #2E7255;
+  --brand-deep:  #1E4F3B;
+  --brand-bg:    rgba(63,143,108,0.12);
+  --brand-bd:    rgba(63,143,108,0.30);
+  --gold:        #E3B93C;
+  --gold-deep:   #C9A020;
+  --ink:         #16201B;
+  --body:        #2D3A33;
+  --muted:       rgba(31,42,36,0.52);
+  --white:       #FFFFFF;
+  --off-white:   #F6F8F5;
+  --border:      rgba(31,42,36,0.10);
+  --radius-sm:   6px;
+  --radius:      10px;
+  --radius-lg:   14px;
+  --shadow:      0 8px 28px rgba(31,42,36,0.11);
+  --shadow-lg:   0 20px 60px rgba(31,42,36,0.14);
+  --ease-out:    cubic-bezier(0.22,1,0.36,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; font-size: 16px; line-height: 1.65;
+  color: var(--body); background: var(--off-white);
+  overflow-x: hidden; -webkit-font-smoothing: antialiased;
+  min-height: 100vh; display: flex; flex-direction: column;
+}
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+
+/* ── Header ── */
+.site-header {
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2.5rem; height: 66px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.header-logo-img { height: 48px; width: auto; }
+.header-back {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.5rem 0.9rem; font-weight: 600; font-size: 0.82rem;
+  color: var(--ink); border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm); transition: all 0.2s;
+}
+.header-back:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+@media (max-width: 640px) {
+  .site-header { padding: 0 1.25rem; }
+  .header-logo-img { height: 42px; }
+}
+
+/* ── Main ── */
+main {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  padding: 4rem 1.5rem;
+}
+
+/* ── Card ── */
+.ty-card {
+  background: var(--white); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg); max-width: 520px; width: 100%;
+  overflow: hidden;
+}
+.ty-card-top { height: 4px; background: var(--brand); }
+.ty-card-body { padding: 3rem 2.5rem; text-align: center; }
+
+.ty-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: var(--brand); display: flex; align-items: center;
+  justify-content: center; margin: 0 auto 1.5rem;
+}
+.ty-icon svg { color: #fff; }
+
+.ty-badge {
+  display: inline-block; font-size: 0.64rem; font-weight: 600;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--brand); background: var(--brand-bg);
+  border: 1px solid var(--brand-bd); border-radius: 100px;
+  padding: 0.3rem 0.85rem; margin-bottom: 1.25rem;
+}
+
+h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 800; line-height: 1.15; letter-spacing: -0.01em;
+  color: var(--ink); margin-bottom: 0.85rem;
+}
+
+.ty-sub {
+  font-size: 1rem; font-weight: 600; color: var(--brand);
+  margin-bottom: 1rem; line-height: 1.5;
+}
+
+.ty-body {
+  font-size: 0.92rem; color: var(--body); line-height: 1.8;
+  margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto;
+}
+
+/* ── CTA buttons ── */
+.ty-ctas { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.btn-amber {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.9rem 1.9rem; background: var(--gold); color: var(--ink);
+  border: none; cursor: pointer; font-family: 'Poppins', sans-serif;
+  font-weight: 700; font-size: 0.88rem; letter-spacing: 0.02em;
+  border-radius: var(--radius-sm); text-decoration: none;
+  transition: all 0.22s ease; width: 100%;
+}
+.btn-amber:hover { background: var(--gold-deep); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(227,185,60,0.30); }
+
+.ty-divider {
+  display: flex; align-items: center; gap: 0.75rem; margin: 0;
+}
+.ty-divider-line { flex: 1; height: 1px; background: var(--border); }
+.ty-divider-text { font-size: 0.72rem; color: var(--muted); white-space: nowrap; }
+
+.btn-call {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  width: 100%; padding: 0.85rem 1rem; background: transparent; color: var(--ink);
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 0.88rem;
+  font-weight: 600; font-family: inherit; text-decoration: none; transition: all 0.15s;
+}
+.btn-call:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.ty-hours { font-size: 0.68rem; color: var(--muted); text-align: center; margin-top: 0.4rem; }
+
+/* ── What happens next ── */
+.ty-steps {
+  background: var(--off-white); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; text-align: left;
+}
+.ty-steps-title {
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 1rem;
+}
+.ty-step {
+  display: flex; align-items: flex-start; gap: 0.75rem;
+  font-size: 0.85rem; color: var(--body); line-height: 1.55;
+  padding: 0.5rem 0; border-bottom: 1px solid var(--border);
+}
+.ty-step:last-child { border-bottom: none; padding-bottom: 0; }
+.ty-step-n {
+  width: 22px; height: 22px; border-radius: 50%; background: var(--brand);
+  color: #fff; font-size: 0.65rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+
+/* ── Footer ── */
+.site-footer {
+  text-align: center; padding: 1.5rem; font-size: 0.7rem;
+  color: var(--muted); border-top: 1px solid var(--border);
+  background: #E9EEE9;
+}
+
+@media (max-width: 540px) {
+  .ty-card-body { padding: 2rem 1.5rem; }
+}
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="../" aria-label="Sailax home">
+    <img class="header-logo-img" src="../assets/logo.png" alt="Sailax">
+  </a>
+  <a href="../" class="header-back">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Back to homepage
+  </a>
+</header>
+
+<main>
+  <div class="ty-card">
+    <div class="ty-card-top"></div>
+    <div class="ty-card-body">
+
+      <div class="ty-icon">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/></svg>
+      </div>
+
+      <div class="ty-badge">Enquiry received</div>
+
+      <h1>Thank you — we'll be in touch shortly.</h1>
+
+      <p class="ty-sub">A member of the Sailax team will contact you within one working day.</p>
+
+      <div class="ty-steps">
+        <div class="ty-steps-title">What happens next</div>
+        <div class="ty-step">
+          <div class="ty-step-n">1</div>
+          <span>We'll contact you within one working day to discuss your enquiry</span>
+        </div>
+        <div class="ty-step">
+          <div class="ty-step-n">2</div>
+          <span>We'll book an in-home assessment at a time that suits you</span>
+        </div>
+        <div class="ty-step">
+          <div class="ty-step-n">3</div>
+          <span>Following the assessment, you'll receive a fixed-price quote with the grant applied</span>
+        </div>
+      </div>
+
+      <div class="ty-ctas">
+        <a href="../" class="btn-amber">Back to homepage &rarr;</a>
+        <div class="ty-divider">
+          <div class="ty-divider-line"></div>
+          <div class="ty-divider-text">Prefer to speak now?</div>
+          <div class="ty-divider-line"></div>
+        </div>
+        <a href="tel:+447457411858" class="btn-call">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z" fill="currentColor"/></svg>
+          +44 7457 411 858
+        </a>
+        <div class="ty-hours">Mon&ndash;Fri, 9am&ndash;5pm &nbsp;&middot;&nbsp; info@sailax.co.uk</div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  &copy; 2025 Sailax UK. All rights reserved. &nbsp;&middot;&nbsp; 1 City Rd, London EC1V 2PU
+</footer>
+
+</body>
+</html>
