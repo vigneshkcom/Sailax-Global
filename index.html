@@ -7,7 +7,7 @@
 <meta name="description" content="Get a residential heat pump from £1,500 with up to £9,000 available through the Boiler Upgrade Scheme. Sailax guides UK homeowners through the full process.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 
 :root {
@@ -17,6 +17,18 @@
   --brand-deep:  #1E4F3B;   /* deepest green accent */
   --brand-bg:    rgba(63,143,108,0.12);
   --brand-bd:    rgba(63,143,108,0.30);
+
+  --green:       #6AAE8A;
+  --green-dark:  #5E9E7D;
+  --green-deep:  #4A8A69;
+  --green-bg:    rgba(106,174,138,0.10);
+  --green-bd:    rgba(106,174,138,0.28);
+
+  --gold:        #E3B93C;
+  --gold-deep:   #C9A020;
+  --gold-light:  #F0CB6A;
+  --gold-bg:     rgba(227,185,60,0.10);
+  --gold-bd:     rgba(227,185,60,0.30);
 
   /* ── Neutrals ── */
   --ink:         #16201B;   /* near-black for stronger contrast */
@@ -38,6 +50,7 @@
   /* ── Borders / Shadows ── */
   --border:      rgba(22,32,27,0.14);
   --border-light:rgba(22,32,27,0.08);
+  --border-mid:  rgba(22,32,27,0.08);
   --red:         #C53030;
 
   /* ── Utility ── */
@@ -54,7 +67,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-weight: 400; font-size: 16px; line-height: 1.65;
   color: var(--body); background: var(--white);
   overflow-x: hidden; -webkit-font-smoothing: antialiased;
@@ -69,16 +82,16 @@ a { text-decoration: none; color: inherit; }
   color: var(--brand); margin-bottom: 0.75rem;
 }
 h1 {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: clamp(2.1rem, 3.8vw, 3.2rem);
   font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; color: var(--ink);
 }
 h2 {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: clamp(1.65rem, 2.8vw, 2.3rem);
   font-weight: 700; line-height: 1.18; letter-spacing: -0.01em; color: var(--ink);
 }
-h3 { font-family: 'DM Sans', sans-serif; font-size: 1.02rem; font-weight: 600; line-height: 1.35; color: var(--ink); }
+h3 { font-family: 'Poppins', sans-serif; font-size: 1.02rem; font-weight: 600; line-height: 1.35; color: var(--ink); }
 p  { font-size: 0.95rem; line-height: 1.8; color: var(--body); }
 .section-sub { font-size: 1rem; color: var(--muted); line-height: 1.78; max-width: 540px; margin-bottom: 2.75rem; }
 
@@ -89,7 +102,7 @@ section { padding: 5.5rem 2.5rem; }
 /* ── Buttons ── */
 .btn {
   display: inline-flex; align-items: center; gap: 0.5rem;
-  padding: 0.85rem 1.9rem; font-family: 'DM Sans', sans-serif;
+  padding: 0.85rem 1.9rem; font-family: 'Poppins', sans-serif;
   font-weight: 600; font-size: 0.88rem; letter-spacing: 0.02em;
   border: none; cursor: pointer; transition: all 0.22s ease;
   white-space: nowrap; border-radius: var(--radius-sm); text-decoration: none;
@@ -208,12 +221,12 @@ section { padding: 5.5rem 2.5rem; }
 }
 .hc-top { padding: 1.75rem 1.75rem 1.25rem; border-bottom: 1px solid rgba(31,42,36,0.10); }
 .hc-label { font-size: 0.62rem; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand); margin-bottom: 0.6rem; }
-.hc-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.hc-title { font-family: 'Poppins', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--ink); line-height: 1.3; }
 .hc-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
 .hc-stat { padding: 1.25rem 1.75rem; border-right: 1px solid rgba(31,42,36,0.10); border-bottom: 1px solid rgba(31,42,36,0.10); }
 .hc-stat:nth-child(even) { border-right: none; }
 .hc-stat:nth-child(n+3) { border-bottom: none; }
-.hc-stat-num { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--brand); display: block; line-height: 1; margin-bottom: 4px; }
+.hc-stat-num { font-family: 'Poppins', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--brand); display: block; line-height: 1; margin-bottom: 4px; }
 .hc-stat-label { font-size: 0.7rem; color: rgba(31,42,36,0.62); line-height: 1.4; }
 .hc-steps-wrap { padding: 1.25rem 1.75rem 0; }
 .hc-step { display: flex; align-items: center; gap: 0.85rem; font-size: 0.82rem; color: rgba(31,42,36,0.72); padding: 0.65rem 0; border-bottom: 1px solid rgba(31,42,36,0.08); }
@@ -237,29 +250,32 @@ section { padding: 5.5rem 2.5rem; }
 @media (max-width: 400px) { .trust-inner { grid-template-columns: 1fr; } }
 
 /* ══════════════════════════════════════
-   NUMBERS STRIP
+   COUNTER STRIP
 ══════════════════════════════════════ */
-.numbers-strip { background: var(--off-white-2); padding: 5rem 2.5rem; }
-.numbers-head { text-align: center; margin-bottom: 3rem; }
-.numbers-head .eyebrow { color: var(--brand); }
-.numbers-head h2 { color: var(--ink); max-width: 600px; margin: 0 auto; }
-.numbers-grid { max-width: var(--max); margin: 0 auto; display: grid; grid-template-columns: repeat(3,1fr); gap: 0; }
-.num-divider { position: relative; }
-.num-divider::before { content: ''; position: absolute; top: 20%; bottom: 20%; right: 0; width: 1px; background: rgba(31,42,36,0.12); }
-.n-block { text-align: center; padding: 0 clamp(16px,3.5vw,52px); }
-.n-badge { display: inline-block; font-size: 0.61rem; font-weight: 600; padding: 0.22rem 0.8rem; border-radius: 999px; margin-bottom: 1rem; letter-spacing: 0.1em; text-transform: uppercase; background: rgba(31,42,36,0.06); color: rgba(31,42,36,0.62); border: 1px solid rgba(31,42,36,0.10); }
-.n-badge-amber { background: var(--brand-bg); color: var(--brand); border-color: var(--brand-bd); }
-.n-num { font-family: 'Playfair Display', serif; font-size: clamp(2.6rem,5vw,4.2rem); font-weight: 700; line-height: 1; display: block; margin-bottom: 0.6rem; color: var(--ink); transition: transform 0.3s var(--ease-out); }
-.n-num.counting { animation: numPulse 0.4s var(--ease-out); }
-@keyframes numPulse { 0%{transform:scale(0.88);opacity:0.4;} 60%{transform:scale(1.04);} 100%{transform:scale(1);opacity:1;} }
-.n-num-amber { color: var(--brand); }
-.n-strong { font-size: 0.88rem; font-weight: 600; color: rgba(31,42,36,0.78); display: block; margin-bottom: 0.35rem; }
-.n-sub    { font-size: 0.76rem; color: rgba(31,42,36,0.55); line-height: 1.55; }
+.counter-strip { background:var(--off-white-2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:4rem 2rem; }
+.counter-strip-head { text-align:center; margin-bottom:2.5rem; max-width:var(--max); margin-left:auto; margin-right:auto; padding:0 2rem; }
+.counter-strip-head h3 { font-size:clamp(1.35rem,2.5vw,1.75rem); font-weight:700; color:var(--ink); letter-spacing:-0.02em; }
+.counter-grid { max-width:var(--max); margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:0; position:relative; }
+.counter-grid::before,.counter-grid::after { content:''; position:absolute; top:15%; bottom:15%; width:1px; background:var(--border); }
+.counter-grid::before { left:33.33%; }
+.counter-grid::after  { left:66.66%; }
+.c-block { text-align:center; padding:0 clamp(12px,3vw,44px); }
+.c-badge { display:inline-block; padding:0.22rem 0.75rem; border-radius:999px; font-size:0.58rem; letter-spacing:0.11em; text-transform:uppercase; font-weight:700; margin-bottom:0.95rem; }
+.c-badge-green{ color:var(--green-dark); background:var(--green-bg); border:1px solid var(--green-bd); }
+.c-badge-gold { color:#7A5D00; background:var(--gold-bg); border:1px solid var(--gold-bd); }
+.c-badge-red  { color:#6A2A2A; background:rgba(200,70,70,0.10); border:1px solid rgba(200,70,70,0.28); }
+.c-num { font-family:'Anton',sans-serif; font-size:clamp(2.6rem,5vw,4.2rem); line-height:1; display:block; margin-bottom:0.5rem; letter-spacing:0.01em; }
+.c-num-green{ color:var(--green-dark); }
+.c-num-gold { color:var(--gold-deep); }
+.c-num.counting { animation:numPulse 0.4s var(--ease-out); }
+@keyframes numPulse { 0%{transform:scale(0.86);opacity:0.4;} 60%{transform:scale(1.05);} 100%{transform:scale(1);opacity:1;} }
+.c-strong { font-size:0.84rem; font-weight:600; color:var(--ink); display:block; margin-bottom:0.35rem; }
+.c-sub { font-size:0.73rem; color:var(--muted); line-height:1.65; }
 @media (max-width: 700px) {
-  .numbers-grid { grid-template-columns: 1fr; }
-  .num-divider::before { display: none; }
-  .n-block { padding: 2rem 1rem; border-bottom: 1px solid rgba(31,42,36,0.08); }
-  .n-block:last-child { border-bottom: none; }
+  .counter-grid { grid-template-columns:1fr; }
+  .counter-grid::before,.counter-grid::after { display:none; }
+  .c-block { padding:1.8rem 0; border-bottom:1px solid var(--border-mid); }
+  .c-block:last-child { border-bottom:none; }
 }
 
 /* ══════════════════════════════════════
@@ -279,7 +295,7 @@ section { padding: 5.5rem 2.5rem; }
 .g-card.featured:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(15,30,53,0.3); }
 .g-card-tag { font-size: 0.62rem; font-weight: 600; color: var(--muted); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.7rem; }
 .g-card.featured .g-card-tag { color: rgba(31,42,36,0.56); }
-.g-card-amount { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1; letter-spacing: -0.01em; margin-bottom: 0.3rem; }
+.g-card-amount { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 700; color: var(--ink); line-height: 1; letter-spacing: -0.01em; margin-bottom: 0.3rem; }
 .g-card.featured .g-card-amount { color: var(--brand); }
 .g-card-sublabel { font-size: 0.7rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
 .g-card.featured .g-card-sublabel { color: rgba(31,42,36,0.58); }
@@ -340,24 +356,24 @@ section { padding: 5.5rem 2.5rem; }
 @media (max-width: 540px) { .benefits-grid { grid-template-columns: 1fr; } }
 
 /* ══════════════════════════════════════
-   PROCESS
+   PROCESS STEPS
 ══════════════════════════════════════ */
-.process-sec { background: #EDF3EE; padding: 5.5rem 2.5rem; }
-.process-sec .eyebrow { color: var(--brand); }
-.process-sec h2 { color: var(--ink); margin-bottom: 0.75rem; }
-.process-sec .section-sub { color: rgba(31,42,36,0.62); margin-bottom: 3rem; }
-.process-steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 0; margin-top: 1rem; }
-.step-card { padding: 2rem 2.5rem; border-left: 1px solid rgba(31,42,36,0.10); position: relative; }
-.step-card:first-child { border-left: none; padding-left: 0; }
-.step-card:last-child { padding-right: 0; }
-.step-num-big { font-family: 'Playfair Display', serif; font-size: clamp(4rem,6vw,6rem); line-height: 0.85; color: rgba(31,42,36,0.10); margin-bottom: 0.6rem; transition: color 0.3s ease; user-select: none; }
-.step-card:hover .step-num-big { color: var(--brand); opacity: 0.5; }
-.step-title { font-size: 1.02rem; font-weight: 600; color: rgba(31,42,36,0.9); margin-bottom: 0.5rem; }
-.step-desc  { font-size: 0.84rem; color: rgba(31,42,36,0.60); line-height: 1.65; }
+.process-sec { background:var(--off-white-2); padding:5rem 2rem; border-top:1px solid var(--border); }
+.process-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:0; margin-top:2.5rem; }
+.step-card { padding:2rem 2.5rem; border-left:1px solid var(--border-mid); position:relative; overflow:hidden; cursor:default; }
+.step-card:first-child { border-left:none; padding-left:0; }
+.step-card:last-child { padding-right:0; }
+.step-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--green-dark),var(--green)); transform:scaleX(0); transform-origin:left; transition:transform 0.4s var(--ease-out); }
+.step-card:hover::before { transform:scaleX(1); }
+.step-num { font-family:'Anton',sans-serif; font-size:clamp(3.5rem,5.5vw,5.5rem); line-height:0.85; color:var(--green); opacity:0.18; margin-bottom:0.6rem; transition:opacity 0.35s ease; user-select:none; }
+.step-card:hover .step-num { opacity:1; }
+.step-title { font-family:'Anton',sans-serif; font-size:1.2rem; letter-spacing:0.03em; text-transform:uppercase; color:var(--ink); margin-bottom:0.5rem; }
+.step-desc { font-size:0.84rem; color:var(--muted); line-height:1.65; }
 @media (max-width: 700px) {
-  .process-steps { grid-template-columns: 1fr; }
-  .step-card { border-left: none; border-top: 1px solid rgba(31,42,36,0.08); padding: 1.75rem 0; }
-  .step-card:first-child { border-top: none; }
+  .process-steps { grid-template-columns:1fr; }
+  .step-card { border-left:none; border-top:1px solid var(--border-mid); padding:1.5rem 0; }
+  .step-card:first-child { border-top:none; padding-top:0; }
+  .step-card::before { display:none; }
 }
 
 /* ══════════════════════════════════════
@@ -396,7 +412,7 @@ section { padding: 5.5rem 2.5rem; }
 .cta-sec { background: #F3F6F2; padding: 5.5rem 2.5rem; }
 .cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem,5vw,5rem); align-items: start; max-width: var(--max); margin: 0 auto; }
 .cta-sec .eyebrow { color: var(--brand); }
-.cta-h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.7rem,3.2vw,2.4rem); color: var(--ink); margin-bottom: 0.85rem; line-height: 1.15; }
+.cta-h2 { font-family: 'Poppins', sans-serif; font-size: clamp(1.7rem,3.2vw,2.4rem); color: var(--ink); margin-bottom: 0.85rem; line-height: 1.15; }
 .cta-sub { font-size: 0.95rem; color: rgba(31,42,36,0.62); line-height: 1.8; margin-bottom: 2rem; }
 .cta-trust-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
 .cta-trust-item { display: flex; align-items: center; gap: 0.8rem; font-size: 0.87rem; color: rgba(31,42,36,0.72); padding: 0.75rem 0; border-bottom: 1px solid rgba(31,42,36,0.08); }
@@ -407,7 +423,7 @@ section { padding: 5.5rem 2.5rem; }
 .form-card { background: var(--white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-lg); }
 .form-top-bar { height: 4px; background: var(--brand); }
 .form-card-body { padding: 2.25rem; }
-.form-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: var(--ink); margin-bottom: 0.3rem; }
+.form-title { font-family: 'Poppins', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--ink); margin-bottom: 0.3rem; }
 .form-sub   { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.75rem; }
 .form-group { margin-bottom: 1.1rem; }
 .form-label { font-size: 0.76rem; font-weight: 600; color: var(--ink); margin-bottom: 0.35rem; display: block; letter-spacing: 0.02em; }
@@ -442,7 +458,7 @@ section { padding: 5.5rem 2.5rem; }
 .form-call-hours { font-size: 0.68rem; color: var(--muted); text-align: center; margin-top: 0.4rem; }
 .success-state { display: none; text-align: center; padding: 3rem 2rem; }
 .success-icon { width: 56px; height: 56px; border-radius: 50%; background: var(--brand); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; }
-.success-state h3 { color: var(--ink); margin-bottom: 0.6rem; font-family: 'Playfair Display', serif; }
+.success-state h3 { color: var(--ink); margin-bottom: 0.6rem; font-family: 'Poppins', sans-serif; }
 .success-state p { font-size: 0.9rem; color: var(--body); }
 @media (max-width: 820px) { .cta-grid { grid-template-columns: 1fr; } }
 
@@ -450,7 +466,7 @@ section { padding: 5.5rem 2.5rem; }
    FOOTER
 ══════════════════════════════════════ */
 footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 2.5rem; }
-.footer-brand-name { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: var(--brand); margin-bottom: 0.6rem; }
+.footer-brand-name { font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--brand); margin-bottom: 0.6rem; }
 .footer-brand p { font-size: 0.75rem; color: rgba(31,42,36,0.62); max-width: 220px; line-height: 1.65; }
 .footer-col h4 { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(31,42,36,0.62); margin-bottom: 0.9rem; }
 .footer-col a, .footer-col p { font-size: 0.8rem; color: rgba(31,42,36,0.8); display: block; margin-bottom: 0.45rem; text-decoration: none; }
@@ -468,7 +484,7 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
   .form-card-body { padding: 1.75rem; }
   .form-input, .form-select { padding: 0.85rem 1rem; font-size: 1rem; }
   .btn-form { padding: 1rem; font-size: 0.9rem; }
-  .numbers-strip, .cta-sec { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .counter-strip, .cta-sec { padding-left: 1.5rem; padding-right: 1.5rem; }
   footer { padding-left: 1.5rem; padding-right: 1.5rem; }
 }
 </style>
@@ -620,30 +636,30 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
   </div>
 </div>
 
-<!-- ════════════════ NUMBERS STRIP ════════════════ -->
-<div class="numbers-strip">
-  <div class="numbers-head reveal">
-    <div class="eyebrow">Boiler Upgrade Scheme — The numbers that matter</div>
-    <h2>The grant is real. The savings are significant.</h2>
+<!-- ════════════════ COUNTER STRIP ════════════════ -->
+<div class="counter-strip">
+  <div class="counter-strip-head reveal">
+    <div class="eyebrow" style="display:block;text-align:center;">Boiler Upgrade Scheme — The numbers that matter</div>
+    <h3>The grant is real. The savings are significant.</h3>
   </div>
-  <div class="numbers-grid">
-    <div class="n-block num-divider reveal">
-      <span class="n-badge">Standard BUS support</span>
-      <span class="n-num" data-count="7500" data-prefix="£">£7,500</span>
-      <span class="n-strong">Available for eligible heat pump installations</span>
-      <span class="n-sub">For eligible owner-occupiers replacing a qualifying heating system with a heat pump</span>
+  <div class="counter-grid">
+    <div class="c-block reveal">
+      <span class="c-badge c-badge-green">Standard BUS support</span>
+      <span class="c-num c-num-green" data-count="7500" data-prefix="£">£7,500</span>
+      <span class="c-strong">Available for eligible heat pump installations</span>
+      <span class="c-sub">For eligible owner-occupiers replacing a qualifying heating system with an air source or ground source heat pump</span>
     </div>
-    <div class="n-block num-divider reveal reveal-d2">
-      <span class="n-badge n-badge-amber">Oil / LPG homes</span>
-      <span class="n-num n-num-amber">Up to £9,000</span>
-      <span class="n-strong">Enhanced support for eligible properties</span>
-      <span class="n-sub">Homeowners replacing oil or LPG heating may qualify for a higher level of grant — Sailax confirms eligibility as part of the no-obligation enquiry.</span>
+    <div class="c-block reveal reveal-d2">
+      <span class="c-badge c-badge-gold">Oil / LPG homes</span>
+      <span class="c-num c-num-gold">Up to £9,000</span>
+      <span class="c-strong">Enhanced support for eligible properties</span>
+      <span class="c-sub">Homeowners replacing oil or LPG heating may qualify for a higher level of grant. Sailax confirms your eligibility as part of the no-obligation enquiry process.</span>
     </div>
-    <div class="n-block reveal reveal-d3">
-      <span class="n-badge">Net cost from</span>
-      <span class="n-num n-num-amber" data-count="1500" data-prefix="£">£1,500</span>
-      <span class="n-strong">For qualifying homeowners after grant</span>
-      <span class="n-sub">The BUS grant is applied directly by Sailax at installation — reducing your upfront cost to as little as £1,500 for eligible properties</span>
+    <div class="c-block reveal reveal-d3">
+      <span class="c-badge c-badge-red">Net cost from</span>
+      <span class="c-num c-num-green" data-count="1500" data-prefix="£">£1,500</span>
+      <span class="c-strong">For qualifying homeowners after grant</span>
+      <span class="c-sub">The BUS grant is applied directly by Sailax at installation — reducing your upfront cost to as little as £1,500 for eligible properties</span>
     </div>
   </div>
 </div>
@@ -775,39 +791,39 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
 <!-- ════════════════ PROCESS ════════════════ -->
 <section class="process-sec" id="process">
   <div class="wrap">
-    <div class="eyebrow reveal">How it works</div>
-    <h2 class="reveal">From first enquiry to installation — a clear, straightforward process.</h2>
-    <p class="section-sub reveal">We don't rush. We take the time to make sure each step is done properly — so you know exactly where things stand throughout.</p>
+    <div class="eyebrow reveal">Your journey with us</div>
+    <h2 class="section-h2 reveal">From first enquiry to<br>completed installation</h2>
+    <p class="section-sub reveal">We manage every stage. You don't need to understand the technical details — we walk you through it clearly at each step, with no pressure to proceed until you're ready.</p>
     <div class="process-steps">
       <div class="step-card reveal">
-        <div class="step-num-big">01</div>
-        <div class="step-title">Enquire &amp; Check Eligibility</div>
-        <div class="step-desc">Tell us about your home and current heating setup. We'll come back to you within one working day with clear information about your eligibility and what grant support may apply.</div>
-      </div>
-      <div class="step-card reveal reveal-d2">
-        <div class="step-num-big">02</div>
-        <div class="step-title">Home Assessment</div>
-        <div class="step-desc">We visit your property to assess its suitability and design the right system. We'll be honest — if a heat pump isn't right for your home right now, we'll say so.</div>
-      </div>
-      <div class="step-card reveal reveal-d3">
-        <div class="step-num-big">03</div>
-        <div class="step-title">Fixed-Price Quote</div>
-        <div class="step-desc">You receive a detailed, fixed-price quote with the BUS grant applied. What we quote is what you pay — no surprises after installation is complete.</div>
+        <div class="step-num">01</div>
+        <div class="step-title">Enquire</div>
+        <div class="step-desc">Tell us about your home and current heating. No obligation — just clear, honest information about what's possible for your situation.</div>
       </div>
       <div class="step-card reveal reveal-d1">
-        <div class="step-num-big">04</div>
-        <div class="step-title">Professional Installation</div>
-        <div class="step-desc">Installation is typically completed within 2–4 days. Every system is properly commissioned and thoroughly tested before handover to you.</div>
+        <div class="step-num">02</div>
+        <div class="step-title">Eligibility</div>
+        <div class="step-desc">We assess your BUS grant eligibility and confirm the level of support you're entitled to — including whether the higher oil/LPG grant applies to you.</div>
       </div>
       <div class="step-card reveal reveal-d2">
-        <div class="step-num-big">05</div>
-        <div class="step-title">Grant Applied</div>
-        <div class="step-desc">We handle the BUS grant administration from start to finish. The grant is applied directly at installation — you pay the net cost, not the full amount.</div>
+        <div class="step-num">03</div>
+        <div class="step-title">Home Survey</div>
+        <div class="step-desc">A full property assessment. We design the right system for your home — correctly sized and configured for your specific heating requirements and layout.</div>
       </div>
-      <div class="step-card reveal reveal-d3">
-        <div class="step-num-big">06</div>
-        <div class="step-title">Ongoing Support</div>
-        <div class="step-desc">We remain accessible after completion. Whether you have a question the day after installation or months later, the Sailax team is reachable and responsive.</div>
+      <div class="step-card reveal">
+        <div class="step-num">04</div>
+        <div class="step-title">Fixed Quote</div>
+        <div class="step-desc">You receive a clear, fixed-price quote with the BUS grant already reflected. What we quote is what you pay — no hidden costs or late additions.</div>
+      </div>
+      <div class="step-card reveal reveal-d1">
+        <div class="step-num">05</div>
+        <div class="step-title">Installation</div>
+        <div class="step-desc">Professional installation completed in 2–4 days with minimal disruption. Every system is commissioned and tested before our team leaves your home.</div>
+      </div>
+      <div class="step-card reveal reveal-d2">
+        <div class="step-num">06</div>
+        <div class="step-title">Grant Applied</div>
+        <div class="step-desc">The BUS grant is applied directly by Sailax. We handle the scheme administration throughout — you don't need to deal with it directly.</div>
       </div>
     </div>
   </div>
@@ -1079,7 +1095,7 @@ function toggleFaq(btn) {
 
 /* Count-up */
 (function () {
-  var grid = document.querySelector('.numbers-grid');
+  var grid = document.querySelector('.counter-grid');
   if (!grid) return;
   function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
   function countUp(el, target, duration, prefix) {
