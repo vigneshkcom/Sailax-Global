@@ -313,9 +313,12 @@ section { padding: 5.5rem 2.5rem; }
 .info-text strong { color: var(--brand-dark); font-weight: 600; }
 .section-cta { text-align: center; margin-top: 2.75rem; }
 @media (max-width: 720px) {
-  .grant-cards { display: block; }
-  .grant-cards .g-card { margin-bottom: 1.25rem; }
+  .grant-cards { display: flex; flex-direction: column; }
+  .grant-cards .g-card { margin-bottom: 1.5rem; position: sticky; }
   .grant-cards .g-card:last-child { margin-bottom: 0; }
+  .grant-cards .g-card:nth-child(1) { top: 70px; z-index: 1; }
+  .grant-cards .g-card:nth-child(2) { top: 78px; z-index: 2; }
+  .grant-cards .g-card:nth-child(3) { top: 86px; z-index: 3; }
 }
 
 /* ══════════════════════════════════════
@@ -353,7 +356,17 @@ section { padding: 5.5rem 2.5rem; }
 .b-card h3 { font-size: 0.97rem; margin-bottom: 0.5rem; }
 .b-card p  { font-size: 0.84rem; line-height: 1.75; }
 @media (max-width: 900px) { .benefits-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 540px) { .benefits-grid { grid-template-columns: 1fr; } }
+@media (max-width: 640px) {
+  .benefits-grid { display: flex; flex-direction: column; }
+  .benefits-grid .b-card { position: sticky; margin-bottom: 1.5rem; }
+  .benefits-grid .b-card:last-child { margin-bottom: 0; }
+  .benefits-grid .b-card:nth-child(1) { top: 70px; z-index: 1; }
+  .benefits-grid .b-card:nth-child(2) { top: 78px; z-index: 2; }
+  .benefits-grid .b-card:nth-child(3) { top: 86px; z-index: 3; }
+  .benefits-grid .b-card:nth-child(4) { top: 94px; z-index: 4; }
+  .benefits-grid .b-card:nth-child(5) { top: 102px; z-index: 5; }
+  .benefits-grid .b-card:nth-child(6) { top: 110px; z-index: 6; }
+}
 
 /* ══════════════════════════════════════
    PROCESS STEPS
@@ -486,9 +499,9 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
     <img class="header-logo-img" src="assets/logo.png" alt="Sailax">
   </a>
   <div class="header-right">
-    <a href="tel:+447457411858" class="header-phone">
+    <a href="tel:+447537149494" class="header-phone">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z" fill="currentColor"/></svg>
-      +44 7457 411 858
+      +44 7537 149 494
     </a>
     <a href="#enquire" class="btn btn-amber header-cta">Check Eligibility</a>
   </div>
@@ -507,7 +520,6 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
       <h1 class="reveal reveal-d1">Residential Heat Pumps,<br><em>from £1,500</em></h1>
       <div class="hero-price-strip reveal reveal-d1">
         Up to £9,000 available through the Boiler Upgrade Scheme
-        <span>&nbsp;·&nbsp; government-backed</span>
       </div>
       <p class="hero-sub reveal reveal-d2">Upgrade your home to a cleaner, more efficient heating system — with significant government grant support applied directly to your installation cost. Sailax manages the entire process for UK homeowners.</p>
       <div class="hero-checks reveal reveal-d3">
@@ -963,9 +975,9 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
             <div class="form-divider-text">Prefer to speak directly?</div>
             <div class="form-divider-line"></div>
           </div>
-          <a href="tel:+447457411858" class="btn-call">
+          <a href="tel:+447537149494" class="btn-call">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z" fill="currentColor"/></svg>
-            +44 7457 411 858
+            +44 7537 149 494
           </a>
           <div class="form-call-hours">Mon&ndash;Fri, 9am&ndash;5pm &nbsp;&middot;&nbsp; info@sailax.co.uk</div>
         </div>
@@ -987,7 +999,7 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
     <img src="assets/logo.png" class="footer-logo-img" alt="Sailax">
     <div class="footer-contact-info">
       <p>1 City Rd, London EC1V 2PU, UK</p>
-      <a href="tel:+447457411858">+44 7457 411 858</a>
+      <a href="tel:+447537149494">+44 7537 149 494</a>
       <a href="mailto:info@sailax.co.uk">info@sailax.co.uk</a>
     </div>
   </div>
