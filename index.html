@@ -1067,16 +1067,30 @@ function toggleFaq(btn) {
 
 /* Form submit */
 function handleSubmit() {
-  var name  = document.getElementById('f-name').value.trim();
-  var email = document.getElementById('f-email').value.trim();
-  var err   = document.getElementById('form-error');
-  err.hidden = true;
+  var name    = document.getElementById('f-name').value.trim();
+  var email   = document.getElementById('f-email').value.trim();
+  var phone   = document.getElementById('f-phone').value.trim();
+  var postcode= document.getElementById('f-postcode').value.trim();
+  var heating = document.getElementById('f-heating').value;
+  var message = document.getElementById('f-message').value.trim();
+  var err     = document.getElementById('form-error');
+  var btn     = document.querySelector('.btn-form');
+  err.hidden  = true;
   if (!name || !email) {
     err.textContent = 'Please enter your name and email address to submit your enquiry.';
     err.hidden = false;
     return;
   }
-  window.location.href = 'thank-you/';
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  fetch('https://services.leadconnectorhq.com/hooks/DJbRokQKsl1YbqIkbRaf/webhook-trigger/144f5ffb-ab3c-465e-8520-a9f63e0f1179', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ full_name: name, email: email, phone: phone, postcode: postcode, heating_system: heating, message: message })
+  }).catch(function () {}).finally(function () {
+    document.getElementById('form-body').style.display = 'none';
+    document.getElementById('success-state').style.display = 'flex';
+  });
 }
 
 /* Marquee */
