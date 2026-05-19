@@ -1083,14 +1083,22 @@ function handleSubmit() {
   }
   btn.disabled = true;
   btn.textContent = 'Sending…';
-  var payload = new URLSearchParams({ full_name: name, email: email, phone: phone, postcode: postcode, heating_system: heating, message: message });
-  fetch('https://services.leadconnectorhq.com/hooks/DJbRokQKsl1YbqIkbRaf/webhook-trigger/144f5ffb-ab3c-465e-8520-a9f63e0f1179', {
-    method: 'POST',
-    mode: 'no-cors',
-    body: payload
-  }).catch(function () {}).finally(function () {
-    window.location.href = 'thank-you/';
+  var iframe = document.createElement('iframe');
+  iframe.name = '_wh';
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = 'https://services.leadconnectorhq.com/hooks/DJbRokQKsl1YbqIkbRaf/webhook-trigger/144f5ffb-ab3c-465e-8520-a9f63e0f1179';
+  form.target = '_wh';
+  [['full_name', name], ['email', email], ['phone', phone], ['postcode', postcode], ['heating_system', heating], ['message', message]].forEach(function(f) {
+    var i = document.createElement('input');
+    i.type = 'hidden'; i.name = f[0]; i.value = f[1];
+    form.appendChild(i);
   });
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(function () { window.location.href = 'thank-you/'; }, 800);
 }
 
 /* Marquee */
