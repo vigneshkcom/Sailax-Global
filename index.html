@@ -1083,11 +1083,11 @@ function handleSubmit() {
   }
   btn.disabled = true;
   btn.textContent = 'Sending…';
+  var payload = new URLSearchParams({ full_name: name, email: email, phone: phone, postcode: postcode, heating_system: heating, message: message });
   fetch('https://services.leadconnectorhq.com/hooks/DJbRokQKsl1YbqIkbRaf/webhook-trigger/144f5ffb-ab3c-465e-8520-a9f63e0f1179', {
     method: 'POST',
     mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ full_name: name, email: email, phone: phone, postcode: postcode, heating_system: heating, message: message })
+    body: payload
   }).catch(function () {}).finally(function () {
     window.location.href = 'thank-you/';
   });
