@@ -87,10 +87,14 @@
     .rad-table td.ref-col { font-size: 10px; color: #8E978F; font-family: monospace; }
     .rad-table td.num { text-align: right; font-weight: 600; }
     .status-badge { display: inline-block; font-size: 10px; font-weight: 700; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
-    .status-additional { background: rgba(59,130,246,0.12); color: #1d4ed8; }
-    .status-adequate    { background: rgba(63,143,108,0.12); color: #2E7255; }
-    .status-oversized   { background: rgba(234,179,8,0.12);  color: #854d0e; }
-    .status-other       { background: rgba(22,32,27,0.08);   color: #536158; }
+    .status-additional  { background: rgba(59,130,246,0.12);  color: #1d4ed8; }
+    .status-adequate    { background: rgba(63,143,108,0.12);  color: #2E7255; }
+    .status-oversized   { background: rgba(234,179,8,0.12);   color: #854d0e; }
+    .status-undersized  { background: rgba(197,48,48,0.10);   color: #9B2C2C; }
+    .status-other       { background: rgba(22,32,27,0.08);    color: #536158; }
+    .overspec-box { margin: 0 20px 14px; padding: 10px 14px; background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.30); border-radius: 7px; font-size: 12px; color: #854d0e; display: flex; align-items: flex-start; gap: 8px; }
+    .overspec-icon { font-size: 14px; flex-shrink: 0; line-height: 1.4; }
+    .overspec-note { color: #A07030; }
     .rad-price-cell { text-align: right; }
     .rad-price-wrap { position: relative; display: inline-block; }
     .rad-price-wrap .sym { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #8E978F; pointer-events: none; }
@@ -436,33 +440,65 @@ function populateFromJSON(d) {
   setText('hp-sub',  (hpData.model_range||'') + ' ' + (hpData.model_name||'') + (hpData.model_number ? ' (' + hpData.model_number + ')' : ''));
   setText('cyl-sub', (cylData.model_range||'') + ' ' + (cylData.model_name||'') + (cylData.model_number ? ' (' + cylData.model_number + ')' : ''));
 
-  /* Radiators */
-  var newRads = [];
-  (d.tables || []).forEach(function(t) { if (t.row_name === 'radiator.new.room') newRads = t.row_data || []; });
+  /* Build room map: id → {title, heat_loss, design_temp} */
+  var hlRooms = ((calcs.heat_loss || {}).rooms) || [];
+  var roomMap = {};
+  hlRooms.forEach(function(r) {
+    roomMap[r.id] = {
+      title:      r.title || '',
+      heat_loss:  (r.calculations || {}).total_room_heat_loss || 0,
+      design_temp: r.design_temperature || 21
+    };
+  });
+
+  /* Adjusted output at design flow temperature (EN442 correction, n=1.3, 5°C spread) */
+  var flowTemp   = parseFloat((d.stages && d.stages.system_design && d.stages.system_design.flow_temperature) || 55);
+  var returnTemp = flowTemp - 5;
+  var meanWT     = (flowTemp + returnTemp) / 2;
+
+  function adjOutput(catW, designTemp) {
+    var dt = meanWT - designTemp;
+    return catW * Math.pow(dt / 50, 1.3);
+  }
+
+  /* Count emitters per room first */
+  var roomEmitterCount = {};
+  (d.stages.system_design.sorted_line_items || []).forEach(function(item) {
+    if (item.label !== 'Hardware: Radiator') return;
+    var rid = item.project_survey_room_id;
+    roomEmitterCount[rid] = (roomEmitterCount[rid] || 0) + 1;
+  });
+
+  /* Build radRowData */
   radRowData = [];
-  newRads.forEach(function(r) {
-    var sizes    = sp(r['radiator.new.room.rad_sizes']);
-    var types    = sp(r['radiator.new.room.type']);
-    var refs     = sp(r['radiator.new.room.rad_model_reference']);
-    var mans     = sp(r['radiator.new.room.rad_manufacturer']);
-    var names    = sp(r['radiator.new.room.rad_model_name']);
-    var outs     = sp(r['radiator.new.room.rad_output']);
-    var covs     = sp(r['radiator.new.room.rad_coverage']);
-    var stats    = sp(r['radiator.new.room.rad_status']);
-    for (var i = 0; i < sizes.length; i++) {
-      radRowData.push({
-        room:         r['radiator.new.room.title'] || '',
-        type:         (types[i]||'').replace('Type ',''),
-        size:         (sizes[i]||'').replace('x','×'),
-        ref:          refs[i]  || '',
-        manufacturer: mans[i]  || '',
-        modelName:    names[i] || '',
-        output:       outs[i]  || '',
-        coverage:     covs[i]  || '',
-        status:       stats[i] || '',
-        heatloss:     r['radiator.new.room.heatloss'] || 0
-      });
-    }
+  (d.stages.system_design.sorted_line_items || []).forEach(function(item) {
+    if (item.label !== 'Hardware: Radiator') return;
+    var rid      = item.project_survey_room_id;
+    var room     = roomMap[rid] || {};
+    var hd       = item.hardware_data || {};
+    var rad      = hd.rad || {};
+    var catW     = rad.heat_output || 0;
+    var adjW     = Math.round(adjOutput(catW, room.design_temp || 21));
+    var hl       = room.heat_loss || 0;
+    var covPct   = hl > 0 ? Math.round(adjW / hl * 100) : 0;
+    var multi    = (roomEmitterCount[rid] || 0) > 1;
+    var status;
+    if (multi)          status = 'Additional';
+    else if (covPct > 150) status = 'Oversized';
+    else if (covPct >= 88) status = 'Adequate';
+    else                   status = 'Under-sized';
+
+    radRowData.push({
+      room:         room.title || '',
+      type:         (rad.rad_type || '').replace('Type ',''),
+      size:         (rad.height_cat || '') + '×' + (rad.length_cat || ''),
+      manufacturer: hd.model_range || '',
+      modelName:    hd.model_name  || '',
+      output:       adjW,
+      coverage:     covPct,
+      status:       status,
+      heatloss:     hl
+    });
   });
 
   setText('rad-count-label', '(' + radRowData.length + ' emitters)');
@@ -472,15 +508,29 @@ function populateFromJSON(d) {
     return;
   }
 
+  /* Per-room combined coverage for "overdoing it" warnings */
+  var roomCombined = {};
+  radRowData.forEach(function(r) {
+    if (!roomCombined[r.room]) roomCombined[r.room] = {total: 0, hl: r.heatloss};
+    roomCombined[r.room].total += r.output;
+  });
+  var overspecRooms = [];
+  Object.keys(roomCombined).forEach(function(rName) {
+    var rc = roomCombined[rName];
+    var combined = rc.hl > 0 ? Math.round(rc.total / rc.hl * 100) : 0;
+    if (combined > 150) overspecRooms.push({room: rName, pct: combined});
+  });
+
   var html = '<div class="rad-wrap"><table class="rad-table">' +
-    '<thead><tr><th>Room</th><th>Type</th><th>Size</th><th>Manufacturer</th><th>Model</th><th>Output</th><th>Coverage</th><th>Status</th><th>Unit Cost</th><th>Total</th></tr></thead><tbody>';
+    '<thead><tr><th>Room</th><th>Type</th><th>Size</th><th>Manufacturer</th><th>Model</th><th>Output @' + flowTemp + '°C</th><th>Coverage</th><th>Status</th><th>Unit Cost</th><th>Total</th></tr></thead><tbody>';
 
   radRowData.forEach(function(r, i) {
     var statusClass = 'status-other';
     var s = (r.status || '').toLowerCase();
-    if (s === 'additional') statusClass = 'status-additional';
-    else if (s === 'adequate') statusClass = 'status-adequate';
-    else if (s === 'oversized') statusClass = 'status-oversized';
+    if (s === 'additional')   statusClass = 'status-additional';
+    else if (s === 'adequate')    statusClass = 'status-adequate';
+    else if (s === 'oversized')   statusClass = 'status-oversized';
+    else if (s === 'under-sized') statusClass = 'status-undersized';
 
     html += '<tr>' +
       '<td class="room">' + r.room + '</td>' +
@@ -488,8 +538,8 @@ function populateFromJSON(d) {
       '<td style="white-space:nowrap">' + r.size + '</td>' +
       '<td>' + r.manufacturer + '</td>' +
       '<td>' + r.modelName + '</td>' +
-      '<td>' + r.output + 'W</td>' +
-      '<td>' + r.coverage + '</td>' +
+      '<td>' + r.output.toLocaleString('en-GB') + 'W</td>' +
+      '<td>' + r.coverage + '%</td>' +
       '<td><span class="status-badge ' + statusClass + '">' + (r.status || '—') + '</span></td>' +
       '<td class="rad-price-cell"><div class="rad-price-wrap"><span class="sym">£</span><input type="number" id="rad-' + i + '" placeholder="0" min="0" oninput="recalc()"></div></td>' +
       '<td class="num" id="rad-tot-' + i + '">—</td>' +
@@ -497,6 +547,13 @@ function populateFromJSON(d) {
   });
 
   html += '</tbody><tfoot><tr><td colspan="8">Radiator Total</td><td></td><td class="num" id="rad-total-cell">£0</td></tr></tfoot></table></div>';
+
+  if (overspecRooms.length > 0) {
+    html += '<div class="overspec-box"><span class="overspec-icon">⚠</span><strong>Potential overspec:</strong> ' +
+      overspecRooms.map(function(o){ return o.room + ' (' + o.pct + '% combined coverage)'; }).join(' · ') +
+      '<span class="overspec-note"> — review emitter sizing or reduce radiator count</span></div>';
+  }
+
   document.getElementById('radTableWrap').innerHTML = html;
 }
 
