@@ -9,108 +9,130 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Inter', system-ui, sans-serif; background: #F0F2EF; color: #16201B; min-height: 100vh; }
 
-    /* ── Header ── */
     header { background: #16201B; padding: 16px 32px; display: flex; align-items: center; gap: 12px; }
     header img { height: 30px; }
     header .divider { width: 1px; height: 20px; background: rgba(255,255,255,0.15); }
     header span { color: rgba(255,255,255,0.5); font-size: 13px; }
 
-    /* ── Layout ── */
-    .layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; max-width: 1100px; margin: 32px auto; padding: 0 24px 80px; align-items: start; }
+    .layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; max-width: 1140px; margin: 28px auto; padding: 0 24px 80px; align-items: start; }
 
-    /* ── Cards ── */
-    .card { background: #fff; border-radius: 12px; border: 1px solid rgba(22,32,27,0.09); overflow: hidden; margin-bottom: 20px; }
-    .card-head { padding: 16px 20px; border-bottom: 1px solid rgba(22,32,27,0.07); display: flex; align-items: center; justify-content: space-between; }
-    .card-head h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #3F8F6C; }
-    .card-body { padding: 20px; }
+    /* Cards */
+    .card { background: #fff; border-radius: 12px; border: 1px solid rgba(22,32,27,0.09); overflow: hidden; margin-bottom: 18px; }
+    .card-head { padding: 14px 20px; border-bottom: 1px solid rgba(22,32,27,0.07); display: flex; align-items: center; justify-content: space-between; }
+    .card-head h2 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #3F8F6C; }
+    .card-body { padding: 18px 20px; }
 
-    /* ── Upload ── */
-    .drop-zone { border: 2px dashed rgba(63,143,108,0.35); border-radius: 9px; padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.15s; background: rgba(63,143,108,0.02); }
+    /* Upload */
+    .drop-zone { border: 2px dashed rgba(63,143,108,0.35); border-radius: 9px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all 0.15s; background: rgba(63,143,108,0.02); }
     .drop-zone:hover, .drop-zone.over { background: rgba(63,143,108,0.06); border-color: #3F8F6C; }
-    .drop-zone p { font-size: 14px; font-weight: 500; color: #2D3A33; margin: 10px 0 3px; }
+    .drop-zone p { font-size: 14px; font-weight: 500; color: #2D3A33; margin: 8px 0 3px; }
     .drop-zone small { font-size: 12px; color: #8E978F; }
     .drop-zone svg { color: #3F8F6C; }
     input[type="file"] { display: none; }
-    .file-pill { display: none; align-items: center; gap: 10px; padding: 11px 14px; background: rgba(63,143,108,0.07); border: 1px solid rgba(63,143,108,0.22); border-radius: 8px; }
+    .file-pill { display: none; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(63,143,108,0.07); border: 1px solid rgba(63,143,108,0.22); border-radius: 8px; }
     .file-pill svg { color: #3F8F6C; flex-shrink: 0; }
     .file-pill .fn { font-size: 13px; font-weight: 600; color: #16201B; }
     .file-pill .fm { font-size: 11px; color: #536158; }
     .file-pill button { margin-left: auto; font-size: 11px; color: #3F8F6C; background: none; border: none; cursor: pointer; text-decoration: underline; }
 
-    /* ── Section labels ── */
-    .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #8E978F; padding: 10px 20px 6px; background: #F6F8F5; border-top: 1px solid rgba(22,32,27,0.06); border-bottom: 1px solid rgba(22,32,27,0.06); }
-    .section-label:first-child { border-top: none; }
+    /* Customer info card */
+    .customer-info { display: none; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+    .info-cell { padding: 9px 20px; border-bottom: 1px solid rgba(22,32,27,0.05); }
+    .info-cell:nth-last-child(-n+2) { border-bottom: none; }
+    .info-cell .ic-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #8E978F; margin-bottom: 2px; }
+    .info-cell .ic-val { font-size: 13px; color: #16201B; font-weight: 500; }
+    .info-cell.full { grid-column: 1 / -1; }
 
-    /* ── Line Items ── */
-    .line-item { display: flex; align-items: center; gap: 12px; padding: 9px 20px; border-bottom: 1px solid rgba(22,32,27,0.05); }
+    /* Section labels */
+    .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: #8E978F; padding: 9px 20px 5px; background: #F6F8F5; border-top: 1px solid rgba(22,32,27,0.06); border-bottom: 1px solid rgba(22,32,27,0.06); }
+
+    /* Line items */
+    .line-item { display: flex; align-items: center; gap: 10px; padding: 8px 20px; border-bottom: 1px solid rgba(22,32,27,0.05); }
     .line-item:last-child { border-bottom: none; }
     .line-item .li-label { flex: 1; font-size: 13px; color: #2D3A33; }
     .line-item .li-sub { font-size: 11px; color: #8E978F; margin-top: 1px; }
-    .line-item .li-qty { width: 56px; }
-    .line-item .price-wrap { position: relative; width: 110px; flex-shrink: 0; }
-    .line-item .price-wrap span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #8E978F; pointer-events: none; }
-    .line-item input[type="number"] { width: 100%; padding: 7px 8px 7px 22px; border: 1px solid rgba(22,32,27,0.13); border-radius: 6px; font-size: 13px; color: #16201B; background: #fff; outline: none; transition: border-color 0.15s; -moz-appearance: textfield; }
-    .line-item input[type="number"]::-webkit-outer-spin-button,
-    .line-item input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .line-item input[type="number"]:focus { border-color: #3F8F6C; background: #fafcfa; }
-    .line-item .li-total { width: 90px; text-align: right; font-size: 13px; color: #16201B; font-weight: 600; flex-shrink: 0; }
-    .li-qty input { padding: 7px 8px; border: 1px solid rgba(22,32,27,0.13); border-radius: 6px; font-size: 13px; width: 100%; outline: none; -moz-appearance: textfield; }
-    .li-qty input::-webkit-outer-spin-button, .li-qty input::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .li-qty input:focus { border-color: #3F8F6C; }
+    .line-item .li-qty { width: 54px; }
+    .li-qty input, .line-item input[type="number"] { padding: 6px 8px; border: 1px solid rgba(22,32,27,0.13); border-radius: 6px; font-size: 13px; width: 100%; outline: none; transition: border-color 0.15s; -moz-appearance: textfield; background: #fff; color: #16201B; }
+    .li-qty input::-webkit-outer-spin-button, .li-qty input::-webkit-inner-spin-button,
+    .line-item input[type="number"]::-webkit-outer-spin-button, .line-item input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .li-qty input:focus, .line-item input[type="number"]:focus { border-color: #3F8F6C; background: #fafcfa; }
+    .price-wrap { position: relative; width: 108px; flex-shrink: 0; }
+    .price-wrap span { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #8E978F; pointer-events: none; }
+    .price-wrap input { padding-left: 20px !important; }
+    .li-total { width: 80px; text-align: right; font-size: 13px; font-weight: 600; color: #16201B; flex-shrink: 0; }
+    .li-x { font-size: 11px; color: #8E978F; flex-shrink: 0; }
 
-    /* rad rows */
-    .rad-row { background: rgba(63,143,108,0.02); }
-    .rad-badge { display: inline-block; background: rgba(63,143,108,0.1); color: #2E7255; font-size: 10px; font-weight: 600; border-radius: 4px; padding: 1px 6px; margin-right: 4px; }
+    /* Radiator table */
+    .rad-table-wrap { padding: 0 20px 16px; }
+    .rad-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .rad-table thead th { background: #16201B; color: rgba(255,255,255,0.75); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 10px; text-align: left; }
+    .rad-table thead th:last-child { text-align: right; }
+    .rad-table tbody tr { border-bottom: 1px solid rgba(22,32,27,0.05); }
+    .rad-table tbody tr:last-child { border-bottom: none; }
+    .rad-table tbody tr:hover td { background: rgba(63,143,108,0.03); }
+    .rad-table td { padding: 7px 10px; color: #2D3A33; vertical-align: middle; }
+    .rad-table td:last-child { text-align: right; }
+    .rad-table .room-cell { font-weight: 600; color: #16201B; white-space: nowrap; }
+    .rad-table .ref-cell { font-size: 10px; color: #8E978F; font-family: monospace; }
+    .rad-table .price-input { position: relative; }
+    .rad-table .price-input span { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #8E978F; pointer-events: none; }
+    .rad-table .price-input input { width: 90px; padding: 5px 6px 5px 18px; border: 1px solid rgba(22,32,27,0.13); border-radius: 5px; font-size: 12px; outline: none; -moz-appearance: textfield; background: #fff; transition: border-color 0.15s; }
+    .rad-table .price-input input::-webkit-outer-spin-button, .rad-table .price-input input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .rad-table .price-input input:focus { border-color: #3F8F6C; }
+    .rad-table tfoot td { background: #F6F8F5; font-weight: 700; font-size: 12px; padding: 9px 10px; border-top: 2px solid rgba(22,32,27,0.10); }
+    .rad-table tfoot td:last-child { text-align: right; color: #16201B; }
+    .rad-placeholder { padding: 16px 20px; font-size: 12px; color: #8E978F; text-align: center; background: #F6F8F5; margin: 0 20px 16px; border-radius: 7px; border: 1px dashed rgba(22,32,27,0.12); }
 
-    /* revenue section */
-    .rev-row { background: rgba(63,143,108,0.03); }
+    /* Revenue section */
     .rev-row .li-label { font-weight: 600; }
 
-    /* totals row */
-    .totals-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #F6F8F5; border-top: 2px solid rgba(22,32,27,0.10); }
+    /* Totals */
+    .totals-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 20px; background: #F6F8F5; border-top: 2px solid rgba(22,32,27,0.10); }
     .totals-row .t-label { font-size: 13px; font-weight: 700; color: #16201B; }
     .totals-row .t-val { font-size: 15px; font-weight: 700; color: #16201B; }
+
+    /* Error */
+    .error-box { background: rgba(197,48,48,0.07); border: 1px solid rgba(197,48,48,0.2); border-radius: 7px; padding: 9px 13px; font-size: 12px; color: #9B2C2C; margin-top: 10px; display: none; }
 
     /* ── Sticky Profit Panel ── */
     .profit-panel { position: sticky; top: 24px; }
     .profit-card { background: #16201B; border-radius: 12px; overflow: hidden; }
-    .profit-card-head { padding: 18px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .profit-card-head h3 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-bottom: 2px; }
-    .profit-card-head .customer-name { font-size: 15px; font-weight: 700; color: #fff; }
-    .profit-card-head .project-addr { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+    .profit-card-head { padding: 16px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .profit-card-head h3 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
+    .profit-card-head .cust { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.2; }
+    .profit-card-head .addr { font-size: 11px; color: rgba(255,255,255,0.38); margin-top: 3px; line-height: 1.4; }
+    .profit-card-head .phone { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
 
-    .profit-rows { padding: 16px 20px; }
-    .profit-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .profit-row .pr-label { font-size: 12px; color: rgba(255,255,255,0.5); }
-    .profit-row .pr-val { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.85); }
-    .profit-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 14px 0; }
+    .profit-rows { padding: 14px 20px 4px; }
+    .pr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .pr .prl { font-size: 12px; color: rgba(255,255,255,0.45); }
+    .pr .prv { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.82); }
+    .pdiv { height: 1px; background: rgba(255,255,255,0.07); margin: 10px 0 14px; }
 
-    .profit-big { padding: 0 20px 20px; }
-    .profit-big .pb-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
-    .profit-big .pb-amount { font-size: 38px; font-weight: 800; color: #6AAE8A; line-height: 1; }
-    .profit-big .pb-amount.negative { color: #E07070; }
-    .profit-big .pb-margin { font-size: 13px; color: rgba(255,255,255,0.45); margin-top: 6px; }
-    .profit-big .pb-margin span { color: rgba(255,255,255,0.75); font-weight: 600; }
+    .profit-big { padding: 0 20px 16px; }
+    .profit-big .pbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255,255,255,0.38); margin-bottom: 5px; }
+    .profit-big .pba { font-size: 40px; font-weight: 800; color: #6AAE8A; line-height: 1; }
+    .profit-big .pba.neg { color: #E07070; }
+    .profit-big .pbm { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 5px; }
+    .profit-big .pbm span { color: rgba(255,255,255,0.72); font-weight: 600; }
 
-    .margin-bar-wrap { padding: 0 20px 20px; }
-    .margin-bar-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 6px; display: flex; justify-content: space-between; }
-    .margin-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-    .margin-bar-fill { height: 100%; background: #6AAE8A; border-radius: 3px; transition: width 0.3s; }
-    .margin-bar-fill.low { background: #E07070; }
-    .margin-bar-fill.mid { background: #E3B93C; }
+    .margin-bar-wrap { padding: 0 20px 18px; }
+    .mbl { font-size: 10px; color: rgba(255,255,255,0.35); margin-bottom: 5px; display: flex; justify-content: space-between; }
+    .mb { height: 5px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
+    .mbf { height: 100%; background: #6AAE8A; border-radius: 3px; transition: width 0.3s, background 0.3s; }
+    .mbf.low { background: #E07070; }
+    .mbf.mid { background: #E3B93C; }
 
     .btn-excel { display: block; margin: 0 20px 20px; padding: 13px; background: #3F8F6C; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: background 0.15s; width: calc(100% - 40px); }
     .btn-excel:hover { background: #2E7255; }
-    .btn-excel:disabled { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.3); cursor: not-allowed; }
+    .btn-excel:disabled { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.25); cursor: not-allowed; }
+    .no-json-note { padding: 0 20px 18px; font-size: 11px; color: rgba(255,255,255,0.28); text-align: center; line-height: 1.5; }
 
-    .no-json-msg { padding: 16px 20px; font-size: 12px; color: rgba(255,255,255,0.35); text-align: center; line-height: 1.5; }
-
-    /* ── Error ── */
-    .error-box { background: rgba(197,48,48,0.08); border: 1px solid rgba(197,48,48,0.2); border-radius: 7px; padding: 10px 14px; font-size: 12px; color: #9B2C2C; margin-top: 12px; display: none; }
-
-    @media (max-width: 780px) {
+    @media (max-width: 800px) {
       .layout { grid-template-columns: 1fr; }
       .profit-panel { position: static; }
+      .info-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -123,213 +145,208 @@
 </header>
 
 <div class="layout">
+<div>
 
-  <!-- ══ LEFT COLUMN ══ -->
-  <div>
-
-    <!-- Upload -->
-    <div class="card">
-      <div class="card-head"><h2>Project File</h2></div>
-      <div class="card-body">
-        <div class="drop-zone" id="dropZone">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <p>Drop JSON file here or click to browse</p>
-          <small>Downloaded from your survey software</small>
-          <input type="file" id="fileInput" accept=".json">
-        </div>
-        <div class="file-pill" id="filePill">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <div>
-            <div class="fn" id="fileName"></div>
-            <div class="fm" id="fileMeta"></div>
-          </div>
-          <button onclick="resetFile()">Change</button>
-        </div>
-        <div class="error-box" id="errorBox"></div>
+  <!-- Upload -->
+  <div class="card">
+    <div class="card-head"><h2>Project File</h2></div>
+    <div class="card-body">
+      <div class="drop-zone" id="dropZone">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p>Drop JSON file here or click to browse</p>
+        <small>Downloaded from your survey software</small>
+        <input type="file" id="fileInput" accept=".json">
       </div>
+      <div class="file-pill" id="filePill">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <div><div class="fn" id="fileName"></div><div class="fm" id="fileMeta"></div></div>
+        <button onclick="resetFile()">Change</button>
+      </div>
+      <div class="error-box" id="errorBox"></div>
     </div>
-
-    <!-- Costs -->
-    <div class="card" id="costsCard">
-      <div class="card-head"><h2>Your Costs</h2><span style="font-size:12px;color:#8E978F;">Enter what you're paying</span></div>
-
-      <!-- Hardware -->
-      <div class="section-label">Hardware</div>
-
-      <div class="line-item">
-        <div class="li-label">Heat Pump<div class="li-sub" id="hp-sub">—</div></div>
-        <div class="price-wrap"><span>£</span><input type="number" id="cost-hp" value="" placeholder="0" min="0" oninput="recalc()"></div>
-        <div class="li-total" id="tot-hp">£0</div>
-      </div>
-
-      <div class="line-item">
-        <div class="li-label">Cylinder / Tank<div class="li-sub" id="cyl-sub">—</div></div>
-        <div class="price-wrap"><span>£</span><input type="number" id="cost-cyl" value="" placeholder="0" min="0" oninput="recalc()"></div>
-        <div class="li-total" id="tot-cyl">£0</div>
-      </div>
-
-      <!-- Radiators (populated from JSON) -->
-      <div class="section-label">Radiators <span id="rad-count-label" style="font-weight:400;text-transform:none;letter-spacing:0;">(upload JSON to auto-fill)</span></div>
-      <div id="radRows">
-        <!-- placeholder -->
-        <div class="line-item" id="radPlaceholder">
-          <div class="li-label" style="color:#8E978F;font-size:12px;">Upload project JSON to list radiators automatically</div>
-        </div>
-      </div>
-
-      <!-- Labour -->
-      <div class="section-label">Labour & Installation</div>
-
-      <div class="line-item">
-        <div class="li-label">Installation Labour</div>
-        <div class="li-qty"><input type="number" id="labour-hrs" placeholder="hrs" min="0" oninput="recalc()" title="Hours"></div>
-        <div style="font-size:11px;color:#8E978F;flex-shrink:0;">×</div>
-        <div class="price-wrap"><span>£</span><input type="number" id="labour-rate" placeholder="rate" min="0" oninput="recalc()" title="£/hr"></div>
-        <div class="li-total" id="tot-labour">£0</div>
-      </div>
-
-      <!-- Materials -->
-      <div class="section-label">Materials</div>
-
-      <div class="line-item">
-        <div class="li-label">Pipes &amp; Fittings</div>
-        <div class="price-wrap"><span>£</span><input type="number" id="cost-pipes" value="" placeholder="0" min="0" oninput="recalc()"></div>
-        <div class="li-total" id="tot-pipes">£0</div>
-      </div>
-
-      <div class="line-item">
-        <div class="li-label">Pipes &amp; Fittings (Safety)</div>
-        <div class="price-wrap"><span>£</span><input type="number" id="cost-pipes-safety" value="" placeholder="0" min="0" oninput="recalc()"></div>
-        <div class="li-total" id="tot-pipes-safety">£0</div>
-      </div>
-
-      <div class="line-item">
-        <div class="li-label">Cables H07RN-F</div>
-        <div class="price-wrap"><span>£</span><input type="number" id="cost-h07" value="" placeholder="0" min="0" oninput="recalc()"></div>
-        <div class="li-total" id="tot-h07">£0</div>
-      </div>
-
-      <div class="line-item">
-        <div class="li-label">3 Core Cable</div>
-        <div class="price-wrap"><span>£</span><input type="number" id="cost-3core" value="" placeholder="0" min="0" oninput="recalc()"></div>
-        <div class="li-total" id="tot-3core">£0</div>
-      </div>
-
-      <div class="line-item">
-        <div class="li-label">Isolator</div>
-        <div class="price-wrap"><span>£</span><input type="number" id="cost-isolator" value="" placeholder="0" min="0" oninput="recalc()"></div>
-        <div class="li-total" id="tot-isolator">£0</div>
-      </div>
-
-      <div class="line-item">
-        <div class="li-label">Other / Misc</div>
-        <div class="price-wrap"><span>£</span><input type="number" id="cost-other" value="" placeholder="0" min="0" oninput="recalc()"></div>
-        <div class="li-total" id="tot-other">£0</div>
-      </div>
-
-      <div class="totals-row">
-        <div class="t-label">Total Costs</div>
-        <div class="t-val" id="totalCosts">£0</div>
-      </div>
-
-      <!-- Revenue -->
-      <div class="section-label" style="border-top:2px solid rgba(22,32,27,0.10);">Revenue</div>
-
-      <div class="line-item rev-row">
-        <div class="li-label">BUS Grant<div class="li-sub">Government Boiler Upgrade Scheme</div></div>
-        <div class="price-wrap"><span>£</span><input type="number" id="rev-bus" value="7500" min="0" max="9000" oninput="recalc()"></div>
-        <div class="li-total" id="tot-bus">£7,500</div>
-      </div>
-
-      <div class="line-item rev-row">
-        <div class="li-label">Quoted Price to Customer<div class="li-sub">What you charge the customer (before grant deduction)</div></div>
-        <div class="price-wrap"><span>£</span><input type="number" id="rev-quote" value="" placeholder="0" min="0" oninput="recalc()"></div>
-        <div class="li-total" id="tot-quote">£0</div>
-      </div>
-
-      <div class="totals-row" style="background:#fff;">
-        <div class="t-label">Total Revenue</div>
-        <div class="t-val" id="totalRevenue">£0</div>
-      </div>
-    </div>
-
   </div>
 
-  <!-- ══ RIGHT COLUMN — Sticky Profit Panel ══ -->
-  <div class="profit-panel">
-    <div class="profit-card">
-
-      <div class="profit-card-head">
-        <h3>Job Summary</h3>
-        <div class="customer-name" id="panel-customer">—</div>
-        <div class="project-addr" id="panel-addr"></div>
+  <!-- Customer Info (shown after JSON upload) -->
+  <div class="card customer-info" id="customerCard">
+    <div class="card-head"><h2>Customer</h2></div>
+    <div class="info-grid">
+      <div class="info-cell">
+        <div class="ic-label">Name</div>
+        <div class="ic-val" id="ci-name">—</div>
       </div>
-
-      <div class="profit-rows">
-        <div class="profit-row">
-          <div class="pr-label">Total Costs</div>
-          <div class="pr-val" id="panel-costs">£0</div>
-        </div>
-        <div class="profit-row">
-          <div class="pr-label">BUS Grant</div>
-          <div class="pr-val" id="panel-bus">£7,500</div>
-        </div>
-        <div class="profit-row">
-          <div class="pr-label">Customer Quote</div>
-          <div class="pr-val" id="panel-quote">£0</div>
-        </div>
-        <div class="profit-divider"></div>
-        <div class="profit-row">
-          <div class="pr-label">Total Revenue</div>
-          <div class="pr-val" id="panel-revenue">£0</div>
-        </div>
+      <div class="info-cell">
+        <div class="ic-label">Phone</div>
+        <div class="ic-val" id="ci-phone">—</div>
       </div>
-
-      <div class="profit-big">
-        <div class="pb-label">Gross Profit</div>
-        <div class="pb-amount" id="panel-profit">£0</div>
-        <div class="pb-margin">Margin: <span id="panel-margin">0%</span></div>
+      <div class="info-cell">
+        <div class="ic-label">Email</div>
+        <div class="ic-val" id="ci-email">—</div>
       </div>
-
-      <div class="margin-bar-wrap">
-        <div class="margin-bar-label">
-          <span>0%</span><span id="margin-pct-label">0%</span><span>40%+</span>
-        </div>
-        <div class="margin-bar"><div class="margin-bar-fill" id="marginFill" style="width:0%"></div></div>
+      <div class="info-cell">
+        <div class="ic-label">Property Type</div>
+        <div class="ic-val" id="ci-type">—</div>
       </div>
+      <div class="info-cell full">
+        <div class="ic-label">Address</div>
+        <div class="ic-val" id="ci-addr">—</div>
+      </div>
+      <div class="info-cell">
+        <div class="ic-label">Total Heat Loss</div>
+        <div class="ic-val" id="ci-heatloss">—</div>
+      </div>
+      <div class="info-cell">
+        <div class="ic-label">HP Output</div>
+        <div class="ic-val" id="ci-hpout">—</div>
+      </div>
+    </div>
+  </div>
 
-      <button class="btn-excel" id="excelBtn" onclick="generateExcel()" disabled>
-        ↓ Download Excel
-      </button>
+  <!-- Costs -->
+  <div class="card" id="costsCard">
+    <div class="card-head"><h2>Your Costs</h2><span style="font-size:11px;color:#8E978F;">What you're paying</span></div>
 
-      <div class="no-json-msg" id="noJsonMsg">Upload a project JSON to<br>enable Excel export</div>
+    <!-- Hardware -->
+    <div class="section-label">Hardware</div>
 
+    <div class="line-item">
+      <div class="li-label">Heat Pump<div class="li-sub" id="hp-sub">—</div></div>
+      <div class="price-wrap"><span>£</span><input type="number" id="cost-hp" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="li-total" id="tot-hp">—</div>
+    </div>
+
+    <div class="line-item">
+      <div class="li-label">Cylinder / Tank<div class="li-sub" id="cyl-sub">—</div></div>
+      <div class="price-wrap"><span>£</span><input type="number" id="cost-cyl" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="li-total" id="tot-cyl">—</div>
+    </div>
+
+    <!-- Radiators -->
+    <div class="section-label">Radiators &nbsp;<span id="rad-count-label" style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(upload JSON to auto-fill)</span></div>
+    <div id="radTableWrap">
+      <div class="rad-placeholder" id="radPlaceholder">Upload project JSON to list radiators automatically</div>
+    </div>
+
+    <!-- Labour -->
+    <div class="section-label">Labour</div>
+    <div class="line-item">
+      <div class="li-label">Installation Labour</div>
+      <div class="li-qty"><input type="number" id="labour-hrs" placeholder="hrs" min="0" oninput="recalc()" title="Hours"></div>
+      <div class="li-x">hrs ×</div>
+      <div class="price-wrap"><span>£</span><input type="number" id="labour-rate" placeholder="rate" min="0" oninput="recalc()" title="£/hr"></div>
+      <div class="li-total" id="tot-labour">—</div>
+    </div>
+
+    <!-- Materials -->
+    <div class="section-label">Materials</div>
+    <div class="line-item">
+      <div class="li-label">Pipes &amp; Fittings</div>
+      <div class="price-wrap"><span>£</span><input type="number" id="cost-pipes" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="li-total" id="tot-pipes">—</div>
+    </div>
+    <div class="line-item">
+      <div class="li-label">Pipes &amp; Fittings (Safety)</div>
+      <div class="price-wrap"><span>£</span><input type="number" id="cost-pipes-safety" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="li-total" id="tot-pipes-safety">—</div>
+    </div>
+    <div class="line-item">
+      <div class="li-label">Cables H07RN-F</div>
+      <div class="price-wrap"><span>£</span><input type="number" id="cost-h07" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="li-total" id="tot-h07">—</div>
+    </div>
+    <div class="line-item">
+      <div class="li-label">3 Core Cable</div>
+      <div class="price-wrap"><span>£</span><input type="number" id="cost-3core" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="li-total" id="tot-3core">—</div>
+    </div>
+    <div class="line-item">
+      <div class="li-label">Isolator</div>
+      <div class="price-wrap"><span>£</span><input type="number" id="cost-isolator" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="li-total" id="tot-isolator">—</div>
+    </div>
+    <div class="line-item" style="border-bottom:none;">
+      <div class="li-label">Other / Misc</div>
+      <div class="price-wrap"><span>£</span><input type="number" id="cost-other" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="li-total" id="tot-other">—</div>
+    </div>
+
+    <div class="totals-row">
+      <div class="t-label">Total Costs</div>
+      <div class="t-val" id="totalCosts">£0</div>
+    </div>
+
+    <!-- Revenue -->
+    <div class="section-label" style="border-top:2px solid rgba(22,32,27,0.10);">Revenue</div>
+    <div class="line-item rev-row">
+      <div class="li-label">BUS Grant<div class="li-sub">Government Boiler Upgrade Scheme</div></div>
+      <div class="price-wrap"><span>£</span><input type="number" id="rev-bus" value="7500" min="0" max="9000" oninput="recalc()"></div>
+      <div class="li-total" id="tot-bus">£7,500</div>
+    </div>
+    <div class="line-item rev-row" style="border-bottom:none;">
+      <div class="li-label">Quoted Price to Customer<div class="li-sub">Before grant deduction</div></div>
+      <div class="price-wrap"><span>£</span><input type="number" id="rev-quote" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="li-total" id="tot-quote">—</div>
+    </div>
+    <div class="totals-row" style="background:#fff;">
+      <div class="t-label">Total Revenue</div>
+      <div class="t-val" id="totalRevenue">£0</div>
     </div>
   </div>
 
 </div>
 
+<!-- ── Sticky Profit Panel ── -->
+<div class="profit-panel">
+  <div class="profit-card">
+
+    <div class="profit-card-head">
+      <h3>Job Summary</h3>
+      <div class="cust" id="panel-customer">—</div>
+      <div class="addr" id="panel-addr"></div>
+      <div class="phone" id="panel-phone"></div>
+    </div>
+
+    <div class="profit-rows">
+      <div class="pr"><div class="prl">Total Costs</div><div class="prv" id="panel-costs">£0</div></div>
+      <div class="pr"><div class="prl">BUS Grant</div><div class="prv" id="panel-bus">£7,500</div></div>
+      <div class="pr"><div class="prl">Customer Quote</div><div class="prv" id="panel-quote">£0</div></div>
+      <div class="pdiv"></div>
+      <div class="pr"><div class="prl">Total Revenue</div><div class="prv" id="panel-revenue">£0</div></div>
+    </div>
+
+    <div class="profit-big">
+      <div class="pbl">Gross Profit</div>
+      <div class="pba" id="panel-profit">£0</div>
+      <div class="pbm">Margin: <span id="panel-margin">0%</span></div>
+    </div>
+
+    <div class="margin-bar-wrap">
+      <div class="mbl"><span>0%</span><span id="margin-mid-label">0%</span><span>40%+</span></div>
+      <div class="mb"><div class="mbf" id="marginFill" style="width:0%"></div></div>
+    </div>
+
+    <button class="btn-excel" id="excelBtn" onclick="generateExcel()" disabled>↓ Download Excel</button>
+    <div class="no-json-note" id="noJsonNote">Upload a project JSON to enable Excel export</div>
+
+  </div>
+</div>
+</div>
+
 <script>
 var projectData = null;
-var radRowData = [];
+var radRowData  = [];
 
-/* ── File Upload ── */
+/* ── File handling ── */
 var dz = document.getElementById('dropZone');
 dz.addEventListener('click', function() { document.getElementById('fileInput').click(); });
 dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('over'); });
 dz.addEventListener('dragleave', function() { dz.classList.remove('over'); });
-dz.addEventListener('drop', function(e) {
-  e.preventDefault(); dz.classList.remove('over');
-  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-});
-document.getElementById('fileInput').addEventListener('change', function() {
-  if (this.files[0]) handleFile(this.files[0]);
-});
+dz.addEventListener('drop', function(e) { e.preventDefault(); dz.classList.remove('over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+document.getElementById('fileInput').addEventListener('change', function() { if (this.files[0]) handleFile(this.files[0]); });
 
 function handleFile(file) {
   if (!file.name.endsWith('.json')) { showError('Please upload a .json file.'); return; }
-  var reader = new FileReader();
-  reader.onload = function(e) {
+  var r = new FileReader();
+  r.onload = function(e) {
     try {
       projectData = JSON.parse(e.target.result);
       dz.style.display = 'none';
@@ -340,11 +357,11 @@ function handleFile(file) {
       document.getElementById('errorBox').style.display = 'none';
       populateFromJSON(projectData);
       document.getElementById('excelBtn').disabled = false;
-      document.getElementById('noJsonMsg').style.display = 'none';
+      document.getElementById('noJsonNote').style.display = 'none';
       recalc();
     } catch(err) { showError('Could not parse JSON: ' + err.message); }
   };
-  reader.readAsText(file);
+  r.readAsText(file);
 }
 
 function resetFile() {
@@ -353,13 +370,15 @@ function resetFile() {
   document.getElementById('filePill').style.display = 'none';
   document.getElementById('fileInput').value = '';
   document.getElementById('excelBtn').disabled = true;
-  document.getElementById('noJsonMsg').style.display = 'block';
+  document.getElementById('noJsonNote').style.display = 'block';
+  document.getElementById('customerCard').style.display = 'none';
   document.getElementById('panel-customer').textContent = '—';
   document.getElementById('panel-addr').textContent = '';
+  document.getElementById('panel-phone').textContent = '';
   document.getElementById('hp-sub').textContent = '—';
   document.getElementById('cyl-sub').textContent = '—';
   document.getElementById('rad-count-label').textContent = '(upload JSON to auto-fill)';
-  document.getElementById('radRows').innerHTML = '<div class="line-item" id="radPlaceholder"><div class="li-label" style="color:#8E978F;font-size:12px;">Upload project JSON to list radiators automatically</div></div>';
+  document.getElementById('radTableWrap').innerHTML = '<div class="rad-placeholder" id="radPlaceholder">Upload project JSON to list radiators automatically</div>';
   recalc();
 }
 
@@ -367,130 +386,147 @@ function populateFromJSON(d) {
   var customer = d.customer || {};
   var property = d.property || {};
   var addr = (property.address || {}).summaryline || '';
+  var calcs = d.calculations || {};
   var hw = (d.stages && d.stages.system_design && d.stages.system_design.hardware) || {};
-  var hp = (hw.heat_pump || {});
-  var cyl = (hw.cylinder || {});
-  var hpData = hp.hardware_data || {};
-  var cylData = cyl.hardware_data || {};
+  var hpItem  = hw.heat_pump || {};
+  var cylItem = hw.cylinder  || {};
+  var hpData  = hpItem.hardware_data  || {};
+  var cylData = cylItem.hardware_data || {};
 
-  document.getElementById('panel-customer').textContent = customer.full_name || '—';
-  document.getElementById('panel-addr').textContent = addr;
-  document.getElementById('hp-sub').textContent = (hpData.model_range || '') + ' ' + (hpData.model_name || '') + (hpData.model_number ? ' (' + hpData.model_number + ')' : '');
-  document.getElementById('cyl-sub').textContent = (cylData.model_range || '') + ' ' + (cylData.model_name || '') + (cylData.model_number ? ' (' + cylData.model_number + ')' : '');
+  /* Customer card */
+  document.getElementById('customerCard').style.display = 'block';
+  setText('ci-name',  customer.full_name || '—');
+  setText('ci-phone', customer.phone_number || '—');
+  setText('ci-email', customer.email || '—');
+  setText('ci-addr',  addr || '—');
+  setText('ci-type',  ((property.build_form || '') + ' ' + (property.property_type || '')).trim() || '—');
+  setText('ci-heatloss', (calcs.heat_loss || {}).total_heat_loss_formatted || '—');
+  setText('ci-hpout',   (calcs.hp_output || {}).formatted || '—');
+
+  /* Panel */
+  setText('panel-customer', customer.full_name || '—');
+  setText('panel-addr', addr);
+  setText('panel-phone', customer.phone_number || '');
+
+  /* HP / Cylinder sub-labels */
+  setText('hp-sub',  (hpData.model_range||'') + ' ' + (hpData.model_name||'') + (hpData.model_number ? ' (' + hpData.model_number + ')' : ''));
+  setText('cyl-sub', (cylData.model_range||'') + ' ' + (cylData.model_name||'') + (cylData.model_number ? ' (' + cylData.model_number + ')' : ''));
 
   /* Radiators */
-  var tables = d.tables || [];
   var newRads = [];
-  tables.forEach(function(t) { if (t.row_name === 'radiator.new.room') newRads = t.row_data || []; });
-
+  (d.tables || []).forEach(function(t) { if (t.row_name === 'radiator.new.room') newRads = t.row_data || []; });
   radRowData = [];
   newRads.forEach(function(r) {
-    var sizes = split(r['radiator.new.room.rad_sizes']);
-    var types = split(r['radiator.new.room.type']);
-    var refs  = split(r['radiator.new.room.rad_model_reference']);
-    var mans  = split(r['radiator.new.room.rad_manufacturer']);
-    var names = split(r['radiator.new.room.rad_model_name']);
-    var outs  = split(r['radiator.new.room.rad_output']);
+    var sizes = sp(r['radiator.new.room.rad_sizes']);
+    var types = sp(r['radiator.new.room.type']);
+    var refs  = sp(r['radiator.new.room.rad_model_reference']);
+    var mans  = sp(r['radiator.new.room.rad_manufacturer']);
+    var names = sp(r['radiator.new.room.rad_model_name']);
+    var outs  = sp(r['radiator.new.room.rad_output']);
+    var covs  = sp(r['radiator.new.room.rad_coverage']);
     for (var i = 0; i < sizes.length; i++) {
       radRowData.push({
         room: r['radiator.new.room.title'] || '',
-        type: (types[i] || '').replace('Type ', ''),
+        type: (types[i] || '').replace('Type ',''),
         size: (sizes[i] || '').replace('x','×'),
-        ref: refs[i] || '',
+        ref:  refs[i] || '',
         manufacturer: mans[i] || '',
         modelName: names[i] || '',
         output: outs[i] || '',
-        heatloss: r['radiator.new.room.heatloss'] || 0,
-        id: 'rad-' + radRowData.length + '-' + i
+        coverage: covs[i] || '',
+        heatloss: r['radiator.new.room.heatloss'] || 0
       });
     }
   });
 
   document.getElementById('rad-count-label').textContent = '(' + radRowData.length + ' emitters)';
-  var container = document.getElementById('radRows');
-  container.innerHTML = radRowData.map(function(r, i) {
-    return '<div class="line-item rad-row">' +
-      '<div class="li-label"><span class="rad-badge">' + r.room + '</span>' + r.manufacturer + ' ' + r.modelName + ' ' + r.size + '<div class="li-sub">' + r.ref + ' &nbsp;·&nbsp; Type ' + r.type + ' &nbsp;·&nbsp; ' + r.output + 'W output</div></div>' +
-      '<div class="price-wrap"><span>£</span><input type="number" id="rad-price-' + i + '" placeholder="0" min="0" oninput="recalc()"></div>' +
-      '<div class="li-total" id="rad-tot-' + i + '">£0</div>' +
-    '</div>';
-  }).join('');
+
+  if (radRowData.length === 0) {
+    document.getElementById('radTableWrap').innerHTML = '<div class="rad-placeholder">No radiators found in this project file.</div>';
+    return;
+  }
+
+  var html = '<div class="rad-table-wrap"><table class="rad-table">' +
+    '<thead><tr><th>Room</th><th>Type</th><th>Size</th><th>Ref</th><th>Output</th><th>Unit Cost</th><th>Total</th></tr></thead>' +
+    '<tbody>';
+  radRowData.forEach(function(r, i) {
+    html += '<tr>' +
+      '<td class="room-cell">' + r.room + '</td>' +
+      '<td>' + r.type + '</td>' +
+      '<td style="white-space:nowrap">' + r.size + '</td>' +
+      '<td class="ref-cell">' + r.ref + '</td>' +
+      '<td>' + r.output + 'W</td>' +
+      '<td><div class="price-input"><span>£</span><input type="number" id="rad-' + i + '" placeholder="0" min="0" oninput="recalc()"></div></td>' +
+      '<td id="rad-tot-' + i + '" style="font-weight:600;">—</td>' +
+    '</tr>';
+  });
+  html += '</tbody>' +
+    '<tfoot><tr><td colspan="5">Radiator Total</td><td></td><td id="rad-total-cell">£0</td></tr></tfoot>' +
+    '</table></div>';
+  document.getElementById('radTableWrap').innerHTML = html;
 }
 
-function split(val) {
-  return (val || '').toString().split('</w:t><w:br/><w:t>');
-}
-
-/* ── Recalc ── */
-function n(id) { return parseFloat(document.getElementById(id) && document.getElementById(id).value) || 0; }
-function fmt(v) { return '£' + v.toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0}); }
+function sp(v) { return (v||'').toString().split('</w:t><w:br/><w:t>'); }
+function n(id) { var el = document.getElementById(id); return el ? (parseFloat(el.value)||0) : 0; }
+function fmt(v) { return '£' + Math.abs(v).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+function setText(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
 
 function recalc() {
+  var radTotal = 0;
+  radRowData.forEach(function(r, i) {
+    var v = n('rad-' + i);
+    radTotal += v;
+    setText('rad-tot-' + i, v > 0 ? fmt(v) : '—');
+  });
+  var radTotCell = document.getElementById('rad-total-cell');
+  if (radTotCell) radTotCell.textContent = fmt(radTotal);
+
   var costHP   = n('cost-hp');
   var costCyl  = n('cost-cyl');
-  var labHrs   = n('labour-hrs');
-  var labRate  = n('labour-rate');
-  var labTotal = labHrs * labRate;
+  var labour   = n('labour-hrs') * n('labour-rate');
   var pipes    = n('cost-pipes');
   var pipesSaf = n('cost-pipes-safety');
   var h07      = n('cost-h07');
   var core3    = n('cost-3core');
   var isolator = n('cost-isolator');
   var other    = n('cost-other');
+  var bus      = n('rev-bus');
+  var quote    = n('rev-quote');
 
-  /* Radiator totals */
-  var radTotal = 0;
-  radRowData.forEach(function(r, i) {
-    var el = document.getElementById('rad-price-' + i);
-    var v = el ? parseFloat(el.value) || 0 : 0;
-    radTotal += v;
-    var tot = document.getElementById('rad-tot-' + i);
-    if (tot) tot.textContent = fmt(v);
-  });
+  var totalCosts = costHP + costCyl + radTotal + labour + pipes + pipesSaf + h07 + core3 + isolator + other;
+  var totalRev   = bus + quote;
+  var profit     = totalRev - totalCosts;
+  var margin     = totalRev > 0 ? profit / totalRev * 100 : 0;
 
-  var totalCosts = costHP + costCyl + radTotal + labTotal + pipes + pipesSaf + h07 + core3 + isolator + other;
-  var bus    = n('rev-bus');
-  var quote  = n('rev-quote');
-  var totalRev = bus + quote;
-  var profit = totalRev - totalCosts;
-  var margin = totalRev > 0 ? (profit / totalRev * 100) : 0;
-
-  /* Update line totals */
-  setText('tot-hp', fmt(costHP));
-  setText('tot-cyl', fmt(costCyl));
-  setText('tot-labour', fmt(labTotal));
-  setText('tot-pipes', fmt(pipes));
-  setText('tot-pipes-safety', fmt(pipesSaf));
-  setText('tot-h07', fmt(h07));
-  setText('tot-3core', fmt(core3));
-  setText('tot-isolator', fmt(isolator));
-  setText('tot-other', fmt(other));
+  setText('tot-hp', costHP > 0 ? fmt(costHP) : '—');
+  setText('tot-cyl', costCyl > 0 ? fmt(costCyl) : '—');
+  setText('tot-labour', labour > 0 ? fmt(labour) : '—');
+  setText('tot-pipes', pipes > 0 ? fmt(pipes) : '—');
+  setText('tot-pipes-safety', pipesSaf > 0 ? fmt(pipesSaf) : '—');
+  setText('tot-h07', h07 > 0 ? fmt(h07) : '—');
+  setText('tot-3core', core3 > 0 ? fmt(core3) : '—');
+  setText('tot-isolator', isolator > 0 ? fmt(isolator) : '—');
+  setText('tot-other', other > 0 ? fmt(other) : '—');
   setText('tot-bus', fmt(bus));
-  setText('tot-quote', fmt(quote));
+  setText('tot-quote', quote > 0 ? fmt(quote) : '—');
   setText('totalCosts', fmt(totalCosts));
   setText('totalRevenue', fmt(totalRev));
 
-  /* Panel */
   setText('panel-costs', fmt(totalCosts));
   setText('panel-bus', fmt(bus));
-  setText('panel-quote', fmt(quote));
+  setText('panel-quote', quote > 0 ? fmt(quote) : '£0');
   setText('panel-revenue', fmt(totalRev));
 
-  var profitEl = document.getElementById('panel-profit');
-  profitEl.textContent = fmt(profit);
-  profitEl.className = 'pb-amount' + (profit < 0 ? ' negative' : '');
+  var profEl = document.getElementById('panel-profit');
+  profEl.textContent = (profit < 0 ? '-' : '') + fmt(profit);
+  profEl.className = 'pba' + (profit < 0 ? ' neg' : '');
   setText('panel-margin', margin.toFixed(1) + '%');
-  setText('margin-pct-label', margin.toFixed(1) + '%');
+  setText('margin-mid-label', margin.toFixed(1) + '%');
 
   var pct = Math.min(Math.max(margin, 0), 40) / 40 * 100;
   var fill = document.getElementById('marginFill');
   fill.style.width = pct + '%';
-  fill.className = 'margin-bar-fill' + (margin < 10 ? ' low' : margin < 20 ? ' mid' : '');
-}
-
-function setText(id, val) {
-  var el = document.getElementById(id);
-  if (el) el.textContent = val;
+  fill.className = 'mbf' + (margin < 10 ? ' low' : margin < 20 ? ' mid' : '');
 }
 
 /* ── Excel Export ── */
@@ -502,16 +538,16 @@ function generateExcel() {
     var property = d.property || {};
     var addr = (property.address || {}).summaryline || '';
     var hw = (d.stages && d.stages.system_design && d.stages.system_design.hardware) || {};
-    var hpItem = hw.heat_pump || {};
-    var cylItem = hw.cylinder || {};
-    var hpData = hpItem.hardware_data || {};
+    var hpItem  = hw.heat_pump  || {};
+    var cylItem = hw.cylinder   || {};
+    var hpData  = hpItem.hardware_data  || {};
     var cylData = cylItem.hardware_data || {};
 
     var costHP   = n('cost-hp');
     var costCyl  = n('cost-cyl');
     var labHrs   = n('labour-hrs');
     var labRate  = n('labour-rate');
-    var labTotal = labHrs * labRate;
+    var labour   = labHrs * labRate;
     var pipes    = n('cost-pipes');
     var pipesSaf = n('cost-pipes-safety');
     var h07      = n('cost-h07');
@@ -521,35 +557,30 @@ function generateExcel() {
     var bus      = n('rev-bus');
     var quote    = n('rev-quote');
 
-    var radCosts = radRowData.map(function(r, i) {
-      var el = document.getElementById('rad-price-' + i);
-      return el ? (parseFloat(el.value) || 0) : 0;
-    });
-    var radTotal = radCosts.reduce(function(a, b) { return a+b; }, 0);
-    var totalCosts = costHP + costCyl + radTotal + labTotal + pipes + pipesSaf + h07 + core3 + isolator + other;
-    var totalRev = bus + quote;
-    var profit = totalRev - totalCosts;
-    var margin = totalRev > 0 ? profit / totalRev : 0;
+    var radCosts = radRowData.map(function(r, i) { return n('rad-' + i); });
+    var radTotal = radCosts.reduce(function(a, b) { return a + b; }, 0);
+    var totalCosts = costHP + costCyl + radTotal + labour + pipes + pipesSaf + h07 + core3 + isolator + other;
+    var totalRev   = bus + quote;
+    var profit     = totalRev - totalCosts;
+    var margin     = totalRev > 0 ? profit / totalRev : 0;
 
     var wb = XLSX.utils.book_new();
-
-    /* Sheet 1: Profit Summary */
     var rows = [
       ['HEAT PUMP JOB – PROFIT CALCULATOR'],
       ['Customer', customer.full_name || ''],
+      ['Phone', customer.phone_number || ''],
+      ['Email', customer.email || ''],
       ['Address', addr],
       ['Date', new Date().toLocaleDateString('en-GB')],
       [],
-      ['COSTS', null, null, '£'],
+      ['COSTS', 'Description', null, '£'],
       ['Heat Pump', (hpData.model_range||'') + ' ' + (hpData.model_name||'') + ' (' + (hpData.model_number||'') + ')', null, costHP],
       ['Cylinder / Tank', (cylData.model_range||'') + ' ' + (cylData.model_name||'') + ' (' + (cylData.model_number||'') + ')', null, costCyl],
     ];
-
     radRowData.forEach(function(r, i) {
       rows.push(['Radiator – ' + r.room, r.manufacturer + ' ' + r.modelName + ' ' + r.size + ' (' + r.ref + ')', null, radCosts[i]]);
     });
-
-    rows.push(['Installation Labour', labHrs + ' hrs × £' + labRate + '/hr', null, labTotal]);
+    rows.push(['Installation Labour', labHrs + ' hrs × £' + labRate + '/hr', null, labour]);
     rows.push(['Pipes & Fittings', null, null, pipes]);
     rows.push(['Pipes & Fittings (Safety)', null, null, pipesSaf]);
     rows.push(['Cables H07RN-F', null, null, h07]);
@@ -568,19 +599,17 @@ function generateExcel() {
     rows.push(['Gross Margin', null, null, margin]);
 
     var ws = XLSX.utils.aoa_to_sheet(rows);
-    ws['!cols'] = [{wch:28},{wch:46},{wch:16},{wch:12}];
-
-    /* Format margin as % */
-    var marginCell = 'D' + (rows.length);
-    if (ws[marginCell]) ws[marginCell].z = '0.0%';
-
+    ws['!cols'] = [{wch:26},{wch:50},{wch:16},{wch:12}];
+    var marginRowIdx = rows.length;
+    var marginCellAddr = 'D' + marginRowIdx;
+    if (ws[marginCellAddr]) ws[marginCellAddr].z = '0.0%';
     XLSX.utils.book_append_sheet(wb, ws, 'Job Costing');
 
     var safeName = (customer.full_name || 'Project').replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
     XLSX.writeFile(wb, 'Sailax_Profit_' + safeName + '.xlsx');
   } catch(err) {
     console.error(err);
-    alert('Error generating Excel: ' + err.message);
+    alert('Error: ' + err.message);
   }
 }
 
@@ -590,7 +619,6 @@ function showError(msg) {
   el.style.display = 'block';
 }
 
-/* init */
 recalc();
 </script>
 </body>
