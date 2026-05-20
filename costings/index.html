@@ -587,117 +587,154 @@ function downloadRadiatorSchedule() {
     groups[key].qty++;
   });
 
-  /* Table rows — with empty Unit Price and Total columns for supplier to fill */
-  var tableRows = groupKeys.map(function(k, idx) {
+  /* PDF table rows — styled with dark header */
+  var pdfRows = groupKeys.map(function(k, idx) {
     var g = groups[k];
-    return '<tr>' +
-      '<td style="color:#999;font-size:11px;padding:10px 12px;border-bottom:1px solid #e0e4de;">' + (idx + 1) + '</td>' +
-      '<td style="padding:10px 12px;border-bottom:1px solid #e0e4de;font-size:13px;">Type ' + g.type + '</td>' +
-      '<td style="padding:10px 12px;border-bottom:1px solid #e0e4de;font-size:13px;">' + g.size + ' mm</td>' +
-      '<td style="padding:10px 12px;border-bottom:1px solid #e0e4de;font-size:13px;text-align:center;font-weight:700;">' + g.qty + '</td>' +
-      '<td style="padding:10px 12px;border-bottom:1px solid #e0e4de;font-size:13px;text-align:right;color:#bbb;">£</td>' +
-      '<td style="padding:10px 12px;border-bottom:1px solid #e0e4de;font-size:13px;text-align:right;color:#bbb;">£</td>' +
+    var bg = idx % 2 === 1 ? 'background:#f7f8f6;' : '';
+    return '<tr style="' + bg + '">' +
+      '<td style="color:#999;font-size:11px;padding:9px 12px;border-bottom:1px solid #e0e4de;">' + (idx+1) + '</td>' +
+      '<td style="padding:9px 12px;border-bottom:1px solid #e0e4de;">Type ' + g.type + '</td>' +
+      '<td style="padding:9px 12px;border-bottom:1px solid #e0e4de;">' + g.size + ' mm</td>' +
+      '<td style="padding:9px 12px;border-bottom:1px solid #e0e4de;text-align:center;font-weight:700;">' + g.qty + '</td>' +
+      '<td style="padding:9px 12px;border-bottom:1px solid #e0e4de;text-align:right;color:#bbb;">£</td>' +
+      '<td style="padding:9px 12px;border-bottom:1px solid #e0e4de;text-align:right;color:#bbb;">£</td>' +
     '</tr>';
   }).join('');
 
-  /* Letter body HTML — inline styles throughout for Gmail paste compatibility */
-  var letterHtml =
-  '<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1a1a;max-width:660px;">' +
+  /* Gmail table rows — plain borders only */
+  var gmailRows = groupKeys.map(function(k, idx) {
+    var g = groups[k];
+    return '<tr>' +
+      '<td style="border:1px solid #ccc;padding:7px 10px;font-size:13px;">' + (idx+1) + '</td>' +
+      '<td style="border:1px solid #ccc;padding:7px 10px;font-size:13px;">Type ' + g.type + '</td>' +
+      '<td style="border:1px solid #ccc;padding:7px 10px;font-size:13px;">' + g.size + ' mm</td>' +
+      '<td style="border:1px solid #ccc;padding:7px 10px;font-size:13px;text-align:center;">' + g.qty + '</td>' +
+      '<td style="border:1px solid #ccc;padding:7px 10px;font-size:13px;min-width:80px;">&nbsp;</td>' +
+      '<td style="border:1px solid #ccc;padding:7px 10px;font-size:13px;min-width:80px;">&nbsp;</td>' +
+    '</tr>';
+  }).join('');
 
-  '<p style="margin:2px 0;font-weight:700;font-size:14px;color:#16201B;">Usman</p>' +
-  '<p style="margin:2px 0;font-size:13px;color:#333;">Sailax Global Technologies</p>' +
-  '<p style="margin:2px 0;font-size:13px;color:#333;">1 City Road, London, EC1V 2PU</p>' +
-  '<p style="margin:2px 0 24px;font-size:13px;color:#333;">usman@sailax.co.uk &nbsp;·&nbsp; 07404 400 833</p>' +
+  var pdfThStyle = 'style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;"';
+  var gmailThStyle = 'style="border:1px solid #ccc;padding:7px 10px;font-size:12px;font-weight:700;background:#f5f5f5;text-align:left;"';
 
-  '<div style="background:#f7f8f6;border-left:3px solid #3F8F6C;padding:10px 14px;margin-bottom:24px;">' +
-    '<p style="margin:0 0 3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;">Property Address</p>' +
-    '<p style="margin:0;font-size:13px;color:#333;">' + addr + '</p>' +
-  '</div>' +
-
-  '<p style="margin:0 0 4px;font-size:16px;font-weight:700;color:#16201B;">Radiator Quotation Request</p>' +
-  '<p style="margin:0 0 24px;font-size:12px;color:#999;">' + today + '</p>' +
-
+  /* ── PDF letter content ── */
+  var pdfContent =
   '<p style="margin:0 0 12px;line-height:1.65;color:#333;">Hi,</p>' +
   '<p style="margin:0 0 12px;line-height:1.65;color:#333;">I hope you are well.</p>' +
   '<p style="margin:0 0 12px;line-height:1.65;color:#333;">Could you please provide your best quote for the radiators listed below?</p>' +
   '<p style="margin:0 0 20px;line-height:1.65;color:#333;">We are looking for the most cost-effective suitable options available.</p>' +
 
-  '<table style="width:100%;border-collapse:collapse;margin:0 0 24px;">' +
-    '<thead>' +
-      '<tr>' +
-        '<th style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:left;">#</th>' +
-        '<th style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:left;">Radiator Type</th>' +
-        '<th style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:left;">Size (H &times; W)</th>' +
-        '<th style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:center;">Qty</th>' +
-        '<th style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:right;">Unit Price (£)</th>' +
-        '<th style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:right;">Total (£)</th>' +
-      '</tr>' +
-    '</thead>' +
-    '<tbody>' + tableRows + '</tbody>' +
+  '<div style="margin-bottom:20px;">' +
+    '<p style="margin:0 0 2px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;">Property Address</p>' +
+    '<p style="margin:0 0 2px;font-size:13px;font-weight:600;color:#16201B;">' + addr + '</p>' +
+    '<p style="margin:0;font-size:12px;color:#999;">Radiator Quotation Request &nbsp;·&nbsp; ' + today + '</p>' +
+  '</div>' +
+
+  '<table style="width:100%;border-collapse:collapse;font-family:Arial,sans-serif;font-size:13px;margin-bottom:24px;">' +
+    '<thead><tr>' +
+      '<th ' + pdfThStyle + '>#</th>' +
+      '<th ' + pdfThStyle + '>Radiator Type</th>' +
+      '<th ' + pdfThStyle + '>Size (H &times; W)</th>' +
+      '<th ' + pdfThStyle + ' style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:center;">Qty</th>' +
+      '<th ' + pdfThStyle + ' style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:right;">Unit Price (£)</th>' +
+      '<th ' + pdfThStyle + ' style="background:#16201B;color:#fff;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:right;">Total (£)</th>' +
+    '</tr></thead>' +
+    '<tbody>' + pdfRows + '</tbody>' +
   '</table>' +
 
-  '<p style="margin:0 0 12px;line-height:1.65;color:#333;">Kind regards,</p>' +
-
+  '<p style="margin:0 0 16px;line-height:1.65;color:#333;">Kind regards,</p>' +
   '<p style="margin:0 0 2px;font-weight:700;font-size:14px;color:#16201B;">Usman</p>' +
   '<p style="margin:0 0 1px;font-size:13px;color:#444;">Sailax Global Technologies &nbsp;·&nbsp; Heat Pump Specialists</p>' +
   '<p style="margin:0 0 1px;font-size:13px;color:#444;">usman@sailax.co.uk</p>' +
   '<p style="margin:0 0 1px;font-size:13px;color:#444;">Tel: 07404 400 833</p>' +
-  '<p style="margin:0;font-size:13px;color:#444;">bus.sailax.co.uk</p>' +
+  '<p style="margin:0;font-size:13px;color:#444;">sailax.co.uk</p>';
+
+  /* ── Gmail copy content — plain, no from-block ── */
+  var gmailHtml =
+  '<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222;max-width:600px;">' +
+
+  '<p style="margin:0 0 12px;">Hi,</p>' +
+  '<p style="margin:0 0 12px;">I hope you are well.</p>' +
+  '<p style="margin:0 0 12px;">Could you please provide your best quote for the radiators listed below?</p>' +
+  '<p style="margin:0 0 20px;">We are looking for the most cost-effective suitable options available.</p>' +
+
+  '<p style="margin:0 0 2px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#666;">Property Address</p>' +
+  '<p style="margin:0 0 2px;font-size:14px;font-weight:600;">' + addr + '</p>' +
+  '<p style="margin:0 0 20px;font-size:13px;color:#666;">Radiator Quotation Request &nbsp;&middot;&nbsp; ' + today + '</p>' +
+
+  '<table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:13px;margin-bottom:20px;">' +
+    '<thead><tr>' +
+      '<th ' + gmailThStyle + '>#</th>' +
+      '<th ' + gmailThStyle + '>Radiator Type</th>' +
+      '<th ' + gmailThStyle + '>Size (H x W)</th>' +
+      '<th ' + gmailThStyle + '>Qty</th>' +
+      '<th ' + gmailThStyle + '>Unit Price (£)</th>' +
+      '<th ' + gmailThStyle + '>Total (£)</th>' +
+    '</tr></thead>' +
+    '<tbody>' + gmailRows + '</tbody>' +
+  '</table>' +
+
+  '<p style="margin:0 0 16px;">Kind regards,</p>' +
+  '<p style="margin:0 0 1px;font-weight:700;">Usman</p>' +
+  '<p style="margin:0 0 1px;">Sailax Global Technologies</p>' +
+  '<p style="margin:0 0 1px;">usman@sailax.co.uk</p>' +
+  '<p style="margin:0 0 1px;">07404 400 833</p>' +
+  '<p style="margin:0;">sailax.co.uk</p>' +
 
   '</div>';
+
+  /* Escape gmailHtml to embed safely as a JS string in the popup */
+  var gmailEscaped = gmailHtml.replace(/\\/g,'\\\\').replace(/`/g,'\\`');
 
   var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
   '<title>Radiator Quote Request</title>' +
   '<style>' +
-    'body{margin:0;padding:0;background:#f0f0f0;}' +
+    'body{margin:0;padding:0;background:#eee;font-family:Arial,sans-serif;}' +
     '.toolbar{background:#fff;border-bottom:1px solid #ddd;padding:12px 20px;display:flex;gap:10px;align-items:center;position:sticky;top:0;z-index:10;}' +
-    '.toolbar span{font-family:Arial,sans-serif;font-size:12px;color:#666;flex:1;}' +
-    '.btn{font-family:Arial,sans-serif;font-size:13px;font-weight:600;padding:9px 18px;border-radius:6px;border:none;cursor:pointer;}' +
+    '.toolbar span{font-size:12px;color:#666;flex:1;}' +
+    '.btn{font-size:13px;font-weight:600;padding:9px 18px;border-radius:6px;border:none;cursor:pointer;}' +
     '.btn-pdf{background:#16201B;color:#fff;}' +
     '.btn-gmail{background:#3F8F6C;color:#fff;}' +
-    '.btn-copied{background:#ccc;color:#666;cursor:default;}' +
-    '.page{max-width:700px;margin:32px auto;background:#fff;padding:48px 48px 56px;box-shadow:0 2px 20px rgba(0,0,0,0.12);}' +
+    '.btn-ok{background:#ccc;color:#555;cursor:default;}' +
+    '.page{max-width:700px;margin:32px auto;background:#fff;padding:48px;box-shadow:0 2px 20px rgba(0,0,0,0.12);}' +
     '.logo-bar{display:flex;align-items:center;gap:12px;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid #eee;}' +
-    '.logo-bar img{height:30px;}' +
-    '.logo-bar .divider{width:1px;height:24px;background:#ddd;}' +
-    '.logo-bar .co{font-size:14px;font-weight:700;color:#16201B;}' +
-    '@media print{.toolbar{display:none!important;}.page{margin:0;box-shadow:none;padding:32px;}body{background:#fff;}' +
-    'thead th,tr td{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}}' +
+    '.logo-bar img{height:28px;} .logo-bar .div{width:1px;height:22px;background:#ddd;} .logo-bar .co{font-size:14px;font-weight:700;color:#16201B;}' +
+    '@media print{.toolbar{display:none!important;}.page{margin:0;box-shadow:none;}body{background:#fff;}' +
+    'thead th{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}}' +
   '</style></head><body>' +
 
   '<div class="toolbar">' +
-    '<span>Radiator Quote Request &mdash; ' + addr + '</span>' +
-    '<button class="btn btn-gmail" onclick="copyForGmail()">Copy for Gmail</button>' +
+    '<span>' + addr + '</span>' +
+    '<button class="btn btn-gmail" id="copyBtn" onclick="copyForGmail()">Copy for Gmail</button>' +
     '<button class="btn btn-pdf" onclick="window.print()">Save as PDF</button>' +
   '</div>' +
 
   '<div class="page">' +
     '<div class="logo-bar">' +
       '<img src="https://assets.cdn.filesafe.space/DJbRokQKsl1YbqIkbRaf/media/6a0c5b06cc2b26d8ba833e45.png" alt="Sailax">' +
-      '<div class="divider"></div>' +
+      '<div class="div"></div>' +
       '<span class="co">Sailax Global Technologies</span>' +
     '</div>' +
-    '<div id="letter">' + letterHtml + '</div>' +
+    pdfContent +
   '</div>' +
 
   '<script>' +
+  'var GMAIL_HTML = `' + gmailEscaped + '`;' +
   'function copyForGmail() {' +
-  '  var el = document.getElementById("letter");' +
-  '  var html = el.innerHTML;' +
-  '  var text = el.innerText;' +
-  '  var btn = document.querySelector(".btn-gmail");' +
-  '  function flash() { btn.textContent = "Copied!"; btn.className = "btn btn-copied"; setTimeout(function(){ btn.textContent = "Copy for Gmail"; btn.className = "btn btn-gmail"; }, 2500); }' +
-  '  if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {' +
+  '  var btn = document.getElementById("copyBtn");' +
+  '  function flash(){ btn.textContent="Copied!"; btn.className="btn btn-ok"; setTimeout(function(){ btn.textContent="Copy for Gmail"; btn.className="btn btn-gmail"; },2500); }' +
+  '  if(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write){' +
   '    navigator.clipboard.write([new ClipboardItem({' +
-  '      "text/html": new Blob([html], {type:"text/html"}),' +
-  '      "text/plain": new Blob([text], {type:"text/plain"})' +
-  '    })]).then(flash).catch(function(){ fallback(text); });' +
-  '  } else { fallback(text); }' +
-  '  function fallback(t) {' +
-  '    var ta = document.createElement("textarea"); ta.value = t;' +
-  '    ta.style.position = "fixed"; ta.style.opacity = "0";' +
-  '    document.body.appendChild(ta); ta.select(); document.execCommand("copy");' +
-  '    document.body.removeChild(ta); flash();' +
+  '      "text/html":new Blob([GMAIL_HTML],{type:"text/html"}),' +
+  '      "text/plain":new Blob([document.querySelector(".page").innerText],{type:"text/plain"})' +
+  '    })]).then(flash).catch(function(){ fallback(); });' +
+  '  } else { fallback(); }' +
+  '  function fallback(){' +
+  '    var d=document.createElement("div"); d.innerHTML=GMAIL_HTML; d.style.position="fixed"; d.style.opacity="0";' +
+  '    document.body.appendChild(d);' +
+  '    var r=document.createRange(); r.selectNodeContents(d);' +
+  '    var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);' +
+  '    document.execCommand("copy"); s.removeAllRanges(); document.body.removeChild(d); flash();' +
   '  }' +
   '}' +
   '<\/script>' +
