@@ -14,13 +14,13 @@
     header .divider { width: 1px; height: 20px; background: rgba(255,255,255,0.15); }
     header span { color: rgba(255,255,255,0.5); font-size: 13px; }
 
-    .layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; max-width: 1140px; margin: 28px auto; padding: 0 24px 80px; align-items: start; }
+    .layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; max-width: 1160px; margin: 28px auto; padding: 0 24px 80px; align-items: start; }
 
     /* Cards */
     .card { background: #fff; border-radius: 12px; border: 1px solid rgba(22,32,27,0.09); overflow: hidden; margin-bottom: 18px; }
-    .card-head { padding: 14px 20px; border-bottom: 1px solid rgba(22,32,27,0.07); display: flex; align-items: center; justify-content: space-between; }
+    .card-head { padding: 13px 20px; border-bottom: 1px solid rgba(22,32,27,0.07); display: flex; align-items: center; justify-content: space-between; }
     .card-head h2 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #3F8F6C; }
-    .card-body { padding: 18px 20px; }
+    .card-body { padding: 16px 20px; }
 
     /* Upload */
     .drop-zone { border: 2px dashed rgba(63,143,108,0.35); border-radius: 9px; padding: 28px 20px; text-align: center; cursor: pointer; transition: all 0.15s; background: rgba(63,143,108,0.02); }
@@ -35,104 +35,122 @@
     .file-pill .fm { font-size: 11px; color: #536158; }
     .file-pill button { margin-left: auto; font-size: 11px; color: #3F8F6C; background: none; border: none; cursor: pointer; text-decoration: underline; }
 
-    /* Customer info card */
-    .customer-info { display: none; }
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
-    .info-cell { padding: 9px 20px; border-bottom: 1px solid rgba(22,32,27,0.05); }
-    .info-cell:nth-last-child(-n+2) { border-bottom: none; }
-    .info-cell .ic-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #8E978F; margin-bottom: 2px; }
-    .info-cell .ic-val { font-size: 13px; color: #16201B; font-weight: 500; }
-    .info-cell.full { grid-column: 1 / -1; }
-
     /* Section labels */
     .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: #8E978F; padding: 9px 20px 5px; background: #F6F8F5; border-top: 1px solid rgba(22,32,27,0.06); border-bottom: 1px solid rgba(22,32,27,0.06); }
 
     /* Line items */
     .line-item { display: flex; align-items: center; gap: 10px; padding: 8px 20px; border-bottom: 1px solid rgba(22,32,27,0.05); }
-    .line-item:last-child { border-bottom: none; }
-    .line-item .li-label { flex: 1; font-size: 13px; color: #2D3A33; }
-    .line-item .li-sub { font-size: 11px; color: #8E978F; margin-top: 1px; }
-    .line-item .li-qty { width: 54px; }
-    .li-qty input, .line-item input[type="number"] { padding: 6px 8px; border: 1px solid rgba(22,32,27,0.13); border-radius: 6px; font-size: 13px; width: 100%; outline: none; transition: border-color 0.15s; -moz-appearance: textfield; background: #fff; color: #16201B; }
-    .li-qty input::-webkit-outer-spin-button, .li-qty input::-webkit-inner-spin-button,
-    .line-item input[type="number"]::-webkit-outer-spin-button, .line-item input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .li-qty input:focus, .line-item input[type="number"]:focus { border-color: #3F8F6C; background: #fafcfa; }
-    .price-wrap { position: relative; width: 108px; flex-shrink: 0; }
-    .price-wrap span { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #8E978F; pointer-events: none; }
-    .price-wrap input { padding-left: 20px !important; }
-    .li-total { width: 80px; text-align: right; font-size: 13px; font-weight: 600; color: #16201B; flex-shrink: 0; }
+    .line-item:last-of-type { border-bottom: none; }
+    .li-label { flex: 1; font-size: 13px; color: #2D3A33; }
+    .li-sub { font-size: 11px; color: #8E978F; margin-top: 1px; }
+    .li-qty { width: 54px; }
+    .li-qty input { padding: 6px 8px; border: 1px solid rgba(22,32,27,0.13); border-radius: 6px; font-size: 13px; width: 100%; outline: none; -moz-appearance: textfield; background: #fff; }
+    .li-qty input::-webkit-outer-spin-button, .li-qty input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .li-qty input:focus { border-color: #3F8F6C; }
     .li-x { font-size: 11px; color: #8E978F; flex-shrink: 0; }
+    .price-wrap { position: relative; width: 108px; flex-shrink: 0; }
+    .price-wrap .sym { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #8E978F; pointer-events: none; }
+    .price-wrap input { padding: 6px 8px 6px 20px; border: 1px solid rgba(22,32,27,0.13); border-radius: 6px; font-size: 13px; width: 100%; outline: none; -moz-appearance: textfield; background: #fff; transition: border-color 0.15s; }
+    .price-wrap input::-webkit-outer-spin-button, .price-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .price-wrap input:focus { border-color: #3F8F6C; }
+    .li-total { width: 76px; text-align: right; font-size: 13px; font-weight: 600; color: #16201B; flex-shrink: 0; }
+
+    /* Fixed cost badge */
+    .fixed-badge { font-size: 10px; font-weight: 600; background: rgba(63,143,108,0.1); color: #2E7255; border-radius: 4px; padding: 2px 7px; flex-shrink: 0; }
+
+    /* Toggle switch */
+    .toggle-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 20px; border-bottom: 1px solid rgba(22,32,27,0.05); }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info { flex: 1; }
+    .toggle-info .ti-label { font-size: 13px; font-weight: 600; color: #2D3A33; }
+    .toggle-info .ti-sub { font-size: 11px; color: #8E978F; margin-top: 2px; }
+    .toggle-info .ti-extra { margin-top: 8px; display: none; }
+    .toggle-info .ti-extra.show { display: flex; align-items: center; gap: 8px; }
+    .ti-extra label { font-size: 11px; color: #536158; white-space: nowrap; }
+    .toggle-cost { font-size: 13px; font-weight: 600; color: #16201B; width: 76px; text-align: right; flex-shrink: 0; margin-top: 2px; }
+    .switch { position: relative; width: 36px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: rgba(22,32,27,0.15); border-radius: 20px; transition: background 0.2s; }
+    .slider:before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+    .switch input:checked + .slider { background: #3F8F6C; }
+    .switch input:checked + .slider:before { transform: translateX(16px); }
 
     /* Radiator table */
-    .rad-table-wrap { padding: 0 20px 16px; }
+    .rad-wrap { padding: 0 20px 16px; }
     .rad-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    .rad-table thead th { background: #16201B; color: rgba(255,255,255,0.75); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 10px; text-align: left; }
-    .rad-table thead th:last-child { text-align: right; }
-    .rad-table tbody tr { border-bottom: 1px solid rgba(22,32,27,0.05); }
-    .rad-table tbody tr:last-child { border-bottom: none; }
+    .rad-table thead th { background: #16201B; color: rgba(255,255,255,0.65); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 8px 8px; text-align: left; white-space: nowrap; }
+    .rad-table thead th:last-child, .rad-table thead th:nth-last-child(2) { text-align: right; }
+    .rad-table tbody tr { border-bottom: 1px solid rgba(22,32,27,0.05); transition: background 0.1s; }
     .rad-table tbody tr:hover td { background: rgba(63,143,108,0.03); }
-    .rad-table td { padding: 7px 10px; color: #2D3A33; vertical-align: middle; }
-    .rad-table td:last-child { text-align: right; }
-    .rad-table .room-cell { font-weight: 600; color: #16201B; white-space: nowrap; }
-    .rad-table .ref-cell { font-size: 10px; color: #8E978F; font-family: monospace; }
-    .rad-table .price-input { position: relative; }
-    .rad-table .price-input span { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #8E978F; pointer-events: none; }
-    .rad-table .price-input input { width: 90px; padding: 5px 6px 5px 18px; border: 1px solid rgba(22,32,27,0.13); border-radius: 5px; font-size: 12px; outline: none; -moz-appearance: textfield; background: #fff; transition: border-color 0.15s; }
-    .rad-table .price-input input::-webkit-outer-spin-button, .rad-table .price-input input::-webkit-inner-spin-button { -webkit-appearance: none; }
-    .rad-table .price-input input:focus { border-color: #3F8F6C; }
-    .rad-table tfoot td { background: #F6F8F5; font-weight: 700; font-size: 12px; padding: 9px 10px; border-top: 2px solid rgba(22,32,27,0.10); }
-    .rad-table tfoot td:last-child { text-align: right; color: #16201B; }
-    .rad-placeholder { padding: 16px 20px; font-size: 12px; color: #8E978F; text-align: center; background: #F6F8F5; margin: 0 20px 16px; border-radius: 7px; border: 1px dashed rgba(22,32,27,0.12); }
+    .rad-table td { padding: 7px 8px; color: #2D3A33; vertical-align: middle; }
+    .rad-table td.room { font-weight: 600; color: #16201B; white-space: nowrap; }
+    .rad-table td.ref-col { font-size: 10px; color: #8E978F; font-family: monospace; }
+    .rad-table td.num { text-align: right; font-weight: 600; }
+    .status-badge { display: inline-block; font-size: 10px; font-weight: 700; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+    .status-additional { background: rgba(59,130,246,0.12); color: #1d4ed8; }
+    .status-adequate    { background: rgba(63,143,108,0.12); color: #2E7255; }
+    .status-oversized   { background: rgba(234,179,8,0.12);  color: #854d0e; }
+    .status-other       { background: rgba(22,32,27,0.08);   color: #536158; }
+    .rad-price-cell { text-align: right; }
+    .rad-price-wrap { position: relative; display: inline-block; }
+    .rad-price-wrap .sym { position: absolute; left: 7px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #8E978F; pointer-events: none; }
+    .rad-price-wrap input { width: 84px; padding: 5px 5px 5px 16px; border: 1px solid rgba(22,32,27,0.13); border-radius: 5px; font-size: 12px; outline: none; -moz-appearance: textfield; background: #fff; text-align: right; }
+    .rad-price-wrap input::-webkit-outer-spin-button, .rad-price-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .rad-price-wrap input:focus { border-color: #3F8F6C; }
+    .rad-table tfoot td { background: #F6F8F5; font-weight: 700; font-size: 12px; padding: 9px 8px; border-top: 2px solid rgba(22,32,27,0.10); }
+    .rad-table tfoot td.num { text-align: right; }
+    .rad-placeholder { padding: 14px 20px; font-size: 12px; color: #8E978F; text-align: center; background: #F6F8F5; margin: 0 20px 14px; border-radius: 7px; border: 1px dashed rgba(22,32,27,0.12); }
 
-    /* Revenue section */
     .rev-row .li-label { font-weight: 600; }
-
-    /* Totals */
     .totals-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 20px; background: #F6F8F5; border-top: 2px solid rgba(22,32,27,0.10); }
-    .totals-row .t-label { font-size: 13px; font-weight: 700; color: #16201B; }
-    .totals-row .t-val { font-size: 15px; font-weight: 700; color: #16201B; }
+    .totals-row .t-label { font-size: 13px; font-weight: 700; }
+    .totals-row .t-val { font-size: 15px; font-weight: 700; }
 
-    /* Error */
     .error-box { background: rgba(197,48,48,0.07); border: 1px solid rgba(197,48,48,0.2); border-radius: 7px; padding: 9px 13px; font-size: 12px; color: #9B2C2C; margin-top: 10px; display: none; }
 
-    /* ── Sticky Profit Panel ── */
+    /* ══ Sticky Panel ══ */
     .profit-panel { position: sticky; top: 24px; }
     .profit-card { background: #16201B; border-radius: 12px; overflow: hidden; }
-    .profit-card-head { padding: 16px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.07); }
-    .profit-card-head h3 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255,255,255,0.4); margin-bottom: 4px; }
-    .profit-card-head .cust { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.2; }
-    .profit-card-head .addr { font-size: 11px; color: rgba(255,255,255,0.38); margin-top: 3px; line-height: 1.4; }
-    .profit-card-head .phone { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 4px; }
 
+    /* Customer section in panel */
+    .panel-customer { padding: 18px 20px 14px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .panel-customer .pc-eyebrow { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255,255,255,0.35); margin-bottom: 6px; }
+    .panel-customer .pc-name { font-size: 18px; font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 5px; }
+    .panel-customer .pc-addr { font-size: 12px; color: rgba(255,255,255,0.42); line-height: 1.45; margin-bottom: 8px; }
+    .panel-customer .pc-meta { display: flex; flex-direction: column; gap: 3px; }
+    .panel-customer .pc-row { font-size: 12px; color: rgba(255,255,255,0.55); }
+    .panel-customer .pc-row strong { color: rgba(255,255,255,0.75); font-weight: 600; }
+    .pc-pills { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .pc-pill { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: rgba(255,255,255,0.55); }
+    .pc-pill span { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+    /* Profit numbers */
     .profit-rows { padding: 14px 20px 4px; }
-    .pr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .pr .prl { font-size: 12px; color: rgba(255,255,255,0.45); }
-    .pr .prv { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.82); }
-    .pdiv { height: 1px; background: rgba(255,255,255,0.07); margin: 10px 0 14px; }
-
-    .profit-big { padding: 0 20px 16px; }
-    .profit-big .pbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255,255,255,0.38); margin-bottom: 5px; }
-    .profit-big .pba { font-size: 40px; font-weight: 800; color: #6AAE8A; line-height: 1; }
-    .profit-big .pba.neg { color: #E07070; }
-    .profit-big .pbm { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 5px; }
-    .profit-big .pbm span { color: rgba(255,255,255,0.72); font-weight: 600; }
-
-    .margin-bar-wrap { padding: 0 20px 18px; }
-    .mbl { font-size: 10px; color: rgba(255,255,255,0.35); margin-bottom: 5px; display: flex; justify-content: space-between; }
+    .pr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+    .prl { font-size: 12px; color: rgba(255,255,255,0.4); }
+    .prv { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+    .pdiv { height: 1px; background: rgba(255,255,255,0.07); margin: 10px 0 12px; }
+    .profit-big { padding: 0 20px 14px; }
+    .pbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: rgba(255,255,255,0.35); margin-bottom: 5px; }
+    .pba { font-size: 42px; font-weight: 800; color: #6AAE8A; line-height: 1; }
+    .pba.neg { color: #E07070; }
+    .pbm { font-size: 12px; color: rgba(255,255,255,0.38); margin-top: 5px; }
+    .pbm span { color: rgba(255,255,255,0.7); font-weight: 600; }
+    .mb-wrap { padding: 0 20px 16px; }
+    .mbl { font-size: 10px; color: rgba(255,255,255,0.3); margin-bottom: 5px; display: flex; justify-content: space-between; }
     .mb { height: 5px; background: rgba(255,255,255,0.07); border-radius: 3px; overflow: hidden; }
     .mbf { height: 100%; background: #6AAE8A; border-radius: 3px; transition: width 0.3s, background 0.3s; }
     .mbf.low { background: #E07070; }
     .mbf.mid { background: #E3B93C; }
 
-    .btn-excel { display: block; margin: 0 20px 20px; padding: 13px; background: #3F8F6C; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: background 0.15s; width: calc(100% - 40px); }
+    .btn-excel { display: block; margin: 0 20px 18px; padding: 13px; background: #3F8F6C; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: background 0.15s; width: calc(100% - 40px); }
     .btn-excel:hover { background: #2E7255; }
-    .btn-excel:disabled { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.25); cursor: not-allowed; }
-    .no-json-note { padding: 0 20px 18px; font-size: 11px; color: rgba(255,255,255,0.28); text-align: center; line-height: 1.5; }
+    .btn-excel:disabled { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.2); cursor: not-allowed; }
+    .no-json-note { padding: 0 20px 16px; font-size: 11px; color: rgba(255,255,255,0.25); text-align: center; line-height: 1.5; }
 
-    @media (max-width: 800px) {
+    @media (max-width: 820px) {
       .layout { grid-template-columns: 1fr; }
       .profit-panel { position: static; }
-      .info-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -166,107 +184,76 @@
     </div>
   </div>
 
-  <!-- Customer Info (shown after JSON upload) -->
-  <div class="card customer-info" id="customerCard">
-    <div class="card-head"><h2>Customer</h2></div>
-    <div class="info-grid">
-      <div class="info-cell">
-        <div class="ic-label">Name</div>
-        <div class="ic-val" id="ci-name">—</div>
-      </div>
-      <div class="info-cell">
-        <div class="ic-label">Phone</div>
-        <div class="ic-val" id="ci-phone">—</div>
-      </div>
-      <div class="info-cell">
-        <div class="ic-label">Email</div>
-        <div class="ic-val" id="ci-email">—</div>
-      </div>
-      <div class="info-cell">
-        <div class="ic-label">Property Type</div>
-        <div class="ic-val" id="ci-type">—</div>
-      </div>
-      <div class="info-cell full">
-        <div class="ic-label">Address</div>
-        <div class="ic-val" id="ci-addr">—</div>
-      </div>
-      <div class="info-cell">
-        <div class="ic-label">Total Heat Loss</div>
-        <div class="ic-val" id="ci-heatloss">—</div>
-      </div>
-      <div class="info-cell">
-        <div class="ic-label">HP Output</div>
-        <div class="ic-val" id="ci-hpout">—</div>
-      </div>
-    </div>
-  </div>
-
   <!-- Costs -->
-  <div class="card" id="costsCard">
-    <div class="card-head"><h2>Your Costs</h2><span style="font-size:11px;color:#8E978F;">What you're paying</span></div>
+  <div class="card">
+    <div class="card-head"><h2>Your Costs</h2><span style="font-size:11px;color:#8E978F;">What you pay</span></div>
 
-    <!-- Hardware -->
     <div class="section-label">Hardware</div>
 
     <div class="line-item">
       <div class="li-label">Heat Pump<div class="li-sub" id="hp-sub">—</div></div>
-      <div class="price-wrap"><span>£</span><input type="number" id="cost-hp" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="cost-hp" placeholder="0" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-hp">—</div>
     </div>
-
     <div class="line-item">
       <div class="li-label">Cylinder / Tank<div class="li-sub" id="cyl-sub">—</div></div>
-      <div class="price-wrap"><span>£</span><input type="number" id="cost-cyl" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="cost-cyl" placeholder="0" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-cyl">—</div>
     </div>
 
-    <!-- Radiators -->
     <div class="section-label">Radiators &nbsp;<span id="rad-count-label" style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(upload JSON to auto-fill)</span></div>
     <div id="radTableWrap">
-      <div class="rad-placeholder" id="radPlaceholder">Upload project JSON to list radiators automatically</div>
+      <div class="rad-placeholder">Upload project JSON to list radiators automatically</div>
     </div>
 
-    <!-- Labour -->
     <div class="section-label">Labour</div>
     <div class="line-item">
       <div class="li-label">Installation Labour</div>
-      <div class="li-qty"><input type="number" id="labour-hrs" placeholder="hrs" min="0" oninput="recalc()" title="Hours"></div>
+      <div class="li-qty"><input type="number" id="labour-hrs" placeholder="hrs" min="0" oninput="recalc()"></div>
       <div class="li-x">hrs ×</div>
-      <div class="price-wrap"><span>£</span><input type="number" id="labour-rate" placeholder="rate" min="0" oninput="recalc()" title="£/hr"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="labour-rate" placeholder="rate" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-labour">—</div>
     </div>
 
-    <!-- Materials -->
     <div class="section-label">Materials</div>
     <div class="line-item">
       <div class="li-label">Pipes &amp; Fittings</div>
-      <div class="price-wrap"><span>£</span><input type="number" id="cost-pipes" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="cost-pipes" placeholder="0" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-pipes">—</div>
     </div>
     <div class="line-item">
       <div class="li-label">Pipes &amp; Fittings (Safety)</div>
-      <div class="price-wrap"><span>£</span><input type="number" id="cost-pipes-safety" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="cost-pipes-safety" placeholder="0" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-pipes-safety">—</div>
     </div>
     <div class="line-item">
       <div class="li-label">Cables H07RN-F</div>
-      <div class="price-wrap"><span>£</span><input type="number" id="cost-h07" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="cost-h07" placeholder="0" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-h07">—</div>
     </div>
     <div class="line-item">
       <div class="li-label">3 Core Cable</div>
-      <div class="price-wrap"><span>£</span><input type="number" id="cost-3core" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="cost-3core" placeholder="0" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-3core">—</div>
     </div>
     <div class="line-item">
       <div class="li-label">Isolator</div>
-      <div class="price-wrap"><span>£</span><input type="number" id="cost-isolator" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="cost-isolator" placeholder="0" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-isolator">—</div>
     </div>
-    <div class="line-item" style="border-bottom:none;">
+    <div class="line-item">
       <div class="li-label">Other / Misc</div>
-      <div class="price-wrap"><span>£</span><input type="number" id="cost-other" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="cost-other" placeholder="0" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-other">—</div>
+    </div>
+
+    <!-- Fornax -->
+    <div class="section-label">Fornax Fees</div>
+
+    <div class="line-item">
+      <div class="li-label">Processing / Umbrella Fee<div class="li-sub">Fixed per project</div></div>
+      <span class="fixed-badge">Fixed</span>
+      <div class="li-total">£210</div>
     </div>
 
     <div class="totals-row">
@@ -274,16 +261,43 @@
       <div class="t-val" id="totalCosts">£0</div>
     </div>
 
+    <!-- Fornax Optional Services -->
+    <div class="section-label" style="border-top:2px solid rgba(22,32,27,0.10);">Fornax Optional Services</div>
+
+    <div class="toggle-row">
+      <label class="switch"><input type="checkbox" id="tog-bus" onchange="recalc()"><span class="slider"></span></label>
+      <div class="toggle-info">
+        <div class="ti-label">BUS Advance</div>
+        <div class="ti-sub">Fixed fee — added to your costs</div>
+      </div>
+      <div class="toggle-cost" id="tc-bus">£200</div>
+    </div>
+
+    <div class="toggle-row">
+      <label class="switch"><input type="checkbox" id="tog-pmt" onchange="togglePMT()"><span class="slider"></span></label>
+      <div class="toggle-info">
+        <div class="ti-label">Pay Me Today — Installation Finance</div>
+        <div class="ti-sub">From 2.5% of drawn amount, capped at 4.5%</div>
+        <div class="ti-extra" id="pmt-extra">
+          <label>Drawn amount</label>
+          <div class="price-wrap" style="width:96px;"><span class="sym">£</span><input type="number" id="pmt-amount" placeholder="0" min="0" oninput="recalc()"></div>
+          <label>Rate %</label>
+          <div class="price-wrap" style="width:72px;"><span class="sym" style="font-size:11px;"></span><input type="number" id="pmt-rate" value="2.5" min="2.5" max="4.5" step="0.1" style="padding-left:8px !important;" oninput="recalc()"></div>
+        </div>
+      </div>
+      <div class="toggle-cost" id="tc-pmt">—</div>
+    </div>
+
     <!-- Revenue -->
     <div class="section-label" style="border-top:2px solid rgba(22,32,27,0.10);">Revenue</div>
     <div class="line-item rev-row">
       <div class="li-label">BUS Grant<div class="li-sub">Government Boiler Upgrade Scheme</div></div>
-      <div class="price-wrap"><span>£</span><input type="number" id="rev-bus" value="7500" min="0" max="9000" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="rev-bus" value="7500" min="0" max="9000" oninput="recalc()"></div>
       <div class="li-total" id="tot-bus">£7,500</div>
     </div>
-    <div class="line-item rev-row" style="border-bottom:none;">
+    <div class="line-item rev-row">
       <div class="li-label">Quoted Price to Customer<div class="li-sub">Before grant deduction</div></div>
-      <div class="price-wrap"><span>£</span><input type="number" id="rev-quote" placeholder="0" min="0" oninput="recalc()"></div>
+      <div class="price-wrap"><span class="sym">£</span><input type="number" id="rev-quote" placeholder="0" min="0" oninput="recalc()"></div>
       <div class="li-total" id="tot-quote">—</div>
     </div>
     <div class="totals-row" style="background:#fff;">
@@ -294,20 +308,24 @@
 
 </div>
 
-<!-- ── Sticky Profit Panel ── -->
+<!-- ══ Sticky Panel ══ -->
 <div class="profit-panel">
   <div class="profit-card">
 
-    <div class="profit-card-head">
-      <h3>Job Summary</h3>
-      <div class="cust" id="panel-customer">—</div>
-      <div class="addr" id="panel-addr"></div>
-      <div class="phone" id="panel-phone"></div>
+    <div class="panel-customer">
+      <div class="pc-eyebrow">Customer</div>
+      <div class="pc-name" id="panel-name">—</div>
+      <div class="pc-addr" id="panel-addr"></div>
+      <div class="pc-meta">
+        <div class="pc-row" id="panel-phone-row" style="display:none;"><strong id="panel-phone"></strong></div>
+        <div class="pc-row" id="panel-email-row" style="display:none;"><strong id="panel-email"></strong></div>
+      </div>
+      <div class="pc-pills" id="panel-pills"></div>
     </div>
 
     <div class="profit-rows">
       <div class="pr"><div class="prl">Total Costs</div><div class="prv" id="panel-costs">£0</div></div>
-      <div class="pr"><div class="prl">BUS Grant</div><div class="prv" id="panel-bus">£7,500</div></div>
+      <div class="pr" id="panel-bus-row"><div class="prl">BUS Grant</div><div class="prv" id="panel-bus">£7,500</div></div>
       <div class="pr"><div class="prl">Customer Quote</div><div class="prv" id="panel-quote">£0</div></div>
       <div class="pdiv"></div>
       <div class="pr"><div class="prl">Total Revenue</div><div class="prv" id="panel-revenue">£0</div></div>
@@ -319,23 +337,23 @@
       <div class="pbm">Margin: <span id="panel-margin">0%</span></div>
     </div>
 
-    <div class="margin-bar-wrap">
-      <div class="mbl"><span>0%</span><span id="margin-mid-label">0%</span><span>40%+</span></div>
+    <div class="mb-wrap">
+      <div class="mbl"><span>0%</span><span id="margin-label">0%</span><span>40%+</span></div>
       <div class="mb"><div class="mbf" id="marginFill" style="width:0%"></div></div>
     </div>
 
     <button class="btn-excel" id="excelBtn" onclick="generateExcel()" disabled>↓ Download Excel</button>
-    <div class="no-json-note" id="noJsonNote">Upload a project JSON to enable Excel export</div>
+    <div class="no-json-note" id="noJsonNote">Upload a project JSON to enable export</div>
 
   </div>
 </div>
-</div>
+</div><!-- end layout -->
 
 <script>
 var projectData = null;
 var radRowData  = [];
 
-/* ── File handling ── */
+/* ── File ── */
 var dz = document.getElementById('dropZone');
 dz.addEventListener('click', function() { document.getElementById('fileInput').click(); });
 dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.classList.add('over'); });
@@ -371,44 +389,50 @@ function resetFile() {
   document.getElementById('fileInput').value = '';
   document.getElementById('excelBtn').disabled = true;
   document.getElementById('noJsonNote').style.display = 'block';
-  document.getElementById('customerCard').style.display = 'none';
-  document.getElementById('panel-customer').textContent = '—';
-  document.getElementById('panel-addr').textContent = '';
-  document.getElementById('panel-phone').textContent = '';
-  document.getElementById('hp-sub').textContent = '—';
-  document.getElementById('cyl-sub').textContent = '—';
-  document.getElementById('rad-count-label').textContent = '(upload JSON to auto-fill)';
-  document.getElementById('radTableWrap').innerHTML = '<div class="rad-placeholder" id="radPlaceholder">Upload project JSON to list radiators automatically</div>';
+  setText('panel-name', '—'); setText('panel-addr', ''); setText('panel-phone', '');
+  document.getElementById('panel-phone-row').style.display = 'none';
+  document.getElementById('panel-email-row').style.display = 'none';
+  document.getElementById('panel-pills').innerHTML = '';
+  setText('hp-sub', '—'); setText('cyl-sub', '—');
+  setText('rad-count-label', '(upload JSON to auto-fill)');
+  document.getElementById('radTableWrap').innerHTML = '<div class="rad-placeholder">Upload project JSON to list radiators automatically</div>';
   recalc();
 }
 
 function populateFromJSON(d) {
   var customer = d.customer || {};
   var property = d.property || {};
-  var addr = (property.address || {}).summaryline || '';
-  var calcs = d.calculations || {};
+  var addr     = (property.address || {}).summaryline || '';
+  var calcs    = d.calculations || {};
   var hw = (d.stages && d.stages.system_design && d.stages.system_design.hardware) || {};
-  var hpItem  = hw.heat_pump || {};
-  var cylItem = hw.cylinder  || {};
-  var hpData  = hpItem.hardware_data  || {};
-  var cylData = cylItem.hardware_data || {};
+  var hpData  = (hw.heat_pump  || {}).hardware_data || {};
+  var cylData = (hw.cylinder   || {}).hardware_data || {};
+  var hpItem  = hw.heat_pump  || {};
+  var cylItem = hw.cylinder   || {};
 
-  /* Customer card */
-  document.getElementById('customerCard').style.display = 'block';
-  setText('ci-name',  customer.full_name || '—');
-  setText('ci-phone', customer.phone_number || '—');
-  setText('ci-email', customer.email || '—');
-  setText('ci-addr',  addr || '—');
-  setText('ci-type',  ((property.build_form || '') + ' ' + (property.property_type || '')).trim() || '—');
-  setText('ci-heatloss', (calcs.heat_loss || {}).total_heat_loss_formatted || '—');
-  setText('ci-hpout',   (calcs.hp_output || {}).formatted || '—');
-
-  /* Panel */
-  setText('panel-customer', customer.full_name || '—');
+  /* Panel customer */
+  setText('panel-name', customer.full_name || '—');
   setText('panel-addr', addr);
-  setText('panel-phone', customer.phone_number || '');
+  if (customer.phone_number) {
+    setText('panel-phone', customer.phone_number);
+    document.getElementById('panel-phone-row').style.display = 'block';
+  }
+  if (customer.email) {
+    setText('panel-email', customer.email);
+    document.getElementById('panel-email-row').style.display = 'block';
+  }
 
-  /* HP / Cylinder sub-labels */
+  var pills = document.getElementById('panel-pills');
+  pills.innerHTML = '';
+  function addPill(label, val) {
+    if (!val) return;
+    pills.innerHTML += '<div class="pc-pill">' + label + ': <span>' + val + '</span></div>';
+  }
+  addPill('Heat Loss', (calcs.heat_loss || {}).total_heat_loss_formatted);
+  addPill('HP Output', (calcs.hp_output || {}).formatted);
+  addPill('Flow', ((d.stages && d.stages.system_design && d.stages.system_design.flow_temperature) || '') + '°C');
+
+  /* HP / Cyl sub-labels */
   setText('hp-sub',  (hpData.model_range||'') + ' ' + (hpData.model_name||'') + (hpData.model_number ? ' (' + hpData.model_number + ')' : ''));
   setText('cyl-sub', (cylData.model_range||'') + ' ' + (cylData.model_name||'') + (cylData.model_number ? ' (' + cylData.model_number + ')' : ''));
 
@@ -417,53 +441,70 @@ function populateFromJSON(d) {
   (d.tables || []).forEach(function(t) { if (t.row_name === 'radiator.new.room') newRads = t.row_data || []; });
   radRowData = [];
   newRads.forEach(function(r) {
-    var sizes = sp(r['radiator.new.room.rad_sizes']);
-    var types = sp(r['radiator.new.room.type']);
-    var refs  = sp(r['radiator.new.room.rad_model_reference']);
-    var mans  = sp(r['radiator.new.room.rad_manufacturer']);
-    var names = sp(r['radiator.new.room.rad_model_name']);
-    var outs  = sp(r['radiator.new.room.rad_output']);
-    var covs  = sp(r['radiator.new.room.rad_coverage']);
+    var sizes    = sp(r['radiator.new.room.rad_sizes']);
+    var types    = sp(r['radiator.new.room.type']);
+    var refs     = sp(r['radiator.new.room.rad_model_reference']);
+    var mans     = sp(r['radiator.new.room.rad_manufacturer']);
+    var names    = sp(r['radiator.new.room.rad_model_name']);
+    var outs     = sp(r['radiator.new.room.rad_output']);
+    var covs     = sp(r['radiator.new.room.rad_coverage']);
+    var stats    = sp(r['radiator.new.room.rad_status']);
     for (var i = 0; i < sizes.length; i++) {
       radRowData.push({
-        room: r['radiator.new.room.title'] || '',
-        type: (types[i] || '').replace('Type ',''),
-        size: (sizes[i] || '').replace('x','×'),
-        ref:  refs[i] || '',
-        manufacturer: mans[i] || '',
-        modelName: names[i] || '',
-        output: outs[i] || '',
-        coverage: covs[i] || '',
-        heatloss: r['radiator.new.room.heatloss'] || 0
+        room:         r['radiator.new.room.title'] || '',
+        type:         (types[i]||'').replace('Type ',''),
+        size:         (sizes[i]||'').replace('x','×'),
+        ref:          refs[i]  || '',
+        manufacturer: mans[i]  || '',
+        modelName:    names[i] || '',
+        output:       outs[i]  || '',
+        coverage:     covs[i]  || '',
+        status:       stats[i] || '',
+        heatloss:     r['radiator.new.room.heatloss'] || 0
       });
     }
   });
 
-  document.getElementById('rad-count-label').textContent = '(' + radRowData.length + ' emitters)';
+  setText('rad-count-label', '(' + radRowData.length + ' emitters)');
 
   if (radRowData.length === 0) {
-    document.getElementById('radTableWrap').innerHTML = '<div class="rad-placeholder">No radiators found in this project file.</div>';
+    document.getElementById('radTableWrap').innerHTML = '<div class="rad-placeholder">No radiators found in this file.</div>';
     return;
   }
 
-  var html = '<div class="rad-table-wrap"><table class="rad-table">' +
-    '<thead><tr><th>Room</th><th>Type</th><th>Size</th><th>Ref</th><th>Output</th><th>Unit Cost</th><th>Total</th></tr></thead>' +
-    '<tbody>';
+  var html = '<div class="rad-wrap"><table class="rad-table">' +
+    '<thead><tr><th>Room</th><th>Type</th><th>Size</th><th>Manufacturer</th><th>Model</th><th>Output</th><th>Coverage</th><th>Status</th><th>Unit Cost</th><th>Total</th></tr></thead><tbody>';
+
   radRowData.forEach(function(r, i) {
+    var statusClass = 'status-other';
+    var s = (r.status || '').toLowerCase();
+    if (s === 'additional') statusClass = 'status-additional';
+    else if (s === 'adequate') statusClass = 'status-adequate';
+    else if (s === 'oversized') statusClass = 'status-oversized';
+
     html += '<tr>' +
-      '<td class="room-cell">' + r.room + '</td>' +
+      '<td class="room">' + r.room + '</td>' +
       '<td>' + r.type + '</td>' +
       '<td style="white-space:nowrap">' + r.size + '</td>' +
-      '<td class="ref-cell">' + r.ref + '</td>' +
+      '<td>' + r.manufacturer + '</td>' +
+      '<td>' + r.modelName + '</td>' +
       '<td>' + r.output + 'W</td>' +
-      '<td><div class="price-input"><span>£</span><input type="number" id="rad-' + i + '" placeholder="0" min="0" oninput="recalc()"></div></td>' +
-      '<td id="rad-tot-' + i + '" style="font-weight:600;">—</td>' +
+      '<td>' + r.coverage + '</td>' +
+      '<td><span class="status-badge ' + statusClass + '">' + (r.status || '—') + '</span></td>' +
+      '<td class="rad-price-cell"><div class="rad-price-wrap"><span class="sym">£</span><input type="number" id="rad-' + i + '" placeholder="0" min="0" oninput="recalc()"></div></td>' +
+      '<td class="num" id="rad-tot-' + i + '">—</td>' +
     '</tr>';
   });
-  html += '</tbody>' +
-    '<tfoot><tr><td colspan="5">Radiator Total</td><td></td><td id="rad-total-cell">£0</td></tr></tfoot>' +
-    '</table></div>';
+
+  html += '</tbody><tfoot><tr><td colspan="8">Radiator Total</td><td></td><td class="num" id="rad-total-cell">£0</td></tr></tfoot></table></div>';
   document.getElementById('radTableWrap').innerHTML = html;
+}
+
+function togglePMT() {
+  var on = document.getElementById('tog-pmt').checked;
+  var extra = document.getElementById('pmt-extra');
+  extra.className = 'ti-extra' + (on ? ' show' : '');
+  recalc();
 }
 
 function sp(v) { return (v||'').toString().split('</w:t><w:br/><w:t>'); }
@@ -478,8 +519,19 @@ function recalc() {
     radTotal += v;
     setText('rad-tot-' + i, v > 0 ? fmt(v) : '—');
   });
-  var radTotCell = document.getElementById('rad-total-cell');
-  if (radTotCell) radTotCell.textContent = fmt(radTotal);
+  var rtCell = document.getElementById('rad-total-cell');
+  if (rtCell) rtCell.textContent = fmt(radTotal);
+
+  var fornaxFixed = 210;
+  var busFee  = document.getElementById('tog-bus').checked ? 200 : 0;
+  var pmtFee  = 0;
+  if (document.getElementById('tog-pmt').checked) {
+    var drawn = n('pmt-amount');
+    var rate  = Math.min(Math.max(n('pmt-rate'), 2.5), 4.5) / 100;
+    pmtFee = drawn * rate;
+  }
+  setText('tc-bus', document.getElementById('tog-bus').checked ? '£200' : '—');
+  setText('tc-pmt', pmtFee > 0 ? fmt(pmtFee) : (document.getElementById('tog-pmt').checked ? '£0' : '—'));
 
   var costHP   = n('cost-hp');
   var costCyl  = n('cost-cyl');
@@ -493,7 +545,7 @@ function recalc() {
   var bus      = n('rev-bus');
   var quote    = n('rev-quote');
 
-  var totalCosts = costHP + costCyl + radTotal + labour + pipes + pipesSaf + h07 + core3 + isolator + other;
+  var totalCosts = costHP + costCyl + radTotal + labour + pipes + pipesSaf + h07 + core3 + isolator + other + fornaxFixed + busFee + pmtFee;
   var totalRev   = bus + quote;
   var profit     = totalRev - totalCosts;
   var margin     = totalRev > 0 ? profit / totalRev * 100 : 0;
@@ -511,7 +563,6 @@ function recalc() {
   setText('tot-quote', quote > 0 ? fmt(quote) : '—');
   setText('totalCosts', fmt(totalCosts));
   setText('totalRevenue', fmt(totalRev));
-
   setText('panel-costs', fmt(totalCosts));
   setText('panel-bus', fmt(bus));
   setText('panel-quote', quote > 0 ? fmt(quote) : '£0');
@@ -521,7 +572,7 @@ function recalc() {
   profEl.textContent = (profit < 0 ? '-' : '') + fmt(profit);
   profEl.className = 'pba' + (profit < 0 ? ' neg' : '');
   setText('panel-margin', margin.toFixed(1) + '%');
-  setText('margin-mid-label', margin.toFixed(1) + '%');
+  setText('margin-label', margin.toFixed(1) + '%');
 
   var pct = Math.min(Math.max(margin, 0), 40) / 40 * 100;
   var fill = document.getElementById('marginFill');
@@ -529,7 +580,7 @@ function recalc() {
   fill.className = 'mbf' + (margin < 10 ? ' low' : margin < 20 ? ' mid' : '');
 }
 
-/* ── Excel Export ── */
+/* ── Excel ── */
 function generateExcel() {
   if (!projectData) return;
   try {
@@ -554,15 +605,20 @@ function generateExcel() {
     var core3    = n('cost-3core');
     var isolator = n('cost-isolator');
     var other    = n('cost-other');
+    var busFeeOn = document.getElementById('tog-bus').checked;
+    var pmtOn    = document.getElementById('tog-pmt').checked;
+    var pmtDrawn = n('pmt-amount');
+    var pmtRate  = Math.min(Math.max(n('pmt-rate'),2.5),4.5);
+    var pmtFee   = pmtOn ? pmtDrawn * pmtRate / 100 : 0;
     var bus      = n('rev-bus');
     var quote    = n('rev-quote');
 
-    var radCosts = radRowData.map(function(r, i) { return n('rad-' + i); });
-    var radTotal = radCosts.reduce(function(a, b) { return a + b; }, 0);
-    var totalCosts = costHP + costCyl + radTotal + labour + pipes + pipesSaf + h07 + core3 + isolator + other;
-    var totalRev   = bus + quote;
-    var profit     = totalRev - totalCosts;
-    var margin     = totalRev > 0 ? profit / totalRev : 0;
+    var radCosts = radRowData.map(function(r,i){ return n('rad-'+i); });
+    var radTotal = radCosts.reduce(function(a,b){return a+b;},0);
+    var totalCosts = costHP + costCyl + radTotal + labour + pipes + pipesSaf + h07 + core3 + isolator + other + 210 + (busFeeOn?200:0) + pmtFee;
+    var totalRev = bus + quote;
+    var profit   = totalRev - totalCosts;
+    var margin   = totalRev > 0 ? profit / totalRev : 0;
 
     var wb = XLSX.utils.book_new();
     var rows = [
@@ -574,19 +630,22 @@ function generateExcel() {
       ['Date', new Date().toLocaleDateString('en-GB')],
       [],
       ['COSTS', 'Description', null, '£'],
-      ['Heat Pump', (hpData.model_range||'') + ' ' + (hpData.model_name||'') + ' (' + (hpData.model_number||'') + ')', null, costHP],
-      ['Cylinder / Tank', (cylData.model_range||'') + ' ' + (cylData.model_name||'') + ' (' + (cylData.model_number||'') + ')', null, costCyl],
+      ['Heat Pump', (hpData.model_range||'')+' '+(hpData.model_name||'')+' ('+(hpData.model_number||'')+')', null, costHP],
+      ['Cylinder / Tank', (cylData.model_range||'')+' '+(cylData.model_name||'')+' ('+(cylData.model_number||'')+')', null, costCyl],
     ];
-    radRowData.forEach(function(r, i) {
-      rows.push(['Radiator – ' + r.room, r.manufacturer + ' ' + r.modelName + ' ' + r.size + ' (' + r.ref + ')', null, radCosts[i]]);
+    radRowData.forEach(function(r,i) {
+      rows.push(['Radiator – '+r.room, r.manufacturer+' '+r.modelName+' '+r.size+' ('+r.ref+')', null, radCosts[i]]);
     });
-    rows.push(['Installation Labour', labHrs + ' hrs × £' + labRate + '/hr', null, labour]);
+    rows.push(['Installation Labour', labHrs+' hrs × £'+labRate+'/hr', null, labour]);
     rows.push(['Pipes & Fittings', null, null, pipes]);
     rows.push(['Pipes & Fittings (Safety)', null, null, pipesSaf]);
     rows.push(['Cables H07RN-F', null, null, h07]);
     rows.push(['3 Core Cable', null, null, core3]);
     rows.push(['Isolator', null, null, isolator]);
     rows.push(['Other / Misc', null, null, other]);
+    rows.push(['Fornax Processing / Umbrella Fee', 'Fixed per project', null, 210]);
+    if (busFeeOn) rows.push(['Fornax BUS Advance', 'Fixed fee', null, 200]);
+    if (pmtOn) rows.push(['Fornax Pay Me Today', pmtRate+'% of £'+pmtDrawn+' drawn', null, pmtFee]);
     rows.push([null, null, 'TOTAL COSTS', totalCosts]);
     rows.push([]);
     rows.push(['REVENUE', null, null, '£']);
@@ -600,23 +659,18 @@ function generateExcel() {
 
     var ws = XLSX.utils.aoa_to_sheet(rows);
     ws['!cols'] = [{wch:26},{wch:50},{wch:16},{wch:12}];
-    var marginRowIdx = rows.length;
-    var marginCellAddr = 'D' + marginRowIdx;
-    if (ws[marginCellAddr]) ws[marginCellAddr].z = '0.0%';
+    var mIdx = rows.length;
+    if (ws['D'+mIdx]) ws['D'+mIdx].z = '0.0%';
     XLSX.utils.book_append_sheet(wb, ws, 'Job Costing');
 
-    var safeName = (customer.full_name || 'Project').replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
-    XLSX.writeFile(wb, 'Sailax_Profit_' + safeName + '.xlsx');
-  } catch(err) {
-    console.error(err);
-    alert('Error: ' + err.message);
-  }
+    var safeName = (customer.full_name||'Project').replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
+    XLSX.writeFile(wb, 'Sailax_Profit_'+safeName+'.xlsx');
+  } catch(err) { alert('Error: '+err.message); console.error(err); }
 }
 
 function showError(msg) {
   var el = document.getElementById('errorBox');
-  el.textContent = msg;
-  el.style.display = 'block';
+  el.textContent = msg; el.style.display = 'block';
 }
 
 recalc();
