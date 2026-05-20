@@ -213,6 +213,13 @@
       <button onclick="downloadRadiatorSchedule()" style="font-size:12px;font-weight:600;color:#3F8F6C;background:none;border:1px solid rgba(63,143,108,0.35);border-radius:6px;padding:7px 14px;cursor:pointer;">↓ Download Radiator Schedule for Supplier Quote</button>
     </div>
 
+    <div class="section-label">VAT on Purchased Hardware</div>
+    <div class="line-item">
+      <div class="li-label">VAT (20%)<div class="li-sub">Heat pump + cylinder + radiators</div></div>
+      <span class="fixed-badge">Auto</span>
+      <div class="li-total" id="tot-vat">£0</div>
+    </div>
+
     <div class="section-label">Labour</div>
     <div class="line-item">
       <div class="li-label">Installation Labour</div>
@@ -571,29 +578,39 @@ function downloadRadiatorSchedule() {
   var property = projectData.property || {};
   var addr = (property.address || {}).summaryline || '';
 
-  /* Group by type + size */
+  /* Group by type + size, preserving insertion order */
+  var groupKeys = [];
   var groups = {};
   radRowData.forEach(function(r) {
-    var key = 'Type ' + r.type + ' ' + r.size;
-    groups[key] = (groups[key] || 0) + 1;
+    var key = r.type + '||' + r.size;
+    if (!groups[key]) { groups[key] = {type: r.type, size: r.size, qty: 0}; groupKeys.push(key); }
+    groups[key].qty++;
   });
+
+  /* CSV helper — quotes any field containing commas or quotes */
+  function q(v) {
+    v = String(v == null ? '' : v);
+    return (v.indexOf(',') >= 0 || v.indexOf('"') >= 0) ? '"' + v.replace(/"/g,'""') + '"' : v;
+  }
+  function row() { return Array.prototype.slice.call(arguments).map(q).join(','); }
 
   var lines = [
-    'RADIATOR SCHEDULE — QUOTE REQUEST',
-    'Customer: ' + (customer.full_name || ''),
-    'Address:  ' + addr,
-    'Date:     ' + new Date().toLocaleDateString('en-GB'),
+    row('RADIATOR SCHEDULE - QUOTE REQUEST'),
+    row('Customer:', customer.full_name || ''),
+    row('Address:', addr),
+    row('Date:', new Date().toLocaleDateString('en-GB')),
     '',
-    'Type,Size (mm),Qty'
+    row('Type', 'Size (H x W mm)', 'Qty')
   ];
-  Object.keys(groups).sort().forEach(function(k) {
-    var parts = k.split(' ');
-    lines.push(parts[0]+' '+parts[1]+','+parts[2]+','+groups[k]);
+  groupKeys.forEach(function(k) {
+    var g = groups[k];
+    lines.push(row('Type ' + g.type, g.size.replace('x',' x '), g.qty));
   });
   lines.push('');
-  lines.push('Notes: Generic / unbranded acceptable. All panel radiators unless stated.');
+  lines.push(row('Notes:', 'Generic / unbranded acceptable. All panel radiators unless stated.'));
 
-  var blob = new Blob([lines.join('\n')], {type: 'text/plain'});
+  /* UTF-8 BOM so Excel opens symbols correctly */
+  var blob = new Blob(['﻿' + lines.join('\r\n')], {type: 'text/csv;charset=utf-8'});
   var url  = URL.createObjectURL(blob);
   var a    = document.createElement('a');
   var safeName = (customer.full_name||'Project').replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
@@ -647,7 +664,9 @@ function recalc() {
   var bus      = n('rev-bus');
   var quote    = n('rev-quote');
 
-  var totalCosts = costHP + costCyl + radTotal + labour + pipes + pipesSaf + h07 + core3 + isolator + other + fornaxFixed + busFee + pmtFee;
+  var vatAmount  = (costHP + costCyl + radTotal) * 0.20;
+  setText('tot-vat', fmt(vatAmount));
+  var totalCosts = costHP + costCyl + radTotal + vatAmount + labour + pipes + pipesSaf + h07 + core3 + isolator + other + fornaxFixed + busFee + pmtFee;
   var totalRev   = bus + quote;
   var profit     = totalRev - totalCosts;
   var margin     = totalRev > 0 ? profit / totalRev * 100 : 0;
@@ -717,7 +736,8 @@ function generateExcel() {
 
     var radCosts = radRowData.map(function(r,i){ return n('rad-'+i); });
     var radTotal = radCosts.reduce(function(a,b){return a+b;},0);
-    var totalCosts = costHP + costCyl + radTotal + labour + pipes + pipesSaf + h07 + core3 + isolator + other + 210 + (busFeeOn?200:0) + pmtFee;
+    var vatAmount = (costHP + costCyl + radTotal) * 0.20;
+    var totalCosts = costHP + costCyl + radTotal + vatAmount + labour + pipes + pipesSaf + h07 + core3 + isolator + other + 210 + (busFeeOn?200:0) + pmtFee;
     var totalRev = bus + quote;
     var profit   = totalRev - totalCosts;
     var margin   = totalRev > 0 ? profit / totalRev : 0;
@@ -738,7 +758,8 @@ function generateExcel() {
     radRowData.forEach(function(r,i) {
       rows.push(['Radiator – '+r.room, 'Type '+r.type+' '+r.size, null, radCosts[i]]);
     });
-    rows.push(['Installation Labour', labHrs+' hrs × £'+labRate+'/hr', null, labour]);
+    rows.push(['VAT on Hardware (20%)', 'Heat pump + cylinder + radiators', null, vatAmount]);
+    rows.push(['Installation Labour', labHrs+' hrs x £'+labRate+'/hr', null, labour]);
     rows.push(['Pipes & Fittings', null, null, pipes]);
     rows.push(['Pipes & Fittings (Safety)', null, null, pipesSaf]);
     rows.push(['Cables H07RN-F', h07m+'m × £'+h07r+'/m', null, h07]);
