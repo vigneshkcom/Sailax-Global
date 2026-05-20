@@ -213,9 +213,9 @@
       <button onclick="downloadRadiatorSchedule()" style="font-size:12px;font-weight:600;color:#3F8F6C;background:none;border:1px solid rgba(63,143,108,0.35);border-radius:6px;padding:7px 14px;cursor:pointer;">↓ Print / Save Radiator Quote Request (PDF)</button>
     </div>
 
-    <div class="section-label">VAT on Purchased Hardware</div>
+    <div class="section-label">VAT on Materials &amp; Hardware</div>
     <div class="line-item">
-      <div class="li-label">VAT (20%)<div class="li-sub">Heat pump + cylinder + radiators</div></div>
+      <div class="li-label">VAT (20%)<div class="li-sub">Hardware + radiators + materials (excl. labour)</div></div>
       <span class="fixed-badge">Auto</span>
       <div class="li-total" id="tot-vat">£0</div>
     </div>
@@ -755,9 +755,9 @@ function recalc() {
   var bus      = n('rev-bus');
   var quote    = n('rev-quote');
 
-  var vatAmount  = (costHP + costCyl + radTotal) * 0.20;
+  var vatAmount  = (costHP + costCyl + radTotal + pipes + pipesSaf + h07 + core3 + isolator + other) * 0.20;
   setText('tot-vat', fmt(vatAmount));
-  var totalCosts = costHP + costCyl + radTotal + vatAmount + labour + pipes + pipesSaf + h07 + core3 + isolator + other + fornaxFixed + busFee + pmtFee;
+  var totalCosts = costHP + costCyl + radTotal + pipes + pipesSaf + h07 + core3 + isolator + other + vatAmount + labour + fornaxFixed + busFee + pmtFee;
   var totalRev   = bus + quote;
   var profit     = totalRev - totalCosts;
   var margin     = totalRev > 0 ? profit / totalRev * 100 : 0;
@@ -827,8 +827,8 @@ function generateExcel() {
 
     var radCosts = radRowData.map(function(r,i){ return n('rad-'+i); });
     var radTotal = radCosts.reduce(function(a,b){return a+b;},0);
-    var vatAmount = (costHP + costCyl + radTotal) * 0.20;
-    var totalCosts = costHP + costCyl + radTotal + vatAmount + labour + pipes + pipesSaf + h07 + core3 + isolator + other + 210 + (busFeeOn?200:0) + pmtFee;
+    var vatAmount = (costHP + costCyl + radTotal + pipes + pipesSaf + h07 + core3 + isolator + other) * 0.20;
+    var totalCosts = costHP + costCyl + radTotal + pipes + pipesSaf + h07 + core3 + isolator + other + vatAmount + labour + 210 + (busFeeOn?200:0) + pmtFee;
     var totalRev = bus + quote;
     var profit   = totalRev - totalCosts;
     var margin   = totalRev > 0 ? profit / totalRev : 0;
@@ -849,7 +849,7 @@ function generateExcel() {
     radRowData.forEach(function(r,i) {
       rows.push(['Radiator – '+r.room, 'Type '+r.type+' '+r.size, null, radCosts[i]]);
     });
-    rows.push(['VAT on Hardware (20%)', 'Heat pump + cylinder + radiators', null, vatAmount]);
+    rows.push(['VAT (20%)', 'Hardware + radiators + materials (excl. labour)', null, vatAmount]);
     rows.push(['Installation Labour', labHrs+' hrs x £'+labRate+'/hr', null, labour]);
     rows.push(['Pipes & Fittings', null, null, pipes]);
     rows.push(['Pipes & Fittings (Safety)', null, null, pipesSaf]);
