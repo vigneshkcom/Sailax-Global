@@ -210,7 +210,7 @@
       <div class="rad-placeholder">Upload project JSON to list radiators automatically</div>
     </div>
     <div id="radQuoteBtn" style="display:none;padding:0 20px 14px;">
-      <button onclick="downloadRadiatorSchedule()" style="font-size:12px;font-weight:600;color:#3F8F6C;background:none;border:1px solid rgba(63,143,108,0.35);border-radius:6px;padding:7px 14px;cursor:pointer;">↓ Download Radiator Schedule for Supplier Quote</button>
+      <button onclick="downloadRadiatorSchedule()" style="font-size:12px;font-weight:600;color:#3F8F6C;background:none;border:1px solid rgba(63,143,108,0.35);border-radius:6px;padding:7px 14px;cursor:pointer;">↓ Print / Save Radiator Quote Request (PDF)</button>
     </div>
 
     <div class="section-label">VAT on Purchased Hardware</div>
@@ -574,9 +574,9 @@ function populateFromJSON(d) {
 
 function downloadRadiatorSchedule() {
   if (!projectData || radRowData.length === 0) return;
-  var customer = projectData.customer || {};
   var property = projectData.property || {};
-  var addr = (property.address || {}).summaryline || '';
+  var addr     = (property.address || {}).summaryline || '';
+  var today    = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
 
   /* Group by type + size, preserving insertion order */
   var groupKeys = [];
@@ -587,36 +587,107 @@ function downloadRadiatorSchedule() {
     groups[key].qty++;
   });
 
-  /* CSV helper — quotes any field containing commas or quotes */
-  function q(v) {
-    v = String(v == null ? '' : v);
-    return (v.indexOf(',') >= 0 || v.indexOf('"') >= 0) ? '"' + v.replace(/"/g,'""') + '"' : v;
-  }
-  function row() { return Array.prototype.slice.call(arguments).map(q).join(','); }
-
-  var lines = [
-    row('RADIATOR SCHEDULE - QUOTE REQUEST'),
-    row('Customer:', customer.full_name || ''),
-    row('Address:', addr),
-    row('Date:', new Date().toLocaleDateString('en-GB')),
-    '',
-    row('Type', 'Size (H x W mm)', 'Qty')
-  ];
-  groupKeys.forEach(function(k) {
+  var tableRows = groupKeys.map(function(k, idx) {
     var g = groups[k];
-    lines.push(row('Type ' + g.type, g.size.replace('x',' x '), g.qty));
-  });
-  lines.push('');
-  lines.push(row('Notes:', 'Generic / unbranded acceptable. All panel radiators unless stated.'));
+    return '<tr>' +
+      '<td>' + (idx + 1) + '</td>' +
+      '<td>Type ' + g.type + '</td>' +
+      '<td>' + g.size + ' mm</td>' +
+      '<td>' + g.qty + '</td>' +
+    '</tr>';
+  }).join('');
 
-  /* UTF-8 BOM so Excel opens symbols correctly */
-  var blob = new Blob(['﻿' + lines.join('\r\n')], {type: 'text/csv;charset=utf-8'});
-  var url  = URL.createObjectURL(blob);
-  var a    = document.createElement('a');
-  var safeName = (customer.full_name||'Project').replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
-  a.href = url; a.download = 'Radiator_Schedule_' + safeName + '.csv';
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
+  var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
+  '<title>Radiator Quote Request</title>' +
+  '<style>' +
+    'body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#1a1a1a;background:#fff;}' +
+    '.page{max-width:680px;margin:48px auto;padding:0 32px;}' +
+    '.logo-bar{display:flex;align-items:center;gap:14px;margin-bottom:36px;}' +
+    '.logo-bar img{height:34px;}' +
+    '.logo-bar .divider{width:1px;height:28px;background:#ccc;}' +
+    '.logo-bar .co-name{font-size:15px;font-weight:700;color:#16201B;letter-spacing:-0.01em;}' +
+    '.from-block{margin-bottom:28px;}' +
+    '.from-block p{margin:2px 0;font-size:13px;color:#333;}' +
+    '.from-block .name{font-weight:700;font-size:14px;color:#16201B;}' +
+    '.to-block{background:#f7f8f6;border-left:3px solid #3F8F6C;padding:10px 14px;margin-bottom:24px;border-radius:0 5px 5px 0;}' +
+    '.to-block p{margin:2px 0;font-size:12px;color:#444;}' +
+    '.to-block .label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#888;margin-bottom:4px;}' +
+    '.subject{font-size:16px;font-weight:700;color:#16201B;margin:0 0 6px;}' +
+    '.date-line{font-size:12px;color:#888;margin-bottom:28px;}' +
+    'p{margin:0 0 14px;line-height:1.65;color:#333;}' +
+    'table{width:100%;border-collapse:collapse;margin:20px 0 24px;}' +
+    'thead th{background:#16201B;color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:9px 12px;text-align:left;}' +
+    'tbody tr:nth-child(even) td{background:#f7f8f6;}' +
+    'tbody td{padding:9px 12px;border-bottom:1px solid #e8ebe7;font-size:13px;}' +
+    'tbody td:first-child{color:#888;font-size:11px;}' +
+    'tbody td:last-child{font-weight:700;text-align:center;width:60px;}' +
+    'thead th:last-child{text-align:center;width:60px;}' +
+    '.note{font-size:12px;color:#666;font-style:italic;margin:0 0 28px;padding:10px 14px;background:#fffbeb;border:1px solid #f0e6b8;border-radius:5px;}' +
+    '.sig{margin-top:32px;}' +
+    '.sig .sig-name{font-weight:700;font-size:14px;color:#16201B;margin:0 0 2px;}' +
+    '.sig p{margin:1px 0;font-size:13px;color:#444;}' +
+    '.sig a{color:#3F8F6C;text-decoration:none;}' +
+    '.footer{margin-top:48px;padding-top:16px;border-top:1px solid #e0e4de;font-size:11px;color:#aaa;text-align:center;}' +
+    '@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+    '.page{margin:20px auto;}button{display:none!important;}}' +
+  '</style></head><body>' +
+  '<div class="page">' +
+
+  '<div class="logo-bar">' +
+    '<img src="https://assets.cdn.filesafe.space/DJbRokQKsl1YbqIkbRaf/media/6a0c5b06cc2b26d8ba833e45.png" alt="Sailax">' +
+    '<div class="divider"></div>' +
+    '<span class="co-name">Sailax Global Ltd</span>' +
+  '</div>' +
+
+  '<div class="from-block">' +
+    '<p class="name">Usman</p>' +
+    '<p>Sailax Global Ltd</p>' +
+    '<p>1 City Road, London, EC1V 2PU</p>' +
+    '<p><a href="mailto:usman@sailax.co.uk">usman@sailax.co.uk</a> &nbsp;·&nbsp; 07404 400 833</p>' +
+  '</div>' +
+
+  '<div class="to-block">' +
+    '<p class="label">Property Address</p>' +
+    '<p>' + addr + '</p>' +
+  '</div>' +
+
+  '<p class="subject">Radiator Quotation Request</p>' +
+  '<p class="date-line">' + today + '</p>' +
+
+  '<p>Dear Sir / Madam,</p>' +
+
+  '<p>I hope this email finds you well. I am writing on behalf of <strong>Sailax Global Ltd</strong>, a UK-based heat pump installation company. We are currently in the process of designing a heat pump system for the above property and require a quotation for the supply of radiators as listed below.</p>' +
+
+  '<p>Please could you provide your best pricing for the following panel radiators. <strong>Generic or unbranded equivalents are perfectly acceptable</strong> — we do not require any specific manufacturer or model.</p>' +
+
+  '<table>' +
+    '<thead><tr><th>#</th><th>Radiator Type</th><th>Size (H &times; W)</th><th>Qty</th></tr></thead>' +
+    '<tbody>' + tableRows + '</tbody>' +
+  '</table>' +
+
+  '<p class="note">All radiators are standard panel convector type unless otherwise stated. Towel rails as specified by type. Please confirm availability and lead times with your quote.</p>' +
+
+  '<p>If you have any questions or require further information, please do not hesitate to get in touch. We look forward to receiving your quotation at your earliest convenience.</p>' +
+
+  '<p>Kind regards,</p>' +
+
+  '<div class="sig">' +
+    '<p class="sig-name">Usman</p>' +
+    '<p>Sailax Global Ltd &nbsp;·&nbsp; Heat Pump Specialists</p>' +
+    '<p><a href="mailto:usman@sailax.co.uk">usman@sailax.co.uk</a></p>' +
+    '<p>Tel: 07404 400 833</p>' +
+    '<p><a href="https://bus.sailax.co.uk">bus.sailax.co.uk</a></p>' +
+  '</div>' +
+
+  '<div class="footer">Sailax Global Ltd &nbsp;·&nbsp; 1 City Road, London, EC1V 2PU &nbsp;·&nbsp; Registered in England &amp; Wales</div>' +
+
+  '</div></body></html>';
+
+  var win = window.open('', '_blank', 'width=780,height=900');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function() { win.print(); }, 600);
 }
 
 function togglePMT() {
