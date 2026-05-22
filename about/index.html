@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us | Sailax UK — Residential Heat Pump Specialists</title>
+<meta name="description" content="Sailax Global is a UK sustainability company helping homeowners transition to cleaner heating through air source heat pump installations and full grant guidance.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --brand:       #3F8F6C;
+  --brand-dark:  #2E7255;
+  --brand-deep:  #1E4F3B;
+  --brand-bg:    rgba(63,143,108,0.10);
+  --brand-bd:    rgba(63,143,108,0.28);
+  --green:       #6AAE8A;
+  --gold:        #E3B93C;
+  --gold-light:  #F0CB6A;
+  --amber:       #B87415;
+  --ink:         #16201B;
+  --body:        #2D3A33;
+  --muted:       #536158;
+  --light-muted: #8E978F;
+  --white:       #FFFFFF;
+  --off-white:   #F6F8F5;
+  --off-white-2: #EDF2EC;
+  --border:      rgba(22,32,27,0.14);
+  --border-light:rgba(22,32,27,0.08);
+  --radius-sm:   5px;
+  --radius:      10px;
+  --radius-lg:   16px;
+  --shadow-sm:   0 2px 8px rgba(31,42,36,0.08);
+  --shadow:      0 8px 28px rgba(31,42,36,0.11);
+  --max:         1160px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; font-size: 16px; line-height: 1.65;
+  color: var(--body); background: var(--white);
+  overflow-x: hidden; -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+
+/* ── Header ── */
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500; height: 66px;
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; padding: 0 2.5rem; gap: 0.5rem;
+}
+.header-logo-link { display: inline-flex; align-items: center; }
+.header-logo-img { height: 48px; width: auto; }
+.header-right { display: flex; align-items: center; gap: 0.75rem; }
+.header-nav-link {
+  font-size: 0.82rem; font-weight: 600; color: var(--muted);
+  padding: 0.5rem 0.75rem; border-radius: var(--radius-sm);
+  transition: color 0.2s;
+}
+.header-nav-link:hover, .header-nav-link.active { color: var(--brand); }
+.header-phone {
+  display: flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.9rem;
+  font-weight: 600; font-size: 0.82rem; color: var(--ink);
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  transition: all 0.2s; white-space: nowrap;
+}
+.header-phone:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.btn-amber {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 0.4rem; font-family: 'Poppins', sans-serif;
+  font-weight: 700; font-size: 0.85rem; letter-spacing: 0.02em;
+  padding: 0.6rem 1.25rem; border-radius: var(--radius-sm); border: none; cursor: pointer;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: var(--ink); transition: all 0.2s;
+}
+.btn-amber:hover { background: linear-gradient(135deg,#D4AC34,#E8C05E); transform: translateY(-1px); }
+@media (max-width: 640px) {
+  .header-phone { display: none; }
+  .site-header { padding: 0 1.25rem; }
+  .header-logo-img { height: 42px; }
+  .header-nav-link { display: none; }
+}
+
+/* ── Page wrapper ── */
+.page-body { padding-top: 66px; }
+
+/* ── Eyebrow ── */
+.eyebrow {
+  display: inline-block; font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--brand); background: var(--brand-bg); border: 1px solid var(--brand-bd);
+  border-radius: 20px; padding: 0.28rem 0.85rem; margin-bottom: 1rem;
+}
+
+/* ══ HERO BANNER ══ */
+.about-hero {
+  background: var(--ink);
+  padding: 80px 2rem 72px;
+  text-align: center;
+}
+.about-hero .eyebrow { color: var(--green); background: rgba(106,174,138,0.12); border-color: rgba(106,174,138,0.28); }
+.about-hero h1 {
+  font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 800; color: #fff;
+  line-height: 1.18; max-width: 720px; margin: 0 auto 1.1rem;
+}
+.about-hero h1 em { font-style: normal; color: var(--green); }
+.about-hero p {
+  font-size: 1.05rem; color: rgba(255,255,255,0.60);
+  max-width: 580px; margin: 0 auto;
+}
+
+/* ══ ABOUT SECTION ══ */
+.about-section {
+  background: var(--off-white);
+  padding: 80px 2rem;
+}
+.about-inner {
+  max-width: var(--max); margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start;
+}
+.about-text h2 {
+  font-size: clamp(1.55rem, 2.5vw, 2.1rem); font-weight: 800; color: var(--ink);
+  line-height: 1.22; margin-bottom: 1.2rem;
+}
+.about-text p { color: var(--muted); margin-bottom: 1rem; font-size: 0.97rem; line-height: 1.75; }
+.about-text p:last-child { margin-bottom: 0; }
+
+.about-pillars { display: flex; flex-direction: column; gap: 16px; }
+.pillar {
+  background: #fff; border: 1px solid var(--border-light);
+  border-radius: var(--radius); padding: 20px 22px;
+  display: flex; gap: 16px; align-items: flex-start;
+  box-shadow: var(--shadow-sm);
+}
+.pillar-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  background: var(--brand-bg); border: 1px solid var(--brand-bd);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  color: var(--brand);
+}
+.pillar-text h4 { font-size: 0.9rem; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.pillar-text p { font-size: 0.82rem; color: var(--muted); line-height: 1.55; margin: 0; }
+
+/* ══ DIVIDER ══ */
+.section-divider { height: 1px; background: var(--border-light); max-width: var(--max); margin: 0 auto; }
+
+/* ══ HOW IT WORKS ══ */
+.how-section {
+  background: var(--white);
+  padding: 80px 2rem;
+}
+.how-inner { max-width: var(--max); margin: 0 auto; }
+.how-header { text-align: center; margin-bottom: 56px; }
+.how-header h2 {
+  font-size: clamp(1.55rem, 2.5vw, 2.1rem); font-weight: 800; color: var(--ink);
+  line-height: 1.22; margin-bottom: 0.75rem;
+}
+.how-header p { font-size: 0.97rem; color: var(--muted); max-width: 580px; margin: 0 auto; line-height: 1.75; }
+
+/* Diagram image */
+.how-diagram {
+  background: var(--off-white); border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg); overflow: hidden;
+  margin-bottom: 56px; text-align: center;
+  min-height: 220px; display: flex; align-items: center; justify-content: center;
+}
+.how-diagram img { width: 100%; height: auto; display: block; }
+.how-diagram-placeholder {
+  padding: 40px 24px; color: var(--light-muted);
+}
+.how-diagram-placeholder svg { margin: 0 auto 12px; opacity: 0.35; }
+.how-diagram-placeholder p { font-size: 0.88rem; margin: 0; }
+.how-diagram-placeholder small { font-size: 0.78rem; opacity: 0.75; }
+
+/* Steps */
+.how-steps {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;
+  margin-bottom: 56px;
+}
+.how-step {
+  background: var(--off-white); border: 1px solid var(--border-light);
+  border-radius: var(--radius); padding: 24px 20px;
+}
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--brand); color: #fff;
+  font-size: 0.85rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+}
+.how-step h4 { font-size: 0.88rem; font-weight: 700; color: var(--ink); margin-bottom: 6px; line-height: 1.3; }
+.how-step p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin: 0; }
+
+/* Includes */
+.includes-wrap {
+  background: var(--ink); border-radius: var(--radius-lg); padding: 40px 48px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+}
+.includes-heading { color: rgba(255,255,255,0.4); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+.includes-title { font-size: 1.3rem; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 0; }
+.includes-note { font-size: 0.82rem; color: rgba(255,255,255,0.38); margin-top: 12px; line-height: 1.55; }
+.includes-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+.includes-list li {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 0.88rem; color: rgba(255,255,255,0.72);
+}
+.includes-list li::before {
+  content: ''; width: 20px; height: 20px; flex-shrink: 0;
+  background: rgba(63,143,108,0.20); border: 1px solid rgba(63,143,108,0.35);
+  border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='%236AAE8A'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: center;
+}
+
+/* ══ CTA STRIP ══ */
+.cta-strip {
+  background: var(--brand);
+  padding: 64px 2rem; text-align: center;
+}
+.cta-strip h2 { font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 800; color: #fff; margin-bottom: 0.6rem; }
+.cta-strip p { color: rgba(255,255,255,0.75); margin-bottom: 1.6rem; font-size: 0.97rem; }
+.cta-strip .btn-amber { font-size: 1rem; padding: 0.85rem 2rem; }
+
+/* ══ FOOTER ══ */
+footer {
+  background: #E9EEE9;
+  display: grid; grid-template-columns: 1fr auto;
+  gap: 2rem; align-items: start;
+  padding: 2.5rem 3rem; border-top: 1px solid var(--border-light);
+}
+.footer-brand { display: flex; flex-direction: column; gap: 0.6rem; }
+.footer-logo-img { height: 32px; width: auto; opacity: 0.75; }
+.footer-contact-info { display: flex; flex-direction: column; gap: 0.15rem; }
+.footer-contact-info p,
+.footer-contact-info a { font-size: 0.8rem; color: var(--muted); }
+.footer-contact-info a:hover { color: var(--brand); }
+.footer-col { display: flex; flex-direction: column; gap: 0.4rem; }
+.footer-col h4 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 0.3rem; }
+.footer-col a { font-size: 0.82rem; color: var(--muted); transition: color 0.15s; }
+.footer-col a:hover { color: var(--brand); }
+.footer-bottom {
+  grid-column: 1 / -1; border-top: 1px solid var(--border-light);
+  padding-top: 1.2rem; display: flex; justify-content: space-between;
+  font-size: 0.76rem; color: var(--light-muted);
+}
+@media (max-width: 680px) {
+  footer { grid-template-columns: 1fr; padding: 2rem 1.5rem; }
+  .footer-bottom { flex-direction: column; gap: 0.3rem; }
+  .about-inner { grid-template-columns: 1fr; gap: 36px; }
+  .how-steps { grid-template-columns: 1fr 1fr; }
+  .includes-wrap { grid-template-columns: 1fr; gap: 24px; padding: 28px 24px; }
+}
+@media (max-width: 460px) {
+  .how-steps { grid-template-columns: 1fr; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="site-header">
+  <a class="header-logo-link" href="/" aria-label="Sailax home">
+    <img class="header-logo-img" src="../assets/logo.png" alt="Sailax">
+  </a>
+  <div class="header-right">
+    <a href="/about/" class="header-nav-link active">About</a>
+    <a href="tel:+447537149494" class="header-phone">+44 7537 149 494</a>
+    <a href="/#enquire" class="btn-amber">Check Eligibility</a>
+  </div>
+</header>
+
+<div class="page-body">
+
+<!-- ══ HERO ══ -->
+<section class="about-hero">
+  <span class="eyebrow">About Sailax</span>
+  <h1>Helping UK homeowners make the switch to <em>cleaner heating</em></h1>
+  <p>We guide you through every step — from your first property assessment through to installation — with no pressure, no jargon, and no surprises on cost.</p>
+</section>
+
+<!-- ══ ABOUT ══ -->
+<section class="about-section">
+  <div class="about-inner">
+
+    <div class="about-text">
+      <span class="eyebrow">Who We Are</span>
+      <h2>A specialist team focused entirely on UK residential heat pumps</h2>
+      <p>Sailax Global is a UK sustainability company specialising in coordinating air source heat pump upgrades for homeowners. We don't just sell systems — we take ownership of the whole process, from your first enquiry through to a fully commissioned installation.</p>
+      <p>We work exclusively with MCS-certified installation partners, so every job meets the standard required for Boiler Upgrade Scheme grant eligibility. That means the grant is applied directly to your quote — you never have to chase it yourself.</p>
+      <p>Our approach is simple: give you honest, clear information, confirm what you're eligible for, and only move forward when you're ready. No obligation until you choose to proceed.</p>
+    </div>
+
+    <div class="about-pillars">
+
+      <div class="pillar">
+        <div class="pillar-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="pillar-text">
+          <h4>MCS-certified installations only</h4>
+          <p>Every installation is carried out by an accredited MCS partner — a requirement for BUS grant eligibility.</p>
+        </div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        </div>
+        <div class="pillar-text">
+          <h4>We handle the grant paperwork</h4>
+          <p>Your installer applies for the Boiler Upgrade Scheme grant on your behalf. It's deducted from your quote upfront.</p>
+        </div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="pillar-text">
+          <h4>UK residential specialists</h4>
+          <p>We work exclusively with homeowners across England and Wales. Not commercial. Not overseas. Just UK homes.</p>
+        </div>
+      </div>
+
+      <div class="pillar">
+        <div class="pillar-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="pillar-text">
+          <h4>Fixed-price quotes, no surprises</h4>
+          <p>What we quote is what you pay. The BUS grant is already applied. No hidden costs at installation.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ══ HOW IT WORKS ══ -->
+<section class="how-section">
+  <div class="how-inner">
+
+    <div class="how-header">
+      <span class="eyebrow">The Technology</span>
+      <h2>How an air source heat pump heats your home</h2>
+      <p>A heat pump doesn't burn fuel — it moves heat. It extracts warmth already present in the outside air and upgrades it to a useful temperature using a refrigerant and compressor, then circulates it through your home.</p>
+    </div>
+
+    <!-- ── Diagram image — swap src below with your image URL ── -->
+    <div class="how-diagram" id="how-diagram-wrap">
+      <img
+        src=""
+        alt="How an air source heat pump works — diagram"
+        id="hp-diagram"
+        onerror="this.style.display='none'; document.getElementById('hp-diagram-placeholder').style.display='block';"
+        onload="document.getElementById('hp-diagram-placeholder').style.display='none';"
+        style="display:none;"
+      >
+      <div class="how-diagram-placeholder" id="hp-diagram-placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <p>Heat pump diagram</p>
+        <small>Paste your image URL into the <code>src</code> of <code>img#hp-diagram</code></small>
+      </div>
+    </div>
+
+    <!-- ── 4 Steps ── -->
+    <div class="how-steps">
+
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <h4>Outside air drawn in</h4>
+        <p>The outdoor unit draws in outside air — even at temperatures as low as −15°C — and extracts the heat energy held within it using a refrigerant.</p>
+      </div>
+
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <h4>Refrigerant compressed</h4>
+        <p>The refrigerant is compressed, which significantly raises its temperature — the same principle as how a bicycle pump heats up when you pump it fast.</p>
+      </div>
+
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <h4>Heat transferred to water</h4>
+        <p>The heat passes through a heat exchanger into the water in your home's central heating circuit, raising it to your required flow temperature.</p>
+      </div>
+
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <h4>Warm water circulated</h4>
+        <p>Heated water flows through your radiators or underfloor heating, and is stored in a hot water cylinder for taps and showers throughout the home.</p>
+      </div>
+
+    </div>
+
+    <!-- ── What the system includes ── -->
+    <div class="includes-wrap">
+      <div>
+        <p class="includes-heading">What's installed</p>
+        <h3 class="includes-title">A complete, fully commissioned system</h3>
+        <p class="includes-note">Every installation covers the full system from the outdoor unit to hot water at your taps. Nothing is left half-done.</p>
+      </div>
+      <ul class="includes-list">
+        <li>Outdoor air source heat pump unit</li>
+        <li>Insulated pipework connecting the system</li>
+        <li>Hot water storage cylinder</li>
+        <li>Radiators or underfloor heating distribution</li>
+        <li>Domestic hot water supply to taps and showers</li>
+        <li>Full commissioning and testing</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ CTA STRIP ══ -->
+<section class="cta-strip">
+  <h2>Ready to find out what you're eligible for?</h2>
+  <p>Check eligibility in under two minutes. No obligation — just clear, honest information about your property.</p>
+  <a href="/#enquire" class="btn-amber">Check Your Eligibility</a>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-brand">
+    <img src="../assets/logo.png" class="footer-logo-img" alt="Sailax">
+    <div class="footer-contact-info">
+      <p>1 City Rd, London EC1V 2PU, UK</p>
+      <a href="tel:+447537149494">+44 7537 149 494</a>
+      <a href="mailto:info@sailax.co.uk">info@sailax.co.uk</a>
+    </div>
+  </div>
+  <div class="footer-col">
+    <h4>Quick Links</h4>
+    <a href="/#grant">Boiler Upgrade Scheme</a>
+    <a href="/#benefits">Why Switch</a>
+    <a href="/#process">Our Process</a>
+    <a href="/#faq">FAQ</a>
+    <a href="/#enquire">Check Eligibility</a>
+    <a href="/about/">About Sailax</a>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2025 Sailax UK. All rights reserved. &nbsp;&middot;&nbsp; Residential Heat Pumps &nbsp;&middot;&nbsp; London, UK</span>
+    <span>1 City Rd, London EC1V 2PU</span>
+  </div>
+</footer>
+
+</div><!-- end page-body -->
+
+<script>
+/* Set diagram image if src provided */
+(function() {
+  var img = document.getElementById('hp-diagram');
+  if (img && img.src && img.src !== window.location.href) {
+    img.style.display = 'block';
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -153,6 +153,12 @@ section { padding: 5.5rem 2.5rem; }
 .header-logo-link { display: inline-flex; align-items: center; }
 .header-logo-img { height: 48px; width: auto; }
 .header-right { display: flex; align-items: center; gap: 0.75rem; }
+.header-nav-link {
+  font-size: 0.82rem; font-weight: 600; color: var(--muted);
+  padding: 0.5rem 0.75rem; border-radius: var(--radius-sm);
+  transition: color 0.2s;
+}
+.header-nav-link:hover { color: var(--brand); }
 .header-phone {
   display: flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.9rem;
   font-weight: 600; font-size: 0.82rem; color: var(--ink);
@@ -163,6 +169,7 @@ section { padding: 5.5rem 2.5rem; }
 .header-cta { display: flex; }
 @media (max-width: 640px) {
   .header-phone { display: none; }
+  .header-nav-link { display: none; }
   .site-header { padding: 0 1.25rem; }
   .header-logo-img { height: 42px; }
 }
@@ -499,6 +506,7 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
     <img class="header-logo-img" src="assets/logo.png" alt="Sailax">
   </a>
   <div class="header-right">
+    <a href="/about/" class="header-nav-link">About</a>
     <a href="tel:+447537149494" class="header-phone">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z" fill="currentColor"/></svg>
       +44 7537 149 494
@@ -1010,6 +1018,7 @@ footer { background: #E9EEE9; padding: 3rem 2.5rem; display: flex; align-items: 
     <a href="#process">Our Process</a>
     <a href="#faq">FAQ</a>
     <a href="#enquire">Check Eligibility</a>
+    <a href="/about/">About Sailax</a>
   </div>
   <div class="footer-bottom">
     <span>&copy; 2025 Sailax UK. All rights reserved. &nbsp;&middot;&nbsp; Residential Heat Pumps &nbsp;&middot;&nbsp; London, UK</span>
