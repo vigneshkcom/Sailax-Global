@@ -75,6 +75,16 @@ input[type=date]{font-family:'Sora',sans-serif;font-size:12px;border:1px solid v
 .src-meta{background:var(--blue-bg);color:var(--blue)}
 .src-ghl{background:var(--green-bg);color:var(--green)}
 
+/* Pipeline stages */
+.stages-wrap{margin-bottom:18px}
+.stages-title{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.stages-title span{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;background:var(--green-bg);color:var(--green)}
+.stages-grid{display:flex;flex-wrap:wrap;gap:8px}
+.stage-pill{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 14px;background:var(--surface2);font-size:13px}
+.stage-pill .sname{font-weight:500;color:var(--text)}
+.stage-pill .scount{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:var(--text)}
+.stage-pill .spct{font-size:11px;color:var(--muted)}
+
 .dtable{width:100%;border-collapse:collapse}
 .dtable th{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 10px 10px;border-bottom:1px solid var(--border)}
 .dtable th.num,.dtable td.num{text-align:right}
@@ -88,6 +98,7 @@ input[type=date]{font-family:'Sora',sans-serif;font-size:12px;border:1px solid v
 .dtable tfoot td.num{font-family:'JetBrains Mono',monospace}
 
 .note{font-size:11px;color:var(--amber);background:var(--amber-bg);border:1px solid #f0dbaa;border-radius:8px;padding:8px 12px;margin-top:12px;line-height:1.5}
+.note-red{font-size:11px;color:var(--red);background:var(--red-bg);border:1px solid #f4c2c2;border-radius:8px;padding:8px 12px;margin-top:12px;line-height:1.5}
 .err{color:var(--red);font-size:13px;padding:10px 0}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:24px 0}
 footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;line-height:1.6}
@@ -139,15 +150,13 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;line-hei
   </main>
 
   <footer>
-    Sailax Global · Meta Ads Dashboard · Spend via Meta Marketing API · Leads via GoHighLevel<br>
+    Sailax Global · Meta Ads Dashboard · Spend via Meta Marketing API · Leads &amp; Stages via GoHighLevel<br>
     Spend is as reported by Meta in each account's currency.
   </footer>
 </div>
 
 <script>
 // ── Account configuration ──────────────────────────────────────────────
-// UK and AU are separate Meta ad accounts AND separate GHL locations, so each
-// account's leads come straight from its own CRM location (no pipeline mapping).
 const ACCOUNTS = [
   { key:'uk', name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#2d6be4' },
   { key:'au', name:'Sailax AU', sub:'Australia',      accountId:'749874504045597',  currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#0ea4ac' },
@@ -213,13 +222,11 @@ async function load(){
   document.getElementById('accounts').innerHTML='<div class="empty">Loading…</div>';
   state.meta={}; state.ghl={};
   await Promise.all(ACCOUNTS.map(async (a)=>{
-    // Meta — spend + leads/day for this ad account
     try{
       const r=await fetch(`${API}/meta?account=${a.accountId}&since=${state.since}&until=${state.until}`);
       const j=await r.json();
       state.meta[a.key] = r.ok ? j : { error: j.error || ('HTTP '+r.status) };
     }catch(e){ state.meta[a.key]={ error:e.message }; }
-    // GHL — this account's own location (optional)
     if(acctCfg(a.key).ghlConfigured){
       try{ state.ghl[a.key] = await loadGHL(a.key, acctCfg(a.key).ghlLocationId); }
       catch(e){ state.ghl[a.key] = { error:e.message }; }
@@ -236,8 +243,20 @@ async function ghlFetch(account, path){
   if(!r.ok) throw new Error(j.error||('GHL HTTP '+r.status));
   return j;
 }
+
 async function loadGHL(account, locationId){
   if(!locationId) throw new Error(`GHL_LOCATION_ID_${account.toUpperCase()} not set in Vercel.`);
+
+  // Fetch pipelines (for stage names) and all opportunities in parallel
+  const [pipelineResp, opps] = await Promise.all([
+    ghlFetch(account, `/opportunities/pipelines?location_id=${locationId}`).catch(()=>({ pipelines:[] })),
+    fetchAllOpps(account, locationId),
+  ]);
+
+  return { opps, pipelines: pipelineResp.pipelines || [] };
+}
+
+async function fetchAllOpps(account, locationId){
   let all=[], after=null, afterId=null, page=0;
   while(true){
     page++;
@@ -252,6 +271,7 @@ async function loadGHL(account, locationId){
   }
   return all;
 }
+
 // Count opportunities created per YYYY-MM-DD in the account's timezone.
 function ghlPerDay(opps, tz, since, until){
   const cnt={};
@@ -263,6 +283,41 @@ function ghlPerDay(opps, tz, since, until){
     if(day>=since && day<=until) cnt[day]=(cnt[day]||0)+1;
   });
   return cnt;
+}
+
+// Build stage breakdown: stageId → { name, count } for opps in the date range.
+function ghlStageBreakdown(opps, pipelines, tz, since, until){
+  // Build stage name lookup
+  const stageNames = {};
+  (pipelines||[]).forEach(pl=>{
+    (pl.stages||[]).forEach(st=>{ stageNames[st.id] = st.name; });
+  });
+
+  const counts = {}; // stageId → count
+  const order = {};  // stageId → position for sorting
+
+  (pipelines||[]).forEach(pl=>{
+    (pl.stages||[]).forEach((st,i)=>{ order[st.id] = i; });
+  });
+
+  (opps||[]).forEach(o=>{
+    const created = o.createdAt||o.created_at||o.dateAdded;
+    if(!created) return;
+    const day = new Date(created).toLocaleDateString('en-CA',{timeZone:tz});
+    if(day < since || day > until) return;
+    const sid = o.pipelineStageId || o.stageId || 'unknown';
+    counts[sid] = (counts[sid]||0) + 1;
+  });
+
+  const total = Object.values(counts).reduce((a,b)=>a+b,0);
+  return Object.entries(counts)
+    .sort((a,b)=> (order[a[0]]??99) - (order[b[0]]??99))
+    .map(([sid, count])=>({
+      id: sid,
+      name: stageNames[sid] || 'Unknown stage',
+      count,
+      pct: total > 0 ? Math.round(count/total*100) : 0,
+    }));
 }
 
 // ── Render ─────────────────────────────────────────────────────────────
@@ -277,26 +332,61 @@ function renderAccount(a){
     <div><span class="an">${a.name}</span> <span class="as">· ${a.sub} · act_${a.accountId}</span></div>
     <div class="right"><span class="acur">${a.currency}</span></div>
   </div>`;
+
   if(!m || m.error){
-    return `<section class="acct">${head}<div class="acct-body"><div class="err">Couldn't load Meta data: ${m?m.error:'no response'}</div></div></section>`;
+    let hint = '';
+    if(m && m.error && (m.error.includes('permission') || m.error.includes('access') || m.error.includes('token') || m.error.includes('OAuth'))){
+      hint = `<div class="note-red" style="margin-top:8px">This usually means the Meta token doesn't have access to act_${a.accountId}. Fix: go to Meta Business Suite → System Users → Sailax → Assign assets → add this ad account with Analyst permission → then revoke and regenerate the token.</div>`;
+    }
+    return `<section class="acct">${head}<div class="acct-body"><div class="err">Meta data error: ${m?m.error:'no response'}</div>${hint}</div></section>`;
   }
+
   const days=m.days||[];
   const t=m.totals||{spend:0,leads:0,clicks:0,impressions:0};
 
-  // Leads source: GHL (this account's location) if available, else Meta-reported.
-  const ghl=state.ghl[a.key];
+  // Check if spend is zero — likely a token access issue for this account
+  const spendZeroNote = (t.spend===0 && days.length>0)
+    ? `<div class="note-red">Spend is £0 / $0 for all days. This usually means the Meta system user token doesn't have access to act_${a.accountId}. Go to Meta Business Suite → System Users → Sailax → Assign assets → add both ad accounts → revoke old token → Generate token again.</div>`
+    : '';
+
+  // Leads source: GHL if available, else Meta-reported
+  const ghlData = state.ghl[a.key];
+  const ghlOpps = ghlData && Array.isArray(ghlData.opps) ? ghlData.opps : null;
+  const ghlPipelines = ghlData && ghlData.pipelines ? ghlData.pipelines : [];
   let leadsByDay={}, leadsTotal, leadsSrc, ghlErr=null;
-  if(Array.isArray(ghl)){
-    leadsByDay=ghlPerDay(ghl,a.tz,state.since,state.until);
-    leadsTotal=Object.values(leadsByDay).reduce((x,y)=>x+y,0);
-    leadsSrc='ghl';
-  }else{
-    if(ghl&&ghl.error) ghlErr=ghl.error;
+
+  if(ghlOpps !== null){
+    leadsByDay = ghlPerDay(ghlOpps, a.tz, state.since, state.until);
+    leadsTotal = Object.values(leadsByDay).reduce((x,y)=>x+y,0);
+    leadsSrc = 'ghl';
+  } else {
+    if(ghlData && ghlData.error) ghlErr = ghlData.error;
     days.forEach(d=>leadsByDay[d.date]=d.leads);
-    leadsTotal=t.leads; leadsSrc='meta';
+    leadsTotal = t.leads; leadsSrc='meta';
   }
+
   const spendByDay={}; days.forEach(d=>spendByDay[d.date]=d.spend);
   const cpl = leadsTotal>0 ? t.spend/leadsTotal : null;
+
+  // Pipeline stages breakdown (only when GHL is live for this account)
+  let stagesHtml = '';
+  if(ghlOpps !== null){
+    const stages = ghlStageBreakdown(ghlOpps, ghlPipelines, a.tz, state.since, state.until);
+    if(stages.length > 0){
+      const pills = stages.map(s=>`
+        <div class="stage-pill">
+          <div>
+            <div class="sname">${s.name}</div>
+            <div class="spct">${s.pct}% of leads</div>
+          </div>
+          <div class="scount">${s.count}</div>
+        </div>`).join('');
+      stagesHtml = `<div class="stages-wrap">
+        <div class="stages-title">Pipeline Stages <span>GHL · in range</span></div>
+        <div class="stages-grid">${pills}</div>
+      </div>`;
+    }
+  }
 
   const dates=dateList(state.since,state.until).reverse();
   const maxLeads=Math.max(1,...dates.map(d=>leadsByDay[d]||0));
@@ -314,7 +404,7 @@ function renderAccount(a){
 
   const tag = leadsSrc==='ghl' ? '<span class="src-tag src-ghl">GHL</span>' : '<span class="src-tag src-meta">Meta</span>';
   let note='';
-  if(ghlErr) note=`<div class="note">GHL for ${a.name} is set but errored (${ghlErr}) — showing Meta-reported leads for now.</div>`;
+  if(ghlErr) note=`<div class="note">GHL for ${a.name} errored (${ghlErr}) — showing Meta-reported leads.</div>`;
   else if(!cfg.ghlConfigured) note=`<div class="note">Add <b>GHL_API_KEY_${a.key.toUpperCase()}</b> + <b>GHL_LOCATION_ID_${a.key.toUpperCase()}</b> in Vercel to switch Leads to CRM-confirmed for this account.</div>`;
 
   return `<section class="acct">${head}
@@ -325,11 +415,13 @@ function renderAccount(a){
         <div class="kpi"><div class="kl">Cost / Lead</div><div class="kv mono">${cpl!==null?money(cpl,a):'—'}</div><div class="ks">spend ÷ leads</div></div>
         <div class="kpi"><div class="kl">Clicks</div><div class="kv mono">${t.clicks}</div><div class="ks">${t.impressions.toLocaleString()} impressions</div></div>
       </div>
+      ${stagesHtml}
       <table class="dtable">
         <thead><tr><th>Day</th><th class="num">Spend</th><th class="bar">Leads</th><th class="num">Leads</th><th class="num">Cost/Lead</th></tr></thead>
         <tbody>${rows||'<tr><td colspan="5" class="empty">No data in range</td></tr>'}</tbody>
         <tfoot><tr><td>Total</td><td class="num">${money(t.spend,a)}</td><td></td><td class="num">${leadsTotal}</td><td class="num">${cpl!==null?money(cpl,a):'—'}</td></tr></tfoot>
       </table>
+      ${spendZeroNote}
       ${note}
     </div>
   </section>`;
