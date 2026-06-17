@@ -14,7 +14,9 @@ name: Daily Ads Report
 
 on:
   schedule:
-    - cron: '0 7 * * *'   # 07:00 UTC daily (~8am UK / ~5pm Sydney; yesterday is closed in both)
+    # 06:30 UTC = 4:30 PM AEST (UTC+10). GitHub schedules are fixed to UTC, so
+    # during Australian daylight saving (Oct-Apr) this lands at 5:30 PM local.
+    - cron: '30 6 * * *'
   workflow_dispatch: {}   # lets you run it manually from the Actions tab to test
 
 jobs:
