@@ -3,23 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sailax · Meta Ads — Spend & Leads</title>
+<title>Sailax · Ads Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f5f6f8; --surface:#fff; --surface2:#f0f2f5; --border:#e3e7ef;
-  --text:#141c2e; --muted:#6b7899;
-  --green:#18a96e; --green-bg:#eaf7f2; --red:#e04f4f; --red-bg:#fdf0f0;
-  --blue:#2d6be4; --blue-bg:#edf2fd; --teal:#0ea4ac; --teal-bg:#e6f7f8;
-  --amber:#d98c1e; --amber-bg:#fdf5e6;
-  --shadow:0 1px 4px rgba(0,0,0,.06),0 6px 16px rgba(0,0,0,.04); --r:12px;
+  --bg:#f5f6f8;--surface:#fff;--surface2:#f0f2f5;--border:#e3e7ef;
+  --text:#141c2e;--muted:#6b7899;
+  --green:#18a96e;--green-bg:#eaf7f2;--red:#e04f4f;--red-bg:#fdf0f0;
+  --blue:#2d6be4;--blue-bg:#edf2fd;--teal:#0ea4ac;--teal-bg:#e6f7f8;
+  --amber:#d98c1e;--amber-bg:#fdf5e6;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 6px 16px rgba(0,0,0,.04);--r:12px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 .mono{font-family:'JetBrains Mono',monospace}
 
-/* ── PASSWORD GATE ── */
-#gate{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px}
+/* GATE */
+#gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
 .pw-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px 48px;width:100%;max-width:400px;box-shadow:var(--shadow);text-align:center}
 .pw-brand{font-size:22px;font-weight:700;letter-spacing:-.4px;margin-bottom:6px}
 .pw-brand span{color:var(--blue)}
@@ -27,18 +28,21 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 .pw-card p{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5}
 .pw-card input{width:100%;padding:13px 16px;border:1px solid var(--border);border-radius:10px;font-family:'Sora',sans-serif;font-size:15px;background:var(--surface2);outline:none;letter-spacing:2px;margin-bottom:14px}
 .pw-card input:focus{border-color:var(--blue)}
-.pw-btn{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s}
+.pw-btn{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Sora',sans-serif;font-size:15px;font-weight:600;cursor:pointer}
 .pw-btn:hover{background:#1f56cc}
 .pw-btn:disabled{background:#b8c5dd;cursor:not-allowed}
 .pw-err{color:var(--red);font-size:12px;min-height:18px;margin-bottom:10px}
 
-/* ── APP ── */
+/* APP */
 #app{display:none}
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 26px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:12px}
-.logo{font-size:18px;font-weight:700;letter-spacing:-.3px}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 26px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;flex-wrap:wrap}
+.logo{font-size:18px;font-weight:700;letter-spacing:-.3px;margin-right:4px}
 .logo span{color:var(--blue)}
-.logo .sub{display:block;font-size:12px;font-weight:400;color:var(--muted)}
-.hr{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.account-tabs{display:flex;gap:6px;flex:1}
+.atab{font-family:'Sora',sans-serif;font-size:13px;font-weight:600;padding:8px 18px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--muted);cursor:pointer;transition:all .15s}
+.atab:hover{border-color:var(--blue);color:var(--blue)}
+.atab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.hbadges{display:flex;gap:8px;align-items:center}
 .badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;border-radius:20px;padding:4px 10px;border:1px solid}
 .badge .dot{width:7px;height:7px;border-radius:50%;animation:pulse 1.5s infinite}
 .badge.on{background:var(--green-bg);color:var(--green);border-color:#b5e8d5}
@@ -47,10 +51,12 @@ header{background:var(--surface);border-bottom:1px solid var(--border);padding:1
 .badge.off .dot{background:var(--muted);animation:none}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-main{padding:22px 26px;max-width:1280px;margin:0 auto}
-.filters{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;box-shadow:var(--shadow)}
+main{padding:20px 26px;max-width:1400px;margin:0 auto}
+
+/* FILTERS */
+.filters{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:11px 16px;display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;box-shadow:var(--shadow)}
 .filters label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase}
-.pbtn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--muted);cursor:pointer}
+.pbtn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:7px;background:var(--surface2);color:var(--muted);cursor:pointer;font-family:'Sora',sans-serif}
 .pbtn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
 input[type=date]{font-family:'Sora',sans-serif;font-size:12px;border:1px solid var(--border);border-radius:7px;padding:6px 10px;background:var(--surface2)}
 .fsep{width:1px;height:22px;background:var(--border)}
@@ -58,81 +64,107 @@ input[type=date]{font-family:'Sora',sans-serif;font-size:12px;border:1px solid v
 .btn-refresh{font-family:'Sora',sans-serif;font-size:12px;font-weight:600;padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer}
 .btn-refresh:hover{background:var(--blue-bg);color:var(--blue)}
 
-/* Account section */
-.acct{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:22px;overflow:hidden}
-.acct-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.acct-head .an{font-size:16px;font-weight:700}
-.acct-head .as{font-size:12px;color:var(--muted)}
-.acct-head .right{display:flex;align-items:center;gap:8px}
-.acct-head .acur{font-size:11px;font-weight:600;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px}
-.acct-body{padding:18px 20px}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-.kpi{border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow)}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}
+.card-head .chtag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px}
+.card-body{padding:18px}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.kpi{border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:var(--surface)}
 .kpi .kl{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.kpi .kv{font-size:26px;font-weight:700;line-height:1}
+.kpi .kv{font-size:26px;font-weight:700;line-height:1;font-family:'JetBrains Mono',monospace}
 .kpi .ks{font-size:11px;color:var(--muted);margin-top:5px}
 .src-tag{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;text-transform:uppercase;letter-spacing:.3px}
 .src-meta{background:var(--blue-bg);color:var(--blue)}
 .src-ghl{background:var(--green-bg);color:var(--green)}
 
-/* Campaigns */
-.camps-wrap{margin-bottom:18px}
-.camps-title{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.camps-title span{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;background:var(--blue-bg);color:var(--blue)}
+/* TWO-COLUMN */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.row2-3{display:grid;grid-template-columns:2fr 3fr;gap:18px;margin-bottom:18px}
 
-/* Pipeline stages */
-.stages-wrap{margin-bottom:18px}
-.stages-title{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.stages-title span{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;background:var(--green-bg);color:var(--green)}
-.stages-grid{display:flex;flex-wrap:wrap;gap:8px}
-.stage-pill{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 14px;background:var(--surface2);font-size:13px}
-.stage-pill .sname{font-weight:500;color:var(--text)}
-.stage-pill .scount{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:var(--text)}
-.stage-pill .spct{font-size:11px;color:var(--muted)}
+/* FUNNEL */
+.funnel{display:flex;flex-direction:column;gap:4px}
+.funnel-row{display:flex;align-items:center;gap:12px}
+.funnel-label{font-size:13px;font-weight:600;width:160px;flex-shrink:0}
+.funnel-bar-wrap{flex:1;background:var(--surface2);border-radius:6px;overflow:hidden;height:28px}
+.funnel-bar{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:12px;font-weight:700;color:#fff;transition:width .4s ease;min-width:40px}
+.funnel-count{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;width:40px;text-align:right;flex-shrink:0}
+.funnel-pct{font-size:11px;color:var(--muted);width:42px;text-align:right;flex-shrink:0}
+.funnel-dropoff{font-size:11px;color:var(--red);padding-left:174px;margin-top:-2px}
 
-.dtable{width:100%;border-collapse:collapse}
-.dtable th{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 10px 10px;border-bottom:1px solid var(--border)}
-.dtable th.num,.dtable td.num{text-align:right}
-.dtable td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--surface2)}
-.dtable td.num{font-family:'JetBrains Mono',monospace}
-.dtable td.strong{font-weight:700}
-.dtable .bar{width:34%}
-.dtable .bar span{display:block;height:8px;border-radius:4px;min-width:2px}
-.dtable tr.today td{background:#fbfdff}
-.dtable tfoot td{padding:11px 10px;font-weight:700;border-top:2px solid var(--border);font-size:13px}
-.dtable tfoot td.num{font-family:'JetBrains Mono',monospace}
+/* STAGE BREAKDOWN */
+.stage-list{display:flex;flex-direction:column;gap:10px}
+.stage-row{display:grid;grid-template-columns:160px 1fr 40px 44px;align-items:center;gap:10px}
+.stage-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stage-bar-wrap{background:var(--surface2);border-radius:4px;height:8px;overflow:hidden}
+.stage-bar{height:100%;border-radius:4px}
+.stage-count{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;text-align:right}
+.stage-pct{font-size:11px;color:var(--muted);text-align:right}
 
+/* LEAD SOURCES */
+.src-table{width:100%;border-collapse:collapse}
+.src-table th{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 8px 10px;border-bottom:1px solid var(--border)}
+.src-table th.num,.src-table td.num{text-align:right}
+.src-table td{padding:8px 8px;font-size:13px;border-bottom:1px solid var(--surface2)}
+.src-table td.num{font-family:'JetBrains Mono',monospace}
+.src-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.src-table tfoot td{font-weight:700;border-top:2px solid var(--border);padding-top:10px}
+
+/* CAMPAIGNS */
+.camp-table{width:100%;border-collapse:collapse}
+.camp-table th{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 10px 10px;border-bottom:1px solid var(--border)}
+.camp-table th.num,.camp-table td.num{text-align:right}
+.camp-table td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--surface2)}
+.camp-table td.num{font-family:'JetBrains Mono',monospace}
+.camp-table tfoot td{font-weight:700;border-top:2px solid var(--border)}
+
+/* DAILY TABLE */
+.day-table{width:100%;border-collapse:collapse}
+.day-table th{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 10px 10px;border-bottom:1px solid var(--border)}
+.day-table th.num,.day-table td.num{text-align:right}
+.day-table td{padding:9px 10px;font-size:13px;border-bottom:1px solid var(--surface2)}
+.day-table td.num{font-family:'JetBrains Mono',monospace}
+.day-table .bar{width:28%}
+.day-table .bar span{display:block;height:8px;border-radius:4px;min-width:2px}
+.day-table tr.today td{background:#fbfdff}
+.day-table tfoot td{font-weight:700;border-top:2px solid var(--border)}
+
+/* MISC */
+.chart-wrap{position:relative;height:240px}
 .note{font-size:11px;color:var(--amber);background:var(--amber-bg);border:1px solid #f0dbaa;border-radius:8px;padding:8px 12px;margin-top:12px;line-height:1.5}
 .note-red{font-size:11px;color:var(--red);background:var(--red-bg);border:1px solid #f4c2c2;border-radius:8px;padding:8px 12px;margin-top:12px;line-height:1.5}
-.err{color:var(--red);font-size:13px;padding:10px 0}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:24px 0}
+.err-block{color:var(--red);font-size:13px;padding:12px 0}
 footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;line-height:1.6}
+.mb18{margin-bottom:18px}
 
-@media (max-width:720px){
-  .kpis{grid-template-columns:repeat(2,1fr)}
-  .dtable .bar{display:none}
+@media(max-width:900px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .row2,.row2-3{grid-template-columns:1fr}
+  .day-table .bar{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- ── PASSWORD GATE ── -->
 <div id="gate">
   <div class="pw-card">
     <div class="pw-brand">Sail<span>ax</span></div>
-    <h2>Meta Ads Dashboard</h2>
-    <p>Spend &amp; leads across Sailax UK and Sailax AU.</p>
+    <h2>Ads Dashboard</h2>
+    <p>Spend &amp; leads for Sailax AU and Sailax UK.</p>
     <div class="pw-err" id="pw-err"></div>
     <input id="pw-input" type="password" placeholder="Password" autocomplete="current-password">
     <button class="pw-btn" id="pw-btn">Unlock</button>
   </div>
 </div>
 
-<!-- ── APP ── -->
 <div id="app">
   <header>
-    <div class="logo">Sail<span>ax</span> Ads<span class="sub">Meta spend &amp; leads — live</span></div>
-    <div class="hr">
+    <div class="logo">Sail<span>ax</span></div>
+    <div class="account-tabs" id="account-tabs"></div>
+    <div class="hbadges">
       <span class="badge off" id="badge-meta"><span class="dot"></span>Meta</span>
       <span class="badge off" id="badge-ghl"><span class="dot"></span>GHL</span>
     </div>
@@ -144,61 +176,62 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;line-hei
       <button class="pbtn active" data-days="7">7d</button>
       <button class="pbtn" data-days="14">14d</button>
       <button class="pbtn" data-days="30">30d</button>
+      <button class="pbtn" data-days="90">3M</button>
       <span class="fsep"></span>
       <input type="date" id="d-since">
       <input type="date" id="d-until">
       <button class="btn-refresh" id="btn-refresh">↻ Refresh</button>
       <span class="updated" id="updated"></span>
     </div>
-
-    <div id="accounts"></div>
+    <div id="account-view"></div>
   </main>
 
   <footer>
-    Sailax Global · Meta Ads Dashboard · Spend via Meta Marketing API · Leads &amp; Stages via GoHighLevel<br>
-    Spend is as reported by Meta in each account's currency.
+    Sailax Global · Ads Dashboard · Spend via Meta · Leads &amp; Stages via GoHighLevel
   </footer>
 </div>
 
 <script>
-// ── Account configuration ──────────────────────────────────────────────
 const ACCOUNTS = [
-  { key:'uk', name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#2d6be4' },
-  { key:'au', name:'Sailax AU', sub:'Australia',      accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#0ea4ac' },
+  { key:'au', name:'Sailax AU', sub:'Aquoz Water Filtration', accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#0ea4ac' },
+  { key:'uk', name:'Sailax UK', sub:'United Kingdom',         accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#2d6be4' },
 ];
 
 const API = '/api/dashboard';
-const state = { since:null, until:null, meta:{}, ghl:{}, cfg:null };
+const state  = { since:null, until:null, meta:{}, ghl:{}, cfg:null };
+let activeKey = 'au';
+const charts  = {};
 
 // ── Helpers ────────────────────────────────────────────────────────────
-const iso = (d) => d.toISOString().slice(0,10);
+const iso     = d => d.toISOString().slice(0,10);
+const money   = (v,a) => new Intl.NumberFormat(a.locale,{style:'currency',currency:a.currency,maximumFractionDigits:0}).format(v||0);
+const fmtDay  = s => new Date(s+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
+const todayIn = tz => new Date().toLocaleDateString('en-CA',{timeZone:tz});
+const acctCfg = k => (state.cfg?.accounts?.[k]) || {ghlConfigured:false,ghlLocationId:''};
+
 function setPreset(days){
-  const u = new Date(); const s = new Date(); s.setDate(u.getDate()-(days-1));
-  state.since = iso(s); state.until = iso(u);
-  document.getElementById('d-since').value = state.since;
-  document.getElementById('d-until').value = state.until;
+  const u=new Date(), s=new Date(); s.setDate(u.getDate()-(days-1));
+  state.since=iso(s); state.until=iso(u);
+  document.getElementById('d-since').value=state.since;
+  document.getElementById('d-until').value=state.until;
 }
-function dateList(since, until){
+function dateList(since,until){
   const out=[]; let d=new Date(since+'T00:00:00'); const end=new Date(until+'T00:00:00');
-  while(d<=end){ out.push(iso(d)); d.setDate(d.getDate()+1); } return out;
+  while(d<=end){out.push(iso(d)); d.setDate(d.getDate()+1);} return out;
 }
-const money = (v,acc) => new Intl.NumberFormat(acc.locale,{style:'currency',currency:acc.currency,maximumFractionDigits:2}).format(v||0);
-const fmtDay = (s) => new Date(s+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
-const todayIn = (tz) => new Date().toLocaleDateString('en-CA',{timeZone:tz});
-const acctCfg = (key) => (state.cfg && state.cfg.accounts && state.cfg.accounts[key]) || { ghlConfigured:false, ghlLocationId:'' };
 
 // ── Auth ───────────────────────────────────────────────────────────────
 async function unlock(){
-  const btn=document.getElementById('pw-btn'), err=document.getElementById('pw-err');
+  const btn=document.getElementById('pw-btn'),err=document.getElementById('pw-err');
   const pw=document.getElementById('pw-input').value;
-  if(!pw){ err.textContent='Enter the password.'; return; }
+  if(!pw){err.textContent='Enter the password.';return;}
   btn.disabled=true; btn.textContent='Checking…'; err.textContent='';
   try{
     const r=await fetch(API+'/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
     const j=await r.json();
-    if(j.ok){ sessionStorage.setItem('sailax_dash','1'); enter(); }
-    else{ err.textContent='Incorrect password.'; btn.disabled=false; btn.textContent='Unlock'; }
-  }catch(e){ err.textContent='Auth endpoint unreachable. Is the app deployed on Vercel with DASHBOARD_PASSWORD set?'; btn.disabled=false; btn.textContent='Unlock'; }
+    if(j.ok){sessionStorage.setItem('sailax_dash','1');enter();}
+    else{err.textContent='Incorrect password.';btn.disabled=false;btn.textContent='Unlock';}
+  }catch(e){err.textContent='Auth endpoint unreachable.';btn.disabled=false;btn.textContent='Unlock';}
 }
 function enter(){
   document.getElementById('gate').style.display='none';
@@ -206,282 +239,417 @@ function enter(){
   init();
 }
 
-// ── Init + config ──────────────────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────────────────
 async function init(){
-  try{ state.cfg = await (await fetch(API+'/config')).json(); }
-  catch(e){ state.cfg = { metaConfigured:false, accounts:{} }; }
-  const anyGhl = ACCOUNTS.some(a=>acctCfg(a.key).ghlConfigured);
-  setBadge('badge-meta','Meta', !!state.cfg.metaConfigured);
-  setBadge('badge-ghl','GHL', anyGhl);
+  // Build account tabs
+  const tabsEl=document.getElementById('account-tabs');
+  tabsEl.innerHTML=ACCOUNTS.map(a=>`<button class="atab${a.key===activeKey?' active':''}" data-key="${a.key}">${a.name}</button>`).join('');
+  tabsEl.querySelectorAll('.atab').forEach(b=>b.addEventListener('click',()=>{
+    activeKey=b.dataset.key;
+    tabsEl.querySelectorAll('.atab').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    render();
+  }));
+
+  try{state.cfg=await(await fetch(API+'/config')).json();}
+  catch(e){state.cfg={metaConfigured:false,accounts:{}};}
+
+  const anyGhl=ACCOUNTS.some(a=>acctCfg(a.key).ghlConfigured);
+  setBadge('badge-meta','Meta',!!state.cfg.metaConfigured);
+  setBadge('badge-ghl','GHL',anyGhl);
   setPreset(7);
   await load();
 }
 function setBadge(id,label,on){
   const el=document.getElementById(id);
   el.className='badge '+(on?'on':'off');
-  el.innerHTML='<span class="dot"></span>'+label+(on?'':' · off');
+  el.innerHTML=`<span class="dot"></span>${label}${on?'':' · off'}`;
 }
 
-// ── Load data ──────────────────────────────────────────────────────────
+// ── Load ───────────────────────────────────────────────────────────────
 async function load(){
-  document.getElementById('accounts').innerHTML='<div class="empty">Loading…</div>';
+  document.getElementById('account-view').innerHTML='<div class="empty">Loading…</div>';
   state.meta={}; state.ghl={};
-  await Promise.all(ACCOUNTS.map(async (a)=>{
+  await Promise.all(ACCOUNTS.map(async a=>{
     try{
       const r=await fetch(`${API}/meta?account=${a.accountId}&since=${state.since}&until=${state.until}`);
       const j=await r.json();
-      state.meta[a.key] = r.ok ? j : { error: j.error || ('HTTP '+r.status) };
-    }catch(e){ state.meta[a.key]={ error:e.message }; }
+      state.meta[a.key]=r.ok?j:{error:j.error||('HTTP '+r.status)};
+    }catch(e){state.meta[a.key]={error:e.message};}
     if(acctCfg(a.key).ghlConfigured){
-      try{ state.ghl[a.key] = await loadGHL(a.key, acctCfg(a.key).ghlLocationId); }
-      catch(e){ state.ghl[a.key] = { error:e.message }; }
+      try{state.ghl[a.key]=await loadGHL(a.key,acctCfg(a.key).ghlLocationId);}
+      catch(e){state.ghl[a.key]={error:e.message};}
     }
   }));
   render();
   document.getElementById('updated').textContent='Updated '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 }
 
-// ── GHL (per account location) ─────────────────────────────────────────
-async function ghlFetch(account, path){
+// ── GHL ────────────────────────────────────────────────────────────────
+async function ghlFetch(account,path){
   const r=await fetch(`${API}/ghl?account=${account}&path=${encodeURIComponent(path)}`);
   const j=await r.json();
   if(!r.ok) throw new Error(j.error||('GHL HTTP '+r.status));
   return j;
 }
-
-async function loadGHL(account, locationId){
-  if(!locationId) throw new Error(`GHL_LOCATION_ID_${account.toUpperCase()} not set in Vercel.`);
-
-  // Pipelines (for stage names) + all opportunities, in parallel.
-  const [pipes, opps] = await Promise.all([
-    fetchPipelines(account, locationId),
-    fetchAllOpps(account, locationId),
+async function loadGHL(account,locationId){
+  if(!locationId) throw new Error(`GHL_LOCATION_ID_${account.toUpperCase()} not set.`);
+  const [pipes,opps]=await Promise.all([
+    fetchPipelines(account,locationId),
+    fetchAllOpps(account,locationId),
   ]);
-
-  return { opps, pipelines: pipes.pipelines, pipelinesError: pipes.error };
+  return {opps,pipelines:pipes.pipelines,pipelinesError:pipes.error};
 }
-
-// GHL is inconsistent: /opportunities/search uses location_id (snake_case) but
-// /opportunities/pipelines uses locationId (camelCase). We try the correct one
-// first, fall back to the other, and surface any error instead of hiding it
-// (the old code swallowed pipeline errors, which is why stages showed "Unknown").
-async function fetchPipelines(account, locationId){
-  let lastErr = null;
+async function fetchPipelines(account,locationId){
+  let lastErr=null;
   for(const param of ['locationId','location_id']){
     try{
-      const j = await ghlFetch(account, `/opportunities/pipelines?${param}=${locationId}`);
-      if(j && Array.isArray(j.pipelines)) return { pipelines:j.pipelines, error:null };
-    }catch(e){ lastErr = e.message; }
+      const j=await ghlFetch(account,`/opportunities/pipelines?${param}=${locationId}`);
+      if(j&&Array.isArray(j.pipelines)) return {pipelines:j.pipelines,error:null};
+    }catch(e){lastErr=e.message;}
   }
-  return { pipelines:[], error: lastErr || 'No pipelines returned by GHL' };
+  return {pipelines:[],error:lastErr||'No pipelines returned'};
 }
-
-async function fetchAllOpps(account, locationId){
-  let all=[], after=null, afterId=null, page=0;
+async function fetchAllOpps(account,locationId){
+  let all=[],after=null,afterId=null,page=0;
   while(true){
     page++;
     let p=`/opportunities/search?location_id=${locationId}&limit=100`;
     if(after) p+=`&startAfter=${after}&startAfterId=${afterId}`;
-    const j=await ghlFetch(account, p);
+    const j=await ghlFetch(account,p);
     const opps=j.opportunities||[];
     all=all.concat(opps);
-    if(opps.length<100 || !(j.meta&&j.meta.nextPageUrl)) break;
-    after=j.meta&&j.meta.startAfter; afterId=j.meta&&j.meta.startAfterId;
-    if(!after || page>60) break;
+    if(opps.length<100||!(j.meta&&j.meta.nextPageUrl)) break;
+    after=j.meta?.startAfter; afterId=j.meta?.startAfterId;
+    if(!after||page>60) break;
   }
   return all;
 }
 
-// Count opportunities created per YYYY-MM-DD in the account's timezone.
-function ghlPerDay(opps, tz, since, until){
+// ── Data computations ──────────────────────────────────────────────────
+function ghlPerDay(opps,tz,since,until){
   const cnt={};
-  if(!Array.isArray(opps)) return cnt;
-  opps.forEach((o)=>{
-    const created=o.createdAt||o.created_at||o.dateAdded;
-    if(!created) return;
-    const day=new Date(created).toLocaleDateString('en-CA',{timeZone:tz});
-    if(day>=since && day<=until) cnt[day]=(cnt[day]||0)+1;
+  (opps||[]).forEach(o=>{
+    const c=o.createdAt||o.created_at||o.dateAdded;
+    if(!c) return;
+    const day=new Date(c).toLocaleDateString('en-CA',{timeZone:tz});
+    if(day>=since&&day<=until) cnt[day]=(cnt[day]||0)+1;
   });
   return cnt;
 }
 
-// Build stage breakdown: stageId → { name, count } for opps in the date range.
-function ghlStageBreakdown(opps, pipelines, tz, since, until){
-  // Build stage name lookup
-  const stageNames = {};
-  (pipelines||[]).forEach(pl=>{
-    (pl.stages||[]).forEach(st=>{ stageNames[st.id] = st.name; });
-  });
-
-  const counts = {}; // stageId → count
-  const order = {};  // stageId → position for sorting
-
-  (pipelines||[]).forEach(pl=>{
-    (pl.stages||[]).forEach((st,i)=>{ order[st.id] = i; });
-  });
-
+function ghlByMonth(opps,tz,since,until){
+  const cnt={};
   (opps||[]).forEach(o=>{
-    const created = o.createdAt||o.created_at||o.dateAdded;
-    if(!created) return;
-    const day = new Date(created).toLocaleDateString('en-CA',{timeZone:tz});
-    if(day < since || day > until) return;
-    const sid = o.pipelineStageId || o.stageId || 'unknown';
-    counts[sid] = (counts[sid]||0) + 1;
+    const c=o.createdAt||o.created_at||o.dateAdded;
+    if(!c) return;
+    const day=new Date(c).toLocaleDateString('en-CA',{timeZone:tz});
+    if(day<since||day>until) return;
+    const month=day.slice(0,7);
+    cnt[month]=(cnt[month]||0)+1;
   });
+  return cnt;
+}
 
-  const total = Object.values(counts).reduce((a,b)=>a+b,0);
+function metaByMonth(days){
+  const out={};
+  (days||[]).forEach(d=>{
+    const m=d.date.slice(0,7);
+    if(!out[m]) out[m]={spend:0,leads:0};
+    out[m].spend+=d.spend; out[m].leads+=d.leads;
+  });
+  return out;
+}
+
+function ghlStageBreakdown(opps,pipelines,tz,since,until){
+  const stageNames={}, order={};
+  (pipelines||[]).forEach(pl=>{
+    (pl.stages||[]).forEach((st,i)=>{stageNames[st.id]=st.name; order[st.id]=st.position??i;});
+  });
+  const counts={};
+  (opps||[]).forEach(o=>{
+    const c=o.createdAt||o.created_at||o.dateAdded;
+    if(!c) return;
+    const day=new Date(c).toLocaleDateString('en-CA',{timeZone:tz});
+    if(day<since||day>until) return;
+    const sid=o.pipelineStageId||o.stageId||'unknown';
+    counts[sid]=(counts[sid]||0)+1;
+  });
+  const total=Object.values(counts).reduce((a,b)=>a+b,0);
   return Object.entries(counts)
-    .sort((a,b)=> (order[a[0]]??99) - (order[b[0]]??99))
-    .map(([sid, count])=>({
-      id: sid,
-      name: stageNames[sid] || 'Unknown stage',
-      count,
-      pct: total > 0 ? Math.round(count/total*100) : 0,
+    .sort((a,b)=>(order[a[0]]??99)-(order[b[0]]??99))
+    .map(([sid,count])=>({
+      id:sid, name:stageNames[sid]||'Unknown stage', count,
+      pct:total>0?Math.round(count/total*100):0,
     }));
+}
+
+function ghlLeadSources(opps,tz,since,until){
+  const counts={};
+  (opps||[]).forEach(o=>{
+    const c=o.createdAt||o.created_at||o.dateAdded;
+    if(!c) return;
+    const day=new Date(c).toLocaleDateString('en-CA',{timeZone:tz});
+    if(day<since||day>until) return;
+    const src=o.source||o.leadSource||o.attributionSource||'Unknown';
+    if(!counts[src]) counts[src]={leads:0,won:0};
+    counts[src].leads++;
+    if(o.status==='won') counts[src].won++;
+  });
+  return Object.entries(counts)
+    .sort((a,b)=>b[1].leads-a[1].leads)
+    .map(([src,d])=>({src,leads:d.leads,won:d.won,pct:d.leads>0?Math.round(d.won/d.leads*100):0}));
+}
+
+function buildFunnel(opps,pipelines,tz,since,until){
+  const stages=[];
+  (pipelines||[]).forEach(pl=>{
+    (pl.stages||[]).sort((a,b)=>(a.position??0)-(b.position??0)).forEach(s=>stages.push(s));
+  });
+  const posMap={};
+  stages.forEach((s,i)=>posMap[s.id]=i);
+  const n=stages.length;
+
+  const inRange=(opps||[]).filter(o=>{
+    const c=o.createdAt||o.created_at||o.dateAdded;
+    if(!c) return false;
+    const day=new Date(c).toLocaleDateString('en-CA',{timeZone:tz});
+    return day>=since&&day<=until;
+  });
+  const total=inRange.length;
+  const steps=[{label:'Total Leads',count:total,pct:100}];
+
+  if(n>=2){
+    const picks=[1];
+    if(n>=4) picks.push(Math.floor(n/2));
+    picks.push(n-1);
+    [...new Set(picks)].forEach(idx=>{
+      const count=inRange.filter(o=>(posMap[o.pipelineStageId]??-1)>=idx).length;
+      steps.push({label:stages[idx].name,count,pct:total>0?count/total*100:0});
+    });
+  } else {
+    const won=inRange.filter(o=>o.status==='won').length;
+    steps.push({label:'Won',count:won,pct:total>0?won/total*100:0});
+  }
+  return steps;
 }
 
 // ── Render ─────────────────────────────────────────────────────────────
 function render(){
-  document.getElementById('accounts').innerHTML = ACCOUNTS.map(renderAccount).join('');
+  const a=ACCOUNTS.find(x=>x.key===activeKey);
+  document.getElementById('account-view').innerHTML=renderAccount(a);
+  // Instantiate charts after DOM insert
+  const m=state.meta[a.key];
+  const gd=state.ghl[a.key];
+  if(m&&!m.error&&typeof Chart!=='undefined'){
+    const mByMonth=metaByMonth(m.days);
+    const gByMonth=(gd&&Array.isArray(gd.opps))?ghlByMonth(gd.opps,a.tz,state.since,state.until):{};
+    renderMonthlyChart(a.key,mByMonth,gByMonth,a.accent,a);
+  }
 }
 
 function renderAccount(a){
   const m=state.meta[a.key];
+  const gd=state.ghl[a.key];
   const cfg=acctCfg(a.key);
-  const head=`<div class="acct-head">
-    <div><span class="an">${a.name}</span> <span class="as">· ${a.sub} · act_${a.accountId}</span></div>
-    <div class="right"><span class="acur">${a.currency}</span></div>
-  </div>`;
 
-  if(!m || m.error){
-    let hint = '';
-    if(m && m.error && (m.error.includes('permission') || m.error.includes('access') || m.error.includes('token') || m.error.includes('OAuth'))){
-      hint = `<div class="note-red" style="margin-top:8px">This usually means the Meta token doesn't have access to act_${a.accountId}. Fix: go to Meta Business Suite → System Users → Sailax → Assign assets → add this ad account with Analyst permission → then revoke and regenerate the token.</div>`;
+  if(!m||m.error){
+    let hint='';
+    if(m?.error&&/permission|access|token|OAuth/i.test(m.error)){
+      hint=`<div class="note-red" style="margin-top:8px">Token doesn't have access to act_${a.accountId}. Go to Meta Business Suite → System Users → Sailax → Assign assets → add this ad account → revoke and regenerate the token.</div>`;
     }
-    return `<section class="acct">${head}<div class="acct-body"><div class="err">Meta data error: ${m?m.error:'no response'}</div>${hint}</div></section>`;
+    return `<div class="card"><div class="card-body"><div class="err-block">Meta error: ${m?m.error:'no response'}</div>${hint}</div></div>`;
   }
 
   const days=m.days||[];
   const t=m.totals||{spend:0,leads:0,clicks:0,impressions:0};
 
-  // Check if spend is zero — likely a token access issue for this account
-  const spendZeroNote = (t.spend===0 && days.length>0)
-    ? `<div class="note-red">Spend is £0 / $0 for all days. This usually means the Meta system user token doesn't have access to act_${a.accountId}. Go to Meta Business Suite → System Users → Sailax → Assign assets → add both ad accounts → revoke old token → Generate token again.</div>`
-    : '';
+  const ghlOpps=gd&&Array.isArray(gd.opps)?gd.opps:null;
+  const ghlPipelines=gd?.pipelines||[];
+  let leadsByDay={},leadsTotal,leadsSrc,ghlErr=null;
 
-  // Leads source: GHL if available, else Meta-reported
-  const ghlData = state.ghl[a.key];
-  const ghlOpps = ghlData && Array.isArray(ghlData.opps) ? ghlData.opps : null;
-  const ghlPipelines = ghlData && ghlData.pipelines ? ghlData.pipelines : [];
-  let leadsByDay={}, leadsTotal, leadsSrc, ghlErr=null;
-
-  if(ghlOpps !== null){
-    leadsByDay = ghlPerDay(ghlOpps, a.tz, state.since, state.until);
-    leadsTotal = Object.values(leadsByDay).reduce((x,y)=>x+y,0);
-    leadsSrc = 'ghl';
+  if(ghlOpps!==null){
+    leadsByDay=ghlPerDay(ghlOpps,a.tz,state.since,state.until);
+    leadsTotal=Object.values(leadsByDay).reduce((x,y)=>x+y,0);
+    leadsSrc='ghl';
   } else {
-    if(ghlData && ghlData.error) ghlErr = ghlData.error;
+    if(gd?.error) ghlErr=gd.error;
     days.forEach(d=>leadsByDay[d.date]=d.leads);
-    leadsTotal = t.leads; leadsSrc='meta';
+    leadsTotal=t.leads; leadsSrc='meta';
   }
 
-  const spendByDay={}; days.forEach(d=>spendByDay[d.date]=d.spend);
-  const cpl = leadsTotal>0 ? t.spend/leadsTotal : null;
+  const cpl=leadsTotal>0?t.spend/leadsTotal:null;
+  const tag=leadsSrc==='ghl'?'<span class="src-tag src-ghl">GHL</span>':'<span class="src-tag src-meta">Meta</span>';
 
-  // Campaigns breakdown from Meta
-  let campsHtml = '';
-  const camps = m.campaigns || [];
-  if(camps.length > 0){
-    const campLeadsTotal = camps.reduce((s,c)=>s+c.leads,0);
-    const rows = camps.map(c=>{
-      const cpl = c.leads > 0 ? money(c.spend/c.leads, a) : '—';
-      const pct = t.spend > 0 ? Math.round(c.spend/t.spend*100) : 0;
-      return `<tr>
-        <td>${c.name}</td>
-        <td class="num">${money(c.spend,a)}</td>
-        <td class="num">${pct}%</td>
-        <td class="num">${c.leads||0}</td>
-        <td class="num">${cpl}</td>
-      </tr>`;
-    }).join('');
-    campsHtml = `<div class="camps-wrap">
-      <div class="camps-title">Campaigns <span>Meta · by spend</span></div>
-      <table class="dtable">
-        <thead><tr><th>Campaign</th><th class="num">Spend</th><th class="num">% of total</th><th class="num">Leads</th><th class="num">Cost/Lead</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
-  }
+  // Spend zero warning
+  const spendZero=t.spend===0&&days.length>0?`<div class="note-red">Spend is $0 — the Meta token may not have access to act_${a.accountId}. Assign the ad account to your system user in Meta Business Suite, revoke the old token, and generate a new one.</div>`:'';
 
-  // Pipeline stages breakdown (only when GHL is live for this account)
-  let stagesHtml = '';
-  if(ghlOpps !== null){
-    const stages = ghlStageBreakdown(ghlOpps, ghlPipelines, a.tz, state.since, state.until);
-    if(stages.length > 0){
-      const pills = stages.map(s=>`
-        <div class="stage-pill">
-          <div>
-            <div class="sname">${s.name}</div>
-            <div class="spct">${s.pct}% of leads</div>
-          </div>
-          <div class="scount">${s.count}</div>
-        </div>`).join('');
-      // Diagnostic: if no stage name resolved, the pipelines lookup failed.
-      const allUnknown = stages.every(s=>s.name==='Unknown stage');
-      const diag = (allUnknown && ghlData.pipelinesError)
-        ? `<div class="note-red" style="margin-top:8px">Couldn't load pipeline stage names from GHL (${ghlData.pipelinesError}). Make sure this location's Private Integration token includes the <b>Opportunities</b> scope.</div>`
-        : '';
-      stagesHtml = `<div class="stages-wrap">
-        <div class="stages-title">Pipeline Stages <span>GHL · in range</span></div>
-        <div class="stages-grid">${pills}</div>
-        ${diag}
+  // KPI row
+  const kpiHtml=`<div class="kpi-row">
+    <div class="kpi"><div class="kl">Ad Spend</div><div class="kv">${money(t.spend,a)}</div><div class="ks">${days.length} days</div></div>
+    <div class="kpi"><div class="kl">Leads ${tag}</div><div class="kv">${leadsTotal}</div><div class="ks">${leadsSrc==='ghl'?'CRM-confirmed':'Meta-reported'}</div></div>
+    <div class="kpi"><div class="kl">Cost / Lead</div><div class="kv">${cpl!==null?money(cpl,a):'—'}</div><div class="ks">spend ÷ leads</div></div>
+    <div class="kpi"><div class="kl">Clicks</div><div class="kv">${t.clicks.toLocaleString()}</div><div class="ks">${t.impressions.toLocaleString()} impressions</div></div>
+  </div>`;
+
+  // Lead funnel (GHL)
+  let funnelHtml='';
+  if(ghlOpps!==null){
+    const steps=buildFunnel(ghlOpps,ghlPipelines,a.tz,state.since,state.until);
+    const rows=steps.map((s,i)=>{
+      const bw=Math.round(s.pct);
+      const dropoff=i>0&&steps[i-1].count>0?Math.round((1-(s.count/steps[i-1].count))*100):null;
+      const drop=dropoff!==null?`<div class="funnel-dropoff">↓ ${dropoff}% drop-off</div>`:'';
+      return `${drop}<div class="funnel-row">
+        <div class="funnel-label">${s.label}</div>
+        <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${bw}%;background:${a.accent}">${bw>20?s.count:''}</div></div>
+        <div class="funnel-count">${bw<=20?s.count:''}</div>
+        <div class="funnel-pct">${s.pct.toFixed(1)}%</div>
       </div>`;
+    }).join('');
+    funnelHtml=`<div class="card mb18"><div class="card-head">Lead Funnel <span class="chtag src-ghl">GHL · in range</span></div><div class="card-body"><div class="funnel">${rows}</div></div></div>`;
+  }
+
+  // Monthly chart placeholder
+  const chartHtml=`<div class="card mb18"><div class="card-head">Monthly Spend vs Leads <span class="chtag src-meta">Meta spend</span> <span class="chtag src-ghl">GHL leads</span></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-${a.key}"></canvas></div></div></div>`;
+
+  // Stage breakdown (GHL)
+  let stagesHtml='';
+  if(ghlOpps!==null){
+    const stages=ghlStageBreakdown(ghlOpps,ghlPipelines,a.tz,state.since,state.until);
+    if(stages.length){
+      const allUnknown=stages.every(s=>s.name==='Unknown stage');
+      const diagNote=allUnknown&&gd.pipelinesError
+        ?`<div class="note-red" style="margin-top:10px">Can't load stage names from GHL (${gd.pipelinesError}). Check the Private Integration token has Opportunities scope.</div>`:'';
+      const maxCount=Math.max(1,...stages.map(s=>s.count));
+      const rows=stages.map(s=>`<div class="stage-row">
+        <div class="stage-name" title="${s.name}">${s.name}</div>
+        <div class="stage-bar-wrap"><div class="stage-bar" style="width:${Math.round(s.count/maxCount*100)}%;background:${a.accent}cc"></div></div>
+        <div class="stage-count">${s.count}</div>
+        <div class="stage-pct">${s.pct}%</div>
+      </div>`).join('');
+      stagesHtml=`<div class="card mb18"><div class="card-head">Stage Breakdown <span class="chtag src-ghl">GHL · in range</span></div><div class="card-body"><div class="stage-list">${rows}</div>${diagNote}</div></div>`;
     }
   }
 
+  // Lead sources (GHL)
+  let sourcesHtml='';
+  if(ghlOpps!==null){
+    const sources=ghlLeadSources(ghlOpps,a.tz,state.since,state.until);
+    if(sources.length&&sources.some(s=>s.src!=='Unknown'&&s.src!=='')){
+      const srcColors=['#2d6be4','#18a96e','#d98c1e','#e04f4f','#0ea4ac','#8b5cf6'];
+      const totalLeads=sources.reduce((s,x)=>s+x.leads,0);
+      const totalWon=sources.reduce((s,x)=>s+x.won,0);
+      const rows=sources.map((s,i)=>{
+        const col=srcColors[i%srcColors.length];
+        return `<tr><td><span class="src-dot" style="background:${col}"></span>${s.src}</td>
+          <td class="num">${s.leads}</td>
+          <td class="num" style="color:var(--green);font-weight:600">${s.won}</td>
+          <td class="num">${s.pct}%</td></tr>`;
+      }).join('');
+      sourcesHtml=`<div class="card mb18"><div class="card-head">Lead Sources <span class="chtag src-ghl">GHL · in range</span></div><div class="card-body">
+        <table class="src-table">
+          <thead><tr><th>Source</th><th class="num">Leads</th><th class="num">Won</th><th class="num">Close %</th></tr></thead>
+          <tbody>${rows}</tbody>
+          <tfoot><tr><td><strong>All sources</strong></td><td class="num">${totalLeads}</td><td class="num" style="color:var(--green)">${totalWon}</td><td class="num">${totalLeads>0?Math.round(totalWon/totalLeads*100):0}%</td></tr></tfoot>
+        </table>
+      </div></div>`;
+    }
+  }
+
+  // Campaigns (Meta)
+  let campsHtml='';
+  const camps=m.campaigns||[];
+  if(camps.length){
+    const rows=camps.map(c=>{
+      const pct=t.spend>0?Math.round(c.spend/t.spend*100):0;
+      const cpl=c.leads>0?money(c.spend/c.leads,a):'—';
+      return `<tr><td>${c.name}</td><td class="num">${money(c.spend,a)}</td><td class="num">${pct}%</td><td class="num">${c.leads||0}</td><td class="num">${cpl}</td></tr>`;
+    }).join('');
+    campsHtml=`<div class="card mb18"><div class="card-head">Campaigns <span class="chtag src-meta">Meta · by spend</span></div><div class="card-body">
+      <table class="camp-table">
+        <thead><tr><th>Campaign</th><th class="num">Spend</th><th class="num">% of total</th><th class="num">Leads</th><th class="num">Cost/Lead</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div></div>`;
+  }
+
+  // Daily table
   const dates=dateList(state.since,state.until).reverse();
   const maxLeads=Math.max(1,...dates.map(d=>leadsByDay[d]||0));
   const today=todayIn(a.tz);
-  const rows=dates.map(d=>{
-    const lv=leadsByDay[d]||0, sv=spendByDay[d]||0, bw=Math.round((lv/maxLeads)*100);
-    return `<tr class="${d===today?'today':''}">
-      <td>${d===today?'<b>Today</b>':fmtDay(d)}</td>
+  const spendByDay={}; days.forEach(d=>spendByDay[d.date]=d.spend);
+  const dayRows=dates.map(d=>{
+    const lv=leadsByDay[d]||0,sv=spendByDay[d]||0,bw=Math.round(lv/maxLeads*100);
+    return `<tr class="${d===today?'today':''}"><td>${d===today?'<b>Today</b>':fmtDay(d)}</td>
       <td class="num">${money(sv,a)}</td>
       <td class="bar"><span style="width:${bw}%;background:${a.accent}"></span></td>
-      <td class="num strong">${lv}</td>
-      <td class="num">${lv>0?money(sv/lv,a):'—'}</td>
-    </tr>`;
+      <td class="num" style="font-weight:700">${lv}</td>
+      <td class="num">${lv>0?money(sv/lv,a):'—'}</td></tr>`;
   }).join('');
+  const dailyHtml=`<div class="card mb18"><div class="card-head">Daily Breakdown</div><div class="card-body">
+    <table class="day-table">
+      <thead><tr><th>Day</th><th class="num">Spend</th><th class="bar">Leads</th><th class="num">Leads</th><th class="num">Cost/Lead</th></tr></thead>
+      <tbody>${dayRows||'<tr><td colspan="5" class="empty">No data</td></tr>'}</tbody>
+      <tfoot><tr><td>Total</td><td class="num">${money(t.spend,a)}</td><td></td><td class="num">${leadsTotal}</td><td class="num">${cpl!==null?money(cpl,a):'—'}</td></tr></tfoot>
+    </table>
+  </div></div>`;
 
-  const tag = leadsSrc==='ghl' ? '<span class="src-tag src-ghl">GHL</span>' : '<span class="src-tag src-meta">Meta</span>';
-  let note='';
-  if(ghlErr) note=`<div class="note">GHL for ${a.name} errored (${ghlErr}) — showing Meta-reported leads.</div>`;
-  else if(!cfg.ghlConfigured) note=`<div class="note">Add <b>GHL_API_KEY_${a.key.toUpperCase()}</b> + <b>GHL_LOCATION_ID_${a.key.toUpperCase()}</b> in Vercel to switch Leads to CRM-confirmed for this account.</div>`;
+  let ghlNote='';
+  if(ghlErr) ghlNote=`<div class="note">GHL errored (${ghlErr}) — showing Meta-reported leads.</div>`;
+  else if(!cfg.ghlConfigured) ghlNote=`<div class="note">Add <b>GHL_API_KEY_${a.key.toUpperCase()}</b> + <b>GHL_LOCATION_ID_${a.key.toUpperCase()}</b> in Vercel to enable CRM leads &amp; stages.</div>`;
 
-  return `<section class="acct">${head}
-    <div class="acct-body">
-      <div class="kpis">
-        <div class="kpi"><div class="kl">Ad Spend</div><div class="kv mono">${money(t.spend,a)}</div><div class="ks">${dates.length} days</div></div>
-        <div class="kpi"><div class="kl">Leads ${tag}</div><div class="kv mono">${leadsTotal}</div><div class="ks">${leadsSrc==='ghl'?'CRM-confirmed':'Meta-reported'}</div></div>
-        <div class="kpi"><div class="kl">Cost / Lead</div><div class="kv mono">${cpl!==null?money(cpl,a):'—'}</div><div class="ks">spend ÷ leads</div></div>
-        <div class="kpi"><div class="kl">Clicks</div><div class="kv mono">${t.clicks}</div><div class="ks">${t.impressions.toLocaleString()} impressions</div></div>
-      </div>
-      ${campsHtml}
-      ${stagesHtml}
-      <table class="dtable">
-        <thead><tr><th>Day</th><th class="num">Spend</th><th class="bar">Leads</th><th class="num">Leads</th><th class="num">Cost/Lead</th></tr></thead>
-        <tbody>${rows||'<tr><td colspan="5" class="empty">No data in range</td></tr>'}</tbody>
-        <tfoot><tr><td>Total</td><td class="num">${money(t.spend,a)}</td><td></td><td class="num">${leadsTotal}</td><td class="num">${cpl!==null?money(cpl,a):'—'}</td></tr></tfoot>
-      </table>
-      ${spendZeroNote}
-      ${note}
-    </div>
-  </section>`;
+  return `${spendZero}${kpiHtml}
+    <div class="row2-3">${funnelHtml||''}${chartHtml}</div>
+    <div class="row2">${stagesHtml||''}${sourcesHtml||''}</div>
+    ${campsHtml}${dailyHtml}${ghlNote}`;
+}
+
+// ── Monthly Chart ───────────────────────────────────────────────────────
+function renderMonthlyChart(key,mByMonth,gByMonth,accent,a){
+  const canvas=document.getElementById(`chart-${key}`);
+  if(!canvas) return;
+  const allMonths=[...new Set([...Object.keys(mByMonth),...Object.keys(gByMonth)])].sort();
+  if(!allMonths.length) return;
+  const labels=allMonths.map(m=>{
+    const d=new Date(m+'-01T12:00:00');
+    return d.toLocaleDateString('en-GB',{month:'short',year:'2-digit'});
+  });
+  if(charts[key]) charts[key].destroy();
+  charts[key]=new Chart(canvas,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Spend',data:allMonths.map(m=>mByMonth[m]?.spend||0),backgroundColor:accent+'bb',yAxisID:'ySpend',order:1,borderRadius:4},
+        {label:'Leads',data:allMonths.map(m=>gByMonth[m]||0),backgroundColor:'#18a96ebb',yAxisID:'yLeads',order:2,borderRadius:4},
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:'top',labels:{font:{family:'Sora',size:11},boxWidth:12,padding:12}},
+        tooltip:{callbacks:{
+          label:ctx=>{
+            if(ctx.dataset.yAxisID==='ySpend') return ` Spend: ${money(ctx.raw,a)}`;
+            return ` Leads: ${ctx.raw}`;
+          }
+        }}
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:'Sora',size:11}}},
+        ySpend:{type:'linear',position:'left',beginAtZero:true,grid:{color:'#e3e7ef'},
+          ticks:{font:{family:'Sora',size:10},callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v}},
+        yLeads:{type:'linear',position:'right',beginAtZero:true,grid:{drawOnChartArea:false},
+          ticks:{font:{family:'Sora',size:10}}},
+      }
+    }
+  });
 }
 
 // ── Wire up ────────────────────────────────────────────────────────────
 document.getElementById('pw-btn').addEventListener('click',unlock);
-document.getElementById('pw-input').addEventListener('keydown',e=>{ if(e.key==='Enter') unlock(); });
+document.getElementById('pw-input').addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
 document.getElementById('btn-refresh').addEventListener('click',load);
 document.querySelectorAll('.pbtn').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.pbtn').forEach(x=>x.classList.remove('active'));
