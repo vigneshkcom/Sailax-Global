@@ -75,6 +75,11 @@ input[type=date]{font-family:'Sora',sans-serif;font-size:12px;border:1px solid v
 .src-meta{background:var(--blue-bg);color:var(--blue)}
 .src-ghl{background:var(--green-bg);color:var(--green)}
 
+/* Campaigns */
+.camps-wrap{margin-bottom:18px}
+.camps-title{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.camps-title span{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;background:var(--blue-bg);color:var(--blue)}
+
 /* Pipeline stages */
 .stages-wrap{margin-bottom:18px}
 .stages-title{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
@@ -383,6 +388,31 @@ function renderAccount(a){
   const spendByDay={}; days.forEach(d=>spendByDay[d.date]=d.spend);
   const cpl = leadsTotal>0 ? t.spend/leadsTotal : null;
 
+  // Campaigns breakdown from Meta
+  let campsHtml = '';
+  const camps = m.campaigns || [];
+  if(camps.length > 0){
+    const campLeadsTotal = camps.reduce((s,c)=>s+c.leads,0);
+    const rows = camps.map(c=>{
+      const cpl = c.leads > 0 ? money(c.spend/c.leads, a) : '—';
+      const pct = t.spend > 0 ? Math.round(c.spend/t.spend*100) : 0;
+      return `<tr>
+        <td>${c.name}</td>
+        <td class="num">${money(c.spend,a)}</td>
+        <td class="num">${pct}%</td>
+        <td class="num">${c.leads||0}</td>
+        <td class="num">${cpl}</td>
+      </tr>`;
+    }).join('');
+    campsHtml = `<div class="camps-wrap">
+      <div class="camps-title">Campaigns <span>Meta · by spend</span></div>
+      <table class="dtable">
+        <thead><tr><th>Campaign</th><th class="num">Spend</th><th class="num">% of total</th><th class="num">Leads</th><th class="num">Cost/Lead</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }
+
   // Pipeline stages breakdown (only when GHL is live for this account)
   let stagesHtml = '';
   if(ghlOpps !== null){
@@ -436,6 +466,7 @@ function renderAccount(a){
         <div class="kpi"><div class="kl">Cost / Lead</div><div class="kv mono">${cpl!==null?money(cpl,a):'—'}</div><div class="ks">spend ÷ leads</div></div>
         <div class="kpi"><div class="kl">Clicks</div><div class="kv mono">${t.clicks}</div><div class="ks">${t.impressions.toLocaleString()} impressions</div></div>
       </div>
+      ${campsHtml}
       ${stagesHtml}
       <table class="dtable">
         <thead><tr><th>Day</th><th class="num">Spend</th><th class="bar">Leads</th><th class="num">Leads</th><th class="num">Cost/Lead</th></tr></thead>
