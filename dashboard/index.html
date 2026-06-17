@@ -247,13 +247,28 @@ async function ghlFetch(account, path){
 async function loadGHL(account, locationId){
   if(!locationId) throw new Error(`GHL_LOCATION_ID_${account.toUpperCase()} not set in Vercel.`);
 
-  // Fetch pipelines (for stage names) and all opportunities in parallel
-  const [pipelineResp, opps] = await Promise.all([
-    ghlFetch(account, `/opportunities/pipelines?location_id=${locationId}`).catch(()=>({ pipelines:[] })),
+  // Pipelines (for stage names) + all opportunities, in parallel.
+  const [pipes, opps] = await Promise.all([
+    fetchPipelines(account, locationId),
     fetchAllOpps(account, locationId),
   ]);
 
-  return { opps, pipelines: pipelineResp.pipelines || [] };
+  return { opps, pipelines: pipes.pipelines, pipelinesError: pipes.error };
+}
+
+// GHL is inconsistent: /opportunities/search uses location_id (snake_case) but
+// /opportunities/pipelines uses locationId (camelCase). We try the correct one
+// first, fall back to the other, and surface any error instead of hiding it
+// (the old code swallowed pipeline errors, which is why stages showed "Unknown").
+async function fetchPipelines(account, locationId){
+  let lastErr = null;
+  for(const param of ['locationId','location_id']){
+    try{
+      const j = await ghlFetch(account, `/opportunities/pipelines?${param}=${locationId}`);
+      if(j && Array.isArray(j.pipelines)) return { pipelines:j.pipelines, error:null };
+    }catch(e){ lastErr = e.message; }
+  }
+  return { pipelines:[], error: lastErr || 'No pipelines returned by GHL' };
 }
 
 async function fetchAllOpps(account, locationId){
@@ -381,9 +396,15 @@ function renderAccount(a){
           </div>
           <div class="scount">${s.count}</div>
         </div>`).join('');
+      // Diagnostic: if no stage name resolved, the pipelines lookup failed.
+      const allUnknown = stages.every(s=>s.name==='Unknown stage');
+      const diag = (allUnknown && ghlData.pipelinesError)
+        ? `<div class="note-red" style="margin-top:8px">Couldn't load pipeline stage names from GHL (${ghlData.pipelinesError}). Make sure this location's Private Integration token includes the <b>Opportunities</b> scope.</div>`
+        : '';
       stagesHtml = `<div class="stages-wrap">
         <div class="stages-title">Pipeline Stages <span>GHL · in range</span></div>
         <div class="stages-grid">${pills}</div>
+        ${diag}
       </div>`;
     }
   }
