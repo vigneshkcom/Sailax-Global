@@ -1,9 +1,3 @@
 {
-  "version": 2,
-  "crons": [
-    {
-      "path": "/api/dashboard/report",
-      "schedule": "0 7 * * *"
-    }
-  ]
+  "version": 2
 }
