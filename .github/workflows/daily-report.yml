@@ -1,0 +1,29 @@
+name: Daily Ads Report
+
+# Sends the daily Sailax ads report by calling the Vercel endpoint, which pulls
+# Meta + GoHighLevel data and emails it via Resend. All data secrets stay in
+# Vercel — this workflow only needs the endpoint URL and the trigger token.
+#
+# Required repository secrets
+# (Settings -> Secrets and variables -> Actions -> New repository secret):
+#   REPORT_URL    Full endpoint URL, e.g. https://your-domain.com/api/dashboard/report
+#   CRON_SECRET   Must match the CRON_SECRET env var set in Vercel.
+#
+# Note: GitHub schedules run in UTC and may be delayed a few minutes under load.
+# A failed run (non-2xx) marks the job red and GitHub emails the repo owner.
+
+on:
+  schedule:
+    - cron: '0 7 * * *'   # 07:00 UTC daily (~8am UK / ~5pm Sydney; yesterday is closed in both)
+  workflow_dispatch: {}   # lets you run it manually from the Actions tab to test
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger report endpoint
+        run: |
+          curl -sS -X POST "${{ secrets.REPORT_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -w $'\nHTTP %{http_code}\n' \
+            --fail-with-body
