@@ -6,6 +6,9 @@ same Vercel serverless-proxy pattern as the Goldsure portal, with one
 improvement: the **Meta token never reaches the browser** — both Meta and GHL
 are proxied server-side.
 
+UK and AU are separate Meta ad accounts **and** separate GHL locations, so each
+account's leads come straight from its own CRM location (no pipeline mapping).
+
 ## Pages & endpoints
 
 | Path | What it is |
@@ -14,14 +17,14 @@ are proxied server-side.
 | `/api/dashboard/auth` | Password check (`DASHBOARD_PASSWORD`) |
 | `/api/dashboard/config` | Reports which integrations are live (no secrets) |
 | `/api/dashboard/meta` | Server-side Meta Marketing API proxy → spend + leads/day |
-| `/api/dashboard/ghl` | Server-side GoHighLevel proxy |
+| `/api/dashboard/ghl` | Server-side GoHighLevel proxy (per account) |
 
 ## Accounts shown
 
-| Region | Account | Currency |
-|---|---|---|
-| Sailax UK | `act_1220120669692442` | GBP |
-| Sailax AU | `act_749874504045597` | AUD |
+| Region | Meta account | Currency | GHL |
+|---|---|---|---|
+| Sailax UK | `act_1220120669692442` | GBP | own location |
+| Sailax AU | `act_749874504045597` | AUD | own location |
 
 Configured at the top of `dashboard/index.html` in the `ACCOUNTS` array.
 
@@ -39,29 +42,27 @@ Configured at the top of `dashboard/index.html` in the `ACCOUNTS` array.
 |---|---|---|
 | `DASHBOARD_PASSWORD` | ✅ | Password for the gate. |
 | `META_TOKEN` | ✅ | Long-lived Meta token with `ads_read` on **both** accounts. Stays server-side. |
-| `GHL_API_KEY` | for GHL | GoHighLevel **Private Integration** token (`pit-…`). Stays server-side. |
-| `GHL_LOCATION_ID` | for GHL | GHL Location / sub-account ID (not secret). |
+| `GHL_API_KEY_UK` | for UK leads | UK location's **Private Integration** token (`pit-…`). Server-side only. |
+| `GHL_LOCATION_ID_UK` | for UK leads | UK GHL location ID (not secret). |
+| `GHL_API_KEY_AU` | for AU leads | AU location's Private Integration token (`pit-…`). Server-side only. |
+| `GHL_LOCATION_ID_AU` | for AU leads | AU GHL location ID (not secret). |
 
-Meta-only works the moment `META_TOKEN` + `DASHBOARD_PASSWORD` are set. GHL
-lights up once `GHL_API_KEY` + `GHL_LOCATION_ID` are added.
+Meta-only works the moment `META_TOKEN` + `DASHBOARD_PASSWORD` are set. Each
+account's CRM leads light up independently once that account's two GHL vars
+are added.
 
 ## How "Leads" is sourced
 
 - **Spend** is always from Meta (authoritative, per account, in account currency).
-- **Leads** per account default to **Meta-reported** leads (from the ad account's
-  lead actions). This is correct per account and works immediately.
-- When GHL is connected, the **CRM Leads** strip shows total new opportunities/day
-  for the location.
-- To make each account's headline Leads number come from the **CRM** instead of
-  Meta, set `ghlPipeline` for that account in the `ACCOUNTS` array to a substring
-  of its GHL pipeline name (e.g. `ghlPipeline:'uk'`). Until then it stays on Meta
-  so nothing is double-counted across regions.
-
-> If UK and AU live in **separate GHL locations**, we'll extend `config.js` to
-> hold one location ID per account — tell me if that's the case.
+- **Leads** per account use **GHL** (new opportunities created per day in that
+  account's location, bucketed in the account's timezone) when its GHL vars are
+  set — shown with a green `GHL` tag and "CRM-confirmed".
+- Until then, Leads fall back to **Meta-reported** leads (blue `Meta` tag) so the
+  dashboard is useful immediately.
 
 ## Notes
 
 - Meta Graph API version is set once via `META_API_VERSION` in `api/dashboard/meta.js`.
+- "Leads" from Meta = sum of onsite (lead-form) + offsite (pixel) lead actions.
 - No build step and no `package.json` — Vercel runs the `/api` files as
   serverless functions directly (same as the Goldsure repo).

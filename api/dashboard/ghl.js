@@ -1,25 +1,34 @@
 // api/dashboard/ghl.js
-// Server-side proxy for the GoHighLevel API using a Private Integration (pit-) token.
-// Requests go FROM the Vercel server → GHL, so the key never reaches the browser
-// and there are no CORS issues.
+// Per-account server-side proxy for the GoHighLevel API.
 //
-// Vercel Environment Variable:
-//   GHL_API_KEY = your GoHighLevel Private Integration token (pit-xxxx...)
+// UK and AU are separate GHL locations, each with its own Private Integration
+// (pit-) token, so the caller specifies which account's token to use. The keys
+// never reach the browser and there are no CORS issues.
+//
+// Vercel Environment Variables:
+//   GHL_API_KEY_UK = UK location's Private Integration token (pit-xxxx...)
+//   GHL_API_KEY_AU = AU location's Private Integration token (pit-xxxx...)
 //
 // Usage from the browser:
-//   /api/dashboard/ghl?path=/opportunities/search?location_id=XXXX&limit=100
+//   /api/dashboard/ghl?account=uk&path=/opportunities/search?location_id=XXXX&limit=100
+
+const TOKEN_ENV = { uk: 'GHL_API_KEY_UK', au: 'GHL_API_KEY_AU' };
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const ghlKey = process.env.GHL_API_KEY || '';
-  if (!ghlKey) {
-    return res.status(500).json({ error: 'GHL_API_KEY not configured in Vercel Environment Variables.' });
+  const { account, path } = req.query;
+  const envName = TOKEN_ENV[String(account || '').toLowerCase()];
+  if (!envName) {
+    return res.status(400).json({ error: 'Invalid or missing `account` query param (expected "uk" or "au").' });
   }
 
-  const { path } = req.query;
+  const ghlKey = process.env[envName] || '';
+  if (!ghlKey) {
+    return res.status(500).json({ error: `${envName} not configured in Vercel Environment Variables.` });
+  }
   if (!path) {
     return res.status(400).json({ error: 'Missing required `path` query parameter.' });
   }

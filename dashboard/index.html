@@ -58,18 +58,12 @@ input[type=date]{font-family:'Sora',sans-serif;font-size:12px;border:1px solid v
 .btn-refresh{font-family:'Sora',sans-serif;font-size:12px;font-weight:600;padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer}
 .btn-refresh:hover{background:var(--blue-bg);color:var(--blue)}
 
-/* GHL summary strip */
-.ghl-strip{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:var(--r);padding:14px 18px;margin-bottom:20px;box-shadow:var(--shadow)}
-.ghl-strip .gh{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.ghl-strip .grow{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
-.ghl-strip .gbig{font-size:30px;font-weight:700}
-.ghl-note{font-size:11px;color:var(--amber);background:var(--amber-bg);border:1px solid #f0dbaa;border-radius:8px;padding:8px 12px;margin-top:12px;line-height:1.5}
-
 /* Account section */
 .acct{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:22px;overflow:hidden}
 .acct-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .acct-head .an{font-size:16px;font-weight:700}
 .acct-head .as{font-size:12px;color:var(--muted)}
+.acct-head .right{display:flex;align-items:center;gap:8px}
 .acct-head .acur{font-size:11px;font-weight:600;color:var(--muted);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px}
 .acct-body{padding:18px 20px}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
@@ -93,6 +87,7 @@ input[type=date]{font-family:'Sora',sans-serif;font-size:12px;border:1px solid v
 .dtable tfoot td{padding:11px 10px;font-weight:700;border-top:2px solid var(--border);font-size:13px}
 .dtable tfoot td.num{font-family:'JetBrains Mono',monospace}
 
+.note{font-size:11px;color:var(--amber);background:var(--amber-bg);border:1px solid #f0dbaa;border-radius:8px;padding:8px 12px;margin-top:12px;line-height:1.5}
 .err{color:var(--red);font-size:13px;padding:10px 0}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:24px 0}
 footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;line-height:1.6}
@@ -140,29 +135,26 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;line-hei
       <span class="updated" id="updated"></span>
     </div>
 
-    <div id="ghl-summary"></div>
     <div id="accounts"></div>
   </main>
 
   <footer>
-    Sailax Global · Meta Ads Dashboard · Data via Meta Marketing API &amp; GoHighLevel<br>
+    Sailax Global · Meta Ads Dashboard · Spend via Meta Marketing API · Leads via GoHighLevel<br>
     Spend is as reported by Meta in each account's currency.
   </footer>
 </div>
 
 <script>
 // ── Account configuration ──────────────────────────────────────────────
-// ghlPipeline: substring of the GHL pipeline name that maps to this account's
-// region. Leave null until you confirm pipeline names — while null, the headline
-// "Leads" number for the account comes from Meta, and total CRM leads are shown
-// in the GHL strip above. Set e.g. ghlPipeline:'uk' to switch Leads to GHL.
+// UK and AU are separate Meta ad accounts AND separate GHL locations, so each
+// account's leads come straight from its own CRM location (no pipeline mapping).
 const ACCOUNTS = [
-  { key:'uk', name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',     accent:'#2d6be4', ghlPipeline:null },
-  { key:'au', name:'Sailax AU', sub:'Australia',      accountId:'749874504045597',  currency:'AUD', locale:'en-AU', tz:'Australia/Sydney',  accent:'#0ea4ac', ghlPipeline:null },
+  { key:'uk', name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#2d6be4' },
+  { key:'au', name:'Sailax AU', sub:'Australia',      accountId:'749874504045597',  currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#0ea4ac' },
 ];
 
 const API = '/api/dashboard';
-const state = { since:null, until:null, meta:{}, ghl:null, cfg:null };
+const state = { since:null, until:null, meta:{}, ghl:{}, cfg:null };
 
 // ── Helpers ────────────────────────────────────────────────────────────
 const iso = (d) => d.toISOString().slice(0,10);
@@ -179,6 +171,7 @@ function dateList(since, until){
 const money = (v,acc) => new Intl.NumberFormat(acc.locale,{style:'currency',currency:acc.currency,maximumFractionDigits:2}).format(v||0);
 const fmtDay = (s) => new Date(s+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
 const todayIn = (tz) => new Date().toLocaleDateString('en-CA',{timeZone:tz});
+const acctCfg = (key) => (state.cfg && state.cfg.accounts && state.cfg.accounts[key]) || { ghlConfigured:false, ghlLocationId:'' };
 
 // ── Auth ───────────────────────────────────────────────────────────────
 async function unlock(){
@@ -202,9 +195,10 @@ function enter(){
 // ── Init + config ──────────────────────────────────────────────────────
 async function init(){
   try{ state.cfg = await (await fetch(API+'/config')).json(); }
-  catch(e){ state.cfg = { metaConfigured:false, ghlConfigured:false, ghlLocationId:'' }; }
-  setBadge('badge-meta','Meta', state.cfg.metaConfigured);
-  setBadge('badge-ghl','GHL', state.cfg.ghlConfigured);
+  catch(e){ state.cfg = { metaConfigured:false, accounts:{} }; }
+  const anyGhl = ACCOUNTS.some(a=>acctCfg(a.key).ghlConfigured);
+  setBadge('badge-meta','Meta', !!state.cfg.metaConfigured);
+  setBadge('badge-ghl','GHL', anyGhl);
   setPreset(14);
   await load();
 }
@@ -216,42 +210,40 @@ function setBadge(id,label,on){
 
 // ── Load data ──────────────────────────────────────────────────────────
 async function load(){
-  const acc=document.getElementById('accounts');
-  acc.innerHTML='<div class="empty">Loading…</div>';
-  // Meta — per account, in parallel
+  document.getElementById('accounts').innerHTML='<div class="empty">Loading…</div>';
+  state.meta={}; state.ghl={};
   await Promise.all(ACCOUNTS.map(async (a)=>{
+    // Meta — spend + leads/day for this ad account
     try{
       const r=await fetch(`${API}/meta?account=${a.accountId}&since=${state.since}&until=${state.until}`);
       const j=await r.json();
       state.meta[a.key] = r.ok ? j : { error: j.error || ('HTTP '+r.status) };
     }catch(e){ state.meta[a.key]={ error:e.message }; }
+    // GHL — this account's own location (optional)
+    if(acctCfg(a.key).ghlConfigured){
+      try{ state.ghl[a.key] = await loadGHL(a.key, acctCfg(a.key).ghlLocationId); }
+      catch(e){ state.ghl[a.key] = { error:e.message }; }
+    }
   }));
-  // GHL — once for the location (optional)
-  state.ghl=null;
-  if(state.cfg.ghlConfigured){
-    try{ state.ghl = await loadGHL(); }
-    catch(e){ state.ghl = { error:e.message }; }
-  }
   render();
   document.getElementById('updated').textContent='Updated '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 }
 
-// ── GHL ────────────────────────────────────────────────────────────────
-async function ghlFetch(path){
-  const r=await fetch(`${API}/ghl?path=${encodeURIComponent(path)}`);
+// ── GHL (per account location) ─────────────────────────────────────────
+async function ghlFetch(account, path){
+  const r=await fetch(`${API}/ghl?account=${account}&path=${encodeURIComponent(path)}`);
   const j=await r.json();
   if(!r.ok) throw new Error(j.error||('GHL HTTP '+r.status));
   return j;
 }
-async function loadGHL(){
-  const loc=state.cfg.ghlLocationId;
-  if(!loc) throw new Error('GHL_LOCATION_ID not set in Vercel.');
+async function loadGHL(account, locationId){
+  if(!locationId) throw new Error(`GHL_LOCATION_ID_${account.toUpperCase()} not set in Vercel.`);
   let all=[], after=null, afterId=null, page=0;
   while(true){
     page++;
-    let p=`/opportunities/search?location_id=${loc}&limit=100`;
+    let p=`/opportunities/search?location_id=${locationId}&limit=100`;
     if(after) p+=`&startAfter=${after}&startAfterId=${afterId}`;
-    const j=await ghlFetch(p);
+    const j=await ghlFetch(account, p);
     const opps=j.opportunities||[];
     all=all.concat(opps);
     if(opps.length<100 || !(j.meta&&j.meta.nextPageUrl)) break;
@@ -260,15 +252,11 @@ async function loadGHL(){
   }
   return all;
 }
-// Count opportunities created per YYYY-MM-DD (in tz), optional pipeline-name filter.
-function ghlPerDay(opps, tz, since, until, pipelineFilter){
+// Count opportunities created per YYYY-MM-DD in the account's timezone.
+function ghlPerDay(opps, tz, since, until){
   const cnt={};
   if(!Array.isArray(opps)) return cnt;
   opps.forEach((o)=>{
-    if(pipelineFilter){
-      const pn=((o.pipeline&&o.pipeline.name)||o.pipelineName||'').toLowerCase();
-      if(!pn.includes(pipelineFilter.toLowerCase())) return;
-    }
     const created=o.createdAt||o.created_at||o.dateAdded;
     if(!created) return;
     const day=new Date(created).toLocaleDateString('en-CA',{timeZone:tz});
@@ -279,55 +267,31 @@ function ghlPerDay(opps, tz, since, until, pipelineFilter){
 
 // ── Render ─────────────────────────────────────────────────────────────
 function render(){
-  renderGHLSummary();
   document.getElementById('accounts').innerHTML = ACCOUNTS.map(renderAccount).join('');
-}
-
-function renderGHLSummary(){
-  const host=document.getElementById('ghl-summary');
-  if(!state.cfg.ghlConfigured){ host.innerHTML=''; return; }
-  if(state.ghl && state.ghl.error){
-    host.innerHTML=`<div class="ghl-strip"><div class="gh">CRM Leads · GoHighLevel</div><div class="err">GHL error: ${state.ghl.error}</div></div>`;
-    return;
-  }
-  const opps=Array.isArray(state.ghl)?state.ghl:[];
-  // Total CRM leads/day across the location (UTC day bucket for the summary).
-  const perDay=ghlPerDay(opps,'UTC',state.since,state.until,null);
-  const total=Object.values(perDay).reduce((a,b)=>a+b,0);
-  const dates=dateList(state.since,state.until);
-  const max=Math.max(1,...dates.map(d=>perDay[d]||0));
-  const spark=dates.map(d=>{
-    const v=perDay[d]||0; const h=Math.round((v/max)*38)+2;
-    return `<span title="${d}: ${v}" style="display:inline-block;width:9px;height:${h}px;background:var(--green);opacity:.85;border-radius:2px;margin-right:2px;vertical-align:bottom"></span>`;
-  }).join('');
-  const mapped=ACCOUNTS.some(a=>a.ghlPipeline);
-  host.innerHTML=`
-    <div class="ghl-strip">
-      <div class="gh"><span class="badge on" style="padding:2px 8px"><span class="dot"></span>Live</span> CRM Leads · GoHighLevel (all pipelines)</div>
-      <div class="grow">
-        <div><div class="gbig mono">${total}</div><div style="font-size:11px;color:var(--muted)">new opportunities · ${state.since} → ${state.until}</div></div>
-        <div style="flex:1;min-width:200px;text-align:right">${spark}</div>
-      </div>
-      ${mapped?'':`<div class="ghl-note">These are <b>all</b> CRM leads for the connected location. To split them by region (UK vs AU) and use them as each account's headline Leads number, tell me your GHL pipeline names and I'll map them — then the per-account Leads switch from Meta-reported to CRM-confirmed.</div>`}
-    </div>`;
 }
 
 function renderAccount(a){
   const m=state.meta[a.key];
-  const head=`<div class="acct-head"><div><span class="an">${a.name}</span> <span class="as">· ${a.sub} · act_${a.accountId}</span></div><span class="acur">${a.currency}</span></div>`;
+  const cfg=acctCfg(a.key);
+  const head=`<div class="acct-head">
+    <div><span class="an">${a.name}</span> <span class="as">· ${a.sub} · act_${a.accountId}</span></div>
+    <div class="right"><span class="acur">${a.currency}</span></div>
+  </div>`;
   if(!m || m.error){
     return `<section class="acct">${head}<div class="acct-body"><div class="err">Couldn't load Meta data: ${m?m.error:'no response'}</div></div></section>`;
   }
   const days=m.days||[];
   const t=m.totals||{spend:0,leads:0,clicks:0,impressions:0};
 
-  // Leads source: GHL if this account has a pipeline mapping, else Meta.
-  let leadsByDay={}, leadsTotal, leadsSrc;
-  if(Array.isArray(state.ghl) && a.ghlPipeline){
-    leadsByDay=ghlPerDay(state.ghl,a.tz,state.since,state.until,a.ghlPipeline);
+  // Leads source: GHL (this account's location) if available, else Meta-reported.
+  const ghl=state.ghl[a.key];
+  let leadsByDay={}, leadsTotal, leadsSrc, ghlErr=null;
+  if(Array.isArray(ghl)){
+    leadsByDay=ghlPerDay(ghl,a.tz,state.since,state.until);
     leadsTotal=Object.values(leadsByDay).reduce((x,y)=>x+y,0);
     leadsSrc='ghl';
   }else{
+    if(ghl&&ghl.error) ghlErr=ghl.error;
     days.forEach(d=>leadsByDay[d.date]=d.leads);
     leadsTotal=t.leads; leadsSrc='meta';
   }
@@ -349,6 +313,9 @@ function renderAccount(a){
   }).join('');
 
   const tag = leadsSrc==='ghl' ? '<span class="src-tag src-ghl">GHL</span>' : '<span class="src-tag src-meta">Meta</span>';
+  let note='';
+  if(ghlErr) note=`<div class="note">GHL for ${a.name} is set but errored (${ghlErr}) — showing Meta-reported leads for now.</div>`;
+  else if(!cfg.ghlConfigured) note=`<div class="note">Add <b>GHL_API_KEY_${a.key.toUpperCase()}</b> + <b>GHL_LOCATION_ID_${a.key.toUpperCase()}</b> in Vercel to switch Leads to CRM-confirmed for this account.</div>`;
 
   return `<section class="acct">${head}
     <div class="acct-body">
@@ -363,6 +330,7 @@ function renderAccount(a){
         <tbody>${rows||'<tr><td colspan="5" class="empty">No data in range</td></tr>'}</tbody>
         <tfoot><tr><td>Total</td><td class="num">${money(t.spend,a)}</td><td></td><td class="num">${leadsTotal}</td><td class="num">${cpl!==null?money(cpl,a):'—'}</td></tr></tfoot>
       </table>
+      ${note}
     </div>
   </section>`;
 }
