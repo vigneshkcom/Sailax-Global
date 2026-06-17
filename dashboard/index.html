@@ -141,8 +141,8 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;line-hei
   <main>
     <div class="filters">
       <label>Range</label>
-      <button class="pbtn" data-days="7">7d</button>
-      <button class="pbtn active" data-days="14">14d</button>
+      <button class="pbtn active" data-days="7">7d</button>
+      <button class="pbtn" data-days="14">14d</button>
       <button class="pbtn" data-days="30">30d</button>
       <span class="fsep"></span>
       <input type="date" id="d-since">
@@ -213,7 +213,7 @@ async function init(){
   const anyGhl = ACCOUNTS.some(a=>acctCfg(a.key).ghlConfigured);
   setBadge('badge-meta','Meta', !!state.cfg.metaConfigured);
   setBadge('badge-ghl','GHL', anyGhl);
-  setPreset(14);
+  setPreset(7);
   await load();
 }
 function setBadge(id,label,on){
