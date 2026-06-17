@@ -153,7 +153,7 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;line-hei
   <div class="pw-card">
     <div class="pw-brand">Sail<span>ax</span></div>
     <h2>Ads Dashboard</h2>
-    <p>Spend &amp; leads for Sailax AU and Sailax UK.</p>
+    <p>Spend &amp; leads for Aquoz and Sailax UK.</p>
     <div class="pw-err" id="pw-err"></div>
     <input id="pw-input" type="password" placeholder="Password" autocomplete="current-password">
     <button class="pw-btn" id="pw-btn">Unlock</button>
@@ -193,8 +193,8 @@ footer{text-align:center;font-size:11px;color:var(--muted);padding:24px;line-hei
 
 <script>
 const ACCOUNTS = [
-  { key:'au', name:'Sailax AU', sub:'Aquoz Water Filtration', accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#0ea4ac' },
-  { key:'uk', name:'Sailax UK', sub:'United Kingdom',         accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#2d6be4' },
+  { key:'au', name:'Aquoz',     sub:'Australia',       accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#0ea4ac', ghlLeadSource:'facebook' },
+  { key:'uk', name:'Sailax UK', sub:'United Kingdom',  accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#2d6be4', ghlLeadSource:null },
 ];
 
 const API = '/api/dashboard';
@@ -327,6 +327,16 @@ async function fetchAllOpps(account,locationId){
 }
 
 // ── Data computations ──────────────────────────────────────────────────
+// Filter opps to only those whose source field contains the given string (case-insensitive).
+// Used for Aquoz to count only Facebook-sourced leads as "true" Meta leads.
+function filterBySource(opps, sourceFilter){
+  if(!sourceFilter) return opps;
+  return (opps||[]).filter(o=>{
+    const src=(o.source||o.leadSource||o.attributionSource||'').toLowerCase();
+    return src.includes(sourceFilter.toLowerCase());
+  });
+}
+
 function ghlPerDay(opps,tz,since,until){
   const cnt={};
   (opps||[]).forEach(o=>{
@@ -443,7 +453,8 @@ function render(){
   const gd=state.ghl[a.key];
   if(m&&!m.error&&typeof Chart!=='undefined'){
     const mByMonth=metaByMonth(m.days);
-    const gByMonth=(gd&&Array.isArray(gd.opps))?ghlByMonth(gd.opps,a.tz,state.since,state.until):{};
+    const filteredForChart=gd&&Array.isArray(gd.opps)?filterBySource(gd.opps,a.ghlLeadSource):[];
+    const gByMonth=ghlByMonth(filteredForChart,a.tz,state.since,state.until);
     renderMonthlyChart(a.key,mByMonth,gByMonth,a.accent,a);
   }
 }
@@ -466,10 +477,12 @@ function renderAccount(a){
 
   const ghlOpps=gd&&Array.isArray(gd.opps)?gd.opps:null;
   const ghlPipelines=gd?.pipelines||[];
+  // For Aquoz (AU), only count Facebook-sourced opps as leads (agents add others manually).
+  const leadOpps=ghlOpps!==null?filterBySource(ghlOpps,a.ghlLeadSource):null;
   let leadsByDay={},leadsTotal,leadsSrc,ghlErr=null;
 
-  if(ghlOpps!==null){
-    leadsByDay=ghlPerDay(ghlOpps,a.tz,state.since,state.until);
+  if(leadOpps!==null){
+    leadsByDay=ghlPerDay(leadOpps,a.tz,state.since,state.until);
     leadsTotal=Object.values(leadsByDay).reduce((x,y)=>x+y,0);
     leadsSrc='ghl';
   } else {
@@ -479,7 +492,9 @@ function renderAccount(a){
   }
 
   const cpl=leadsTotal>0?t.spend/leadsTotal:null;
-  const tag=leadsSrc==='ghl'?'<span class="src-tag src-ghl">GHL</span>':'<span class="src-tag src-meta">Meta</span>';
+  const tag=leadsSrc==='ghl'
+    ? `<span class="src-tag src-ghl">GHL${a.ghlLeadSource?' · Facebook':''}</span>`
+    : '<span class="src-tag src-meta">Meta</span>';
 
   // Spend zero warning
   const spendZero=t.spend===0&&days.length>0?`<div class="note-red">Spend is $0 — the Meta token may not have access to act_${a.accountId}. Assign the ad account to your system user in Meta Business Suite, revoke the old token, and generate a new one.</div>`:'';
@@ -492,10 +507,10 @@ function renderAccount(a){
     <div class="kpi"><div class="kl">Clicks</div><div class="kv">${t.clicks.toLocaleString()}</div><div class="ks">${t.impressions.toLocaleString()} impressions</div></div>
   </div>`;
 
-  // Lead funnel (GHL)
+  // Lead funnel (GHL) — uses source-filtered opps for Aquoz
   let funnelHtml='';
-  if(ghlOpps!==null){
-    const steps=buildFunnel(ghlOpps,ghlPipelines,a.tz,state.since,state.until);
+  if(leadOpps!==null){
+    const steps=buildFunnel(leadOpps,ghlPipelines,a.tz,state.since,state.until);
     const rows=steps.map((s,i)=>{
       const bw=Math.round(s.pct);
       const dropoff=i>0&&steps[i-1].count>0?Math.round((1-(s.count/steps[i-1].count))*100):null;
@@ -513,10 +528,10 @@ function renderAccount(a){
   // Monthly chart placeholder
   const chartHtml=`<div class="card mb18"><div class="card-head">Monthly Spend vs Leads <span class="chtag src-meta">Meta spend</span> <span class="chtag src-ghl">GHL leads</span></div><div class="card-body"><div class="chart-wrap"><canvas id="chart-${a.key}"></canvas></div></div></div>`;
 
-  // Stage breakdown (GHL)
+  // Stage breakdown (GHL) — uses source-filtered opps for Aquoz
   let stagesHtml='';
-  if(ghlOpps!==null){
-    const stages=ghlStageBreakdown(ghlOpps,ghlPipelines,a.tz,state.since,state.until);
+  if(leadOpps!==null){
+    const stages=ghlStageBreakdown(leadOpps,ghlPipelines,a.tz,state.since,state.until);
     if(stages.length){
       const allUnknown=stages.every(s=>s.name==='Unknown stage');
       const diagNote=allUnknown&&gd.pipelinesError
@@ -532,7 +547,7 @@ function renderAccount(a){
     }
   }
 
-  // Lead sources (GHL)
+  // Lead sources (GHL) — always show all sources so user can see what agents added
   let sourcesHtml='';
   if(ghlOpps!==null){
     const sources=ghlLeadSources(ghlOpps,a.tz,state.since,state.until);
