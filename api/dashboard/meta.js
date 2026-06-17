@@ -1,10 +1,8 @@
 // api/dashboard/meta.js
 // Server-side Meta Marketing API proxy.
 //
-// The Meta access token stays on the server and is NEVER exposed to the browser
-// (this is a deliberate improvement over the original Goldsure dashboard, which
-// returned the token to the client). The browser calls this endpoint, the server
-// calls Graph API, and only the computed daily numbers are returned.
+// Returns per-day account totals AND per-campaign totals for the date range.
+// The Meta access token stays on the server — never exposed to the browser.
 //
 // Vercel Environment Variable:
 //   META_TOKEN = a long-lived Meta access token with `ads_read` on both accounts
@@ -16,9 +14,6 @@
 
 const META_API_VERSION = 'v21.0';
 
-// Action types that represent a "lead". Lead-form (onsite) and website-pixel
-// (offsite) leads are mutually exclusive per campaign, so onsite + pixel is a
-// safe sum. We pick the single most-specific onsite type to avoid double counting.
 const ONSITE_LEAD_TYPES = ['onsite_conversion.lead_grouped', 'leadgen_grouped', 'lead'];
 const PIXEL_LEAD_TYPE = 'offsite_conversion.fb_pixel_lead';
 
@@ -31,6 +26,21 @@ function extractLeads(actions) {
   const onsite = ONSITE_LEAD_TYPES.reduce((acc, t) => acc || val(t), 0);
   const pixel = val(PIXEL_LEAD_TYPE);
   return onsite + pixel;
+}
+
+async function fetchAllPages(startUrl) {
+  let rows = [];
+  let url = startUrl;
+  let guard = 0;
+  while (url && guard < 50) {
+    guard++;
+    const r = await fetch(url);
+    const j = await r.json();
+    if (j.error) throw new Error(j.error.message || 'Meta API error');
+    rows = rows.concat(j.data || []);
+    url = j.paging && j.paging.next ? j.paging.next : '';
+  }
+  return rows;
 }
 
 export default async function handler(req, res) {
@@ -48,29 +58,24 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required query params: account, since, until.' });
   }
   const acct = String(account).replace(/^act_/, '');
-
-  const fields = 'spend,impressions,clicks,actions';
   const timeRange = encodeURIComponent(JSON.stringify({ since, until }));
-  let url =
-    `https://graph.facebook.com/${META_API_VERSION}/act_${acct}/insights` +
-    `?level=account&fields=${fields}&time_increment=1&time_range=${timeRange}` +
-    `&limit=500&access_token=${encodeURIComponent(token)}`;
+  const tok = encodeURIComponent(token);
+  const base = `https://graph.facebook.com/${META_API_VERSION}/act_${acct}/insights`;
 
   try {
-    let rows = [];
-    let guard = 0;
-    while (url && guard < 50) {
-      guard++;
-      const r = await fetch(url);
-      const j = await r.json();
-      if (j.error) {
-        return res.status(502).json({ error: j.error.message || 'Meta API error', meta: j.error });
-      }
-      rows = rows.concat(j.data || []);
-      url = j.paging && j.paging.next ? j.paging.next : '';
-    }
+    // Fetch account-level daily breakdown and campaign totals in parallel.
+    const [dayRows, campRows] = await Promise.all([
+      fetchAllPages(
+        `${base}?level=account&fields=spend,impressions,clicks,actions` +
+        `&time_increment=1&time_range=${timeRange}&limit=500&access_token=${tok}`
+      ),
+      fetchAllPages(
+        `${base}?level=campaign&fields=campaign_id,campaign_name,spend,impressions,clicks,actions` +
+        `&time_range=${timeRange}&limit=500&access_token=${tok}`
+      ),
+    ]);
 
-    const days = rows.map((d) => ({
+    const days = dayRows.map((d) => ({
       date: d.date_start,
       spend: parseFloat(d.spend || 0),
       impressions: parseInt(d.impressions || 0, 10),
@@ -88,7 +93,18 @@ export default async function handler(req, res) {
       { spend: 0, impressions: 0, clicks: 0, leads: 0 }
     );
 
-    return res.status(200).json({ account: acct, since, until, days, totals });
+    const campaigns = campRows
+      .map((c) => ({
+        id: c.campaign_id,
+        name: c.campaign_name,
+        spend: parseFloat(c.spend || 0),
+        impressions: parseInt(c.impressions || 0, 10),
+        clicks: parseInt(c.clicks || 0, 10),
+        leads: extractLeads(c.actions),
+      }))
+      .sort((a, b) => b.spend - a.spend);
+
+    return res.status(200).json({ account: acct, since, until, days, totals, campaigns });
   } catch (err) {
     return res.status(500).json({ error: `Meta proxy failed: ${err.message}` });
   }
