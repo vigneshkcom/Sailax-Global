@@ -62,16 +62,14 @@ async function fetchAllPages(startUrl) {
   return rows;
 }
 
-/* ── Meta: last-7-days daily + yesterday campaigns ───────────────────────── */
+/* ── Meta: last-7-days daily breakdown ──────────────────────────────────── */
 async function fetchMeta(a, token, since7, yesterday) {
   const tok = encodeURIComponent(token);
   const base = `https://graph.facebook.com/${META_API_VERSION}/act_${a.accountId}/insights`;
   const range7 = encodeURIComponent(JSON.stringify({ since: since7, until: yesterday }));
-  const range1 = encodeURIComponent(JSON.stringify({ since: yesterday, until: yesterday }));
-  const [dayRows, campRows] = await Promise.all([
-    fetchAllPages(`${base}?level=account&fields=spend,impressions,clicks,actions&time_increment=1&time_range=${range7}&limit=500&access_token=${tok}`),
-    fetchAllPages(`${base}?level=campaign&fields=campaign_id,campaign_name,spend,impressions,clicks,actions&time_range=${range1}&limit=500&access_token=${tok}`),
-  ]);
+  const dayRows = await fetchAllPages(
+    `${base}?level=account&fields=spend,impressions,clicks,actions&time_increment=1&time_range=${range7}&limit=500&access_token=${tok}`
+  );
   const days = dayRows.map((d) => ({
     date: d.date_start,
     spend: parseFloat(d.spend || 0),
@@ -79,13 +77,10 @@ async function fetchMeta(a, token, since7, yesterday) {
     clicks: parseInt(d.clicks || 0, 10),
     leads: extractLeads(d.actions),
   }));
-  const campaigns = campRows
-    .map((c) => ({ name: c.campaign_name, spend: parseFloat(c.spend || 0), leads: extractLeads(c.actions) }))
-    .sort((x, y) => y.spend - x.spend);
-  return { days, campaigns };
+  return { days };
 }
 
-/* ── GHL: opportunities (server-side, same logic as the dashboard) ───────── */
+/* ── GHL: pipelines + opportunities ─────────────────────────────────────── */
 async function ghlGet(key, path) {
   const r = await fetch(`https://services.leadconnectorhq.com${path}`, {
     headers: { Authorization: `Bearer ${key}`, Version: '2021-07-28', Accept: 'application/json' },
@@ -123,6 +118,32 @@ const oppDate = (o, tz) => {
 const countOnDay = (opps, tz, day) => (opps || []).filter((o) => oppDate(o, tz) === day).length;
 const countInRange = (opps, tz, since, until) =>
   (opps || []).filter((o) => { const d = oppDate(o, tz); return d && d >= since && d <= until; }).length;
+async function fetchPipelines(key, locationId) {
+  for (const param of ['locationId', 'location_id']) {
+    try {
+      const j = await ghlGet(key, `/opportunities/pipelines?${param}=${locationId}`);
+      if (j && Array.isArray(j.pipelines)) return j.pipelines;
+    } catch {}
+  }
+  return [];
+}
+function stageBreakdown(opps, pipelines, tz, since, until) {
+  const names = {}, order = {};
+  (pipelines || []).forEach((pl) =>
+    (pl.stages || []).forEach((s, i) => { names[s.id] = s.name; order[s.id] = s.position ?? i; })
+  );
+  const cnt = {};
+  (opps || []).forEach((o) => {
+    const d = oppDate(o, tz);
+    if (!d || d < since || d > until) return;
+    const sid = o.pipelineStageId || o.stageId || 'unknown';
+    cnt[sid] = (cnt[sid] || 0) + 1;
+  });
+  const total = Object.values(cnt).reduce((a, b) => a + b, 0);
+  return Object.entries(cnt)
+    .sort((a, b) => (order[a[0]] ?? 99) - (order[b[0]] ?? 99))
+    .map(([sid, n]) => ({ name: names[sid] || 'Unknown', count: n, pct: total > 0 ? Math.round(n / total * 100) : 0 }));
+}
 function sourcesOnDay(opps, tz, day) {
   const cnt = {};
   (opps || []).forEach((o) => {
@@ -138,7 +159,7 @@ async function buildAccount(a) {
   const today = todayIn(a.tz);
   const yesterday = addDays(today, -1);
   const since7 = addDays(today, -7); // 7 days ending yesterday
-  const out = { a, yesterday, error: null, ghlError: null, leadsSource: 'meta', campaigns: [], bySource: [] };
+  const out = { a, yesterday, error: null, ghlError: null, leadsSource: 'meta', stages: [], bySource: [] };
 
   // Meta
   try {
@@ -150,7 +171,6 @@ async function buildAccount(a) {
     out.metaLeadsY = dayRow ? dayRow.leads : 0;
     out.spend7 = meta.days.reduce((s, d) => s + d.spend, 0);
     out.metaLeads7 = meta.days.reduce((s, d) => s + d.leads, 0);
-    out.campaigns = meta.campaigns.filter((c) => c.spend > 0).slice(0, 6);
   } catch (e) {
     out.error = 'Meta: ' + e.message;
     out.spendY = out.clicksY = out.imprY = out.metaLeadsY = out.spend7 = out.metaLeads7 = 0;
@@ -163,11 +183,12 @@ async function buildAccount(a) {
   const loc = process.env[`GHL_LOCATION_ID_${a.key.toUpperCase()}`];
   if (key && loc) {
     try {
-      const opps = await fetchAllOpps(key, loc);
+      const [opps, pipelines] = await Promise.all([fetchAllOpps(key, loc), fetchPipelines(key, loc)]);
       const leadOpps = filterBySource(opps, a.ghlLeadSource);
       out.leadsY = countOnDay(leadOpps, a.tz, yesterday);
       out.leads7 = countInRange(leadOpps, a.tz, since7, yesterday);
-      out.bySource = sourcesOnDay(opps, a.tz, yesterday); // all sources, for visibility
+      out.bySource = sourcesOnDay(opps, a.tz, yesterday);
+      out.stages = stageBreakdown(leadOpps, pipelines, a.tz, since7, yesterday); // 7-day window for stages
       out.leadsSource = a.ghlLeadSource ? 'ghl-fb' : 'ghl';
     } catch (e) {
       out.ghlError = 'GHL: ' + e.message;
@@ -202,7 +223,7 @@ function accountBlock(r) {
       <span style="font-size:12px;color:#9CA3AF;margin-left:8px;">${esc(a.sub)} · ${a.currency}</span>
     </td></tr>`;
 
-  if (r.error && !r.campaigns.length && r.leadsSource === 'meta') {
+  if (r.error && !r.stages.length && r.leadsSource === 'meta') {
     return `${header}<tr><td style="padding:6px 24px 8px;">
       <div style="background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;border-radius:12px;padding:12px 14px;font-size:13px;">${esc(r.error)}</div>
     </td></tr><tr><td style="padding:14px 24px 6px;"><div style="border-bottom:1px solid #E5E7EB;"></div></td></tr>`;
@@ -222,23 +243,21 @@ function accountBlock(r) {
     src = `<div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9CA3AF;margin:18px 0 8px;">New leads by source · yesterday</div><div>${items}</div>`;
   }
 
-  let camps = '';
-  if (r.campaigns.length) {
-    const rows = r.campaigns
-      .map((c) => `<tr>
-        <td style="padding:8px 6px;font-size:13px;color:#111827;border-bottom:1px solid #F3F4F6;">${esc(c.name)}</td>
-        <td align="right" style="padding:8px 6px;font-size:13px;font-weight:600;color:#111827;border-bottom:1px solid #F3F4F6;">${money(c.spend, a)}</td>
-        <td align="right" style="padding:8px 6px;font-size:13px;color:#6B7280;border-bottom:1px solid #F3F4F6;">${c.leads || 0}</td>
-      </tr>`)
-      .join('');
-    camps = `<div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9CA3AF;margin:18px 0 6px;">Top campaigns · yesterday</div>
-      <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-          <td style="font-size:10px;font-weight:700;text-transform:uppercase;color:#9CA3AF;padding:0 6px 6px;">Campaign</td>
-          <td align="right" style="font-size:10px;font-weight:700;text-transform:uppercase;color:#9CA3AF;padding:0 6px 6px;">Spend</td>
-          <td align="right" style="font-size:10px;font-weight:700;text-transform:uppercase;color:#9CA3AF;padding:0 6px 6px;">Leads</td>
-        </tr>${rows}
-      </table>`;
+  let stages = '';
+  if (r.stages.length) {
+    const maxCount = Math.max(1, ...r.stages.map((s) => s.count));
+    const rows = r.stages.map((s) => {
+      const barW = Math.round(s.count / maxCount * 120); // max 120px bar
+      return `<tr>
+        <td style="padding:7px 6px;font-size:13px;color:#111827;border-bottom:1px solid #F3F4F6;width:40%;">${esc(s.name)}</td>
+        <td style="padding:7px 6px;border-bottom:1px solid #F3F4F6;">
+          <div style="background:${a.accent};height:6px;border-radius:3px;width:${barW}px;opacity:.7;"></div>
+        </td>
+        <td align="right" style="padding:7px 6px;font-size:13px;font-weight:700;color:#111827;border-bottom:1px solid #F3F4F6;white-space:nowrap;">${s.count} <span style="font-size:11px;color:#9CA3AF;font-weight:500;">${s.pct}%</span></td>
+      </tr>`;
+    }).join('');
+    stages = `<div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9CA3AF;margin:18px 0 6px;">Pipeline stages · 7 days</div>
+      <table width="100%" cellpadding="0" cellspacing="0">${rows}</table>`;
   }
 
   const ghlNote = r.ghlError
@@ -247,7 +266,7 @@ function accountBlock(r) {
 
   return `${header}
     <tr><td style="padding:8px 18px 0;">${kpis}</td></tr>
-    <tr><td style="padding:0 24px;">${src}${camps}${ghlNote}</td></tr>
+    <tr><td style="padding:0 24px;">${src}${stages}${ghlNote}</td></tr>
     <tr><td style="padding:16px 24px 6px;"><div style="border-bottom:1px solid #E5E7EB;"></div></td></tr>`;
 }
 
