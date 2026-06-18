@@ -1,9 +1,10 @@
 // api/dashboard/report.js
 // Scheduled DAILY ads report, emailed via Resend.
 //
-// Triggered by Vercel Cron (see vercel.json -> "crons"). For each account it
-// pulls YESTERDAY's spend + leads (same sources as the live dashboard) plus a
-// 7-day context line, then emails an HTML summary. Every secret stays
+// Triggered by a GitHub Actions schedule (.github/workflows/daily-report.yml),
+// which calls this endpoint with the CRON_SECRET bearer. For each account it
+// pulls TODAY's spend + leads so far (same sources as the live dashboard) plus
+// a rolling 7-day context line, then emails an HTML summary. Every secret stays
 // server-side — nothing is ever returned to the browser.
 //
 // Vercel Environment Variables:
@@ -13,8 +14,8 @@
 //                      (The onboarding@resend.dev test sender only delivers to
 //                       your own Resend account email until you verify a domain.)
 //   CRON_SECRET        If set, the endpoint only runs for requests carrying
-//                      "Authorization: Bearer <CRON_SECRET>" — Vercel Cron adds
-//                      this header automatically. Leave UNSET to test by URL.
+//                      "Authorization: Bearer <CRON_SECRET>" — the GitHub Actions
+//                      workflow adds this header. Leave UNSET to test by URL.
 //   DASHBOARD_URL      Optional "View live dashboard" link in the email.
 //   META_TOKEN, GHL_API_KEY_UK/AU, GHL_LOCATION_ID_UK/AU  (as used elsewhere)
 
@@ -63,10 +64,10 @@ async function fetchAllPages(startUrl) {
 }
 
 /* ── Meta: last-7-days daily breakdown ──────────────────────────────────── */
-async function fetchMeta(a, token, since7, yesterday) {
+async function fetchMeta(a, token, since, until) {
   const tok = encodeURIComponent(token);
   const base = `https://graph.facebook.com/${META_API_VERSION}/act_${a.accountId}/insights`;
-  const range7 = encodeURIComponent(JSON.stringify({ since: since7, until: yesterday }));
+  const range7 = encodeURIComponent(JSON.stringify({ since, until }));
   const dayRows = await fetchAllPages(
     `${base}?level=account&fields=spend,impressions,clicks,actions&time_increment=1&time_range=${range7}&limit=500&access_token=${tok}`
   );
@@ -156,28 +157,27 @@ function sourcesOnDay(opps, tz, day) {
 
 /* ── per-account data ────────────────────────────────────────────────────── */
 async function buildAccount(a) {
-  const today = todayIn(a.tz);
-  const yesterday = addDays(today, -1);
-  const since7 = addDays(today, -7); // 7 days ending yesterday
-  const out = { a, yesterday, error: null, ghlError: null, leadsSource: 'meta', stages: [], bySource: [] };
+  const today = todayIn(a.tz);            // the reporting day (in the account's tz)
+  const since7 = addDays(today, -6);      // rolling 7 days, ending today (inclusive)
+  const out = { a, day: today, error: null, ghlError: null, leadsSource: 'meta', stages: [], bySource: [] };
 
-  // Meta
+  // Meta — today's figures are partial/still settling (spend can lag a couple hours)
   try {
-    const meta = await fetchMeta(a, process.env.META_TOKEN, since7, yesterday);
-    const dayRow = meta.days.find((d) => d.date === yesterday);
-    out.spendY = dayRow ? dayRow.spend : 0;
-    out.clicksY = dayRow ? dayRow.clicks : 0;
-    out.imprY = dayRow ? dayRow.impressions : 0;
-    out.metaLeadsY = dayRow ? dayRow.leads : 0;
+    const meta = await fetchMeta(a, process.env.META_TOKEN, since7, today);
+    const dayRow = meta.days.find((d) => d.date === today);
+    out.spendDay = dayRow ? dayRow.spend : 0;
+    out.clicksDay = dayRow ? dayRow.clicks : 0;
+    out.imprDay = dayRow ? dayRow.impressions : 0;
+    out.metaLeadsDay = dayRow ? dayRow.leads : 0;
     out.spend7 = meta.days.reduce((s, d) => s + d.spend, 0);
     out.metaLeads7 = meta.days.reduce((s, d) => s + d.leads, 0);
   } catch (e) {
     out.error = 'Meta: ' + e.message;
-    out.spendY = out.clicksY = out.imprY = out.metaLeadsY = out.spend7 = out.metaLeads7 = 0;
+    out.spendDay = out.clicksDay = out.imprDay = out.metaLeadsDay = out.spend7 = out.metaLeads7 = 0;
   }
 
   // GHL leads (preferred when configured); fall back to Meta-reported leads
-  out.leadsY = out.metaLeadsY;
+  out.leadsDay = out.metaLeadsDay;
   out.leads7 = out.metaLeads7;
   const key = process.env[`GHL_API_KEY_${a.key.toUpperCase()}`];
   const loc = process.env[`GHL_LOCATION_ID_${a.key.toUpperCase()}`];
@@ -185,17 +185,17 @@ async function buildAccount(a) {
     try {
       const [opps, pipelines] = await Promise.all([fetchAllOpps(key, loc), fetchPipelines(key, loc)]);
       const leadOpps = filterBySource(opps, a.ghlLeadSource);
-      out.leadsY = countOnDay(leadOpps, a.tz, yesterday);
-      out.leads7 = countInRange(leadOpps, a.tz, since7, yesterday);
-      out.bySource = sourcesOnDay(opps, a.tz, yesterday);
-      out.stages = stageBreakdown(leadOpps, pipelines, a.tz, since7, yesterday); // 7-day window for stages
+      out.leadsDay = countOnDay(leadOpps, a.tz, today);
+      out.leads7 = countInRange(leadOpps, a.tz, since7, today);
+      out.bySource = sourcesOnDay(opps, a.tz, today);
+      out.stages = stageBreakdown(leadOpps, pipelines, a.tz, since7, today); // 7-day window for stages
       out.leadsSource = a.ghlLeadSource ? 'ghl-fb' : 'ghl';
     } catch (e) {
       out.ghlError = 'GHL: ' + e.message;
     }
   }
 
-  out.cplY = out.leadsY > 0 ? out.spendY / out.leadsY : null;
+  out.cplDay = out.leadsDay > 0 ? out.spendDay / out.leadsDay : null;
   out.cpl7 = out.leads7 > 0 ? out.spend7 / out.leads7 : null;
   return out;
 }
@@ -231,8 +231,8 @@ function accountBlock(r) {
 
   const leadTag = r.leadsSource === 'ghl-fb' ? 'CRM · Facebook' : r.leadsSource === 'ghl' ? 'CRM' : 'Meta-reported';
   const kpis = `<table width="100%" cellpadding="0" cellspacing="0">
-    <tr>${kpiCell('Spend · yesterday', money(r.spendY, a), `7d: ${money(r.spend7, a)}`, a.accent)}${kpiCell('Leads · yesterday', String(r.leadsY), leadTag, '#111827')}</tr>
-    <tr>${kpiCell('Cost / Lead', r.cplY != null ? money(r.cplY, a) : '—', r.cpl7 != null ? `7d: ${money(r.cpl7, a)}` : 'no leads', '#111827')}${kpiCell('Clicks · yesterday', r.clicksY.toLocaleString(), `${r.imprY.toLocaleString()} impressions`, '#111827')}</tr>
+    <tr>${kpiCell('Spend · today', money(r.spendDay, a), `7d: ${money(r.spend7, a)}`, a.accent)}${kpiCell('Leads · today', String(r.leadsDay), leadTag, '#111827')}</tr>
+    <tr>${kpiCell('Cost / Lead', r.cplDay != null ? money(r.cplDay, a) : '—', r.cpl7 != null ? `7d: ${money(r.cpl7, a)}` : 'no leads', '#111827')}${kpiCell('Clicks · today', r.clicksDay.toLocaleString(), `${r.imprDay.toLocaleString()} impressions`, '#111827')}</tr>
   </table>`;
 
   let src = '';
@@ -240,7 +240,7 @@ function accountBlock(r) {
     const items = r.bySource
       .map((s) => `<span style="display:inline-block;background:#F5F6F8;border:1px solid #E5E7EB;border-radius:10px;padding:5px 10px;font-size:12px;color:#374151;margin:0 6px 6px 0;">${esc(s.src)} · <strong>${s.n}</strong></span>`)
       .join('');
-    src = `<div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9CA3AF;margin:18px 0 8px;">New leads by source · yesterday</div><div>${items}</div>`;
+    src = `<div style="font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9CA3AF;margin:18px 0 8px;">New leads by source · today</div><div>${items}</div>`;
   }
 
   let stages = '';
@@ -288,12 +288,12 @@ function buildEmail(reports, dateLabel) {
     <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.06);">
       <tr><td style="background:#111827;padding:24px;">
         <div style="font-size:20px;font-weight:700;color:#fff;">Sail<span style="color:#FF6B35;">ax</span> <span style="font-weight:500;color:#9CA3AF;font-size:15px;">· Daily Ads Report</span></div>
-        <div style="font-size:13px;color:#9CA3AF;margin-top:4px;">${esc(dateLabel)}</div>
+        <div style="font-size:13px;color:#9CA3AF;margin-top:4px;">${esc(dateLabel)} <span style="color:#6B7280;">· figures so far today</span></div>
       </td></tr>
       ${blocks}
       ${dashBtn}
       <tr><td style="background:#F9FAFB;padding:18px 24px;text-align:center;">
-        <div style="font-size:11px;color:#9CA3AF;line-height:1.7;">Spend via Meta Marketing API · Leads &amp; sources via GoHighLevel.<br>Aquoz leads counted from Facebook-sourced CRM opportunities only.</div>
+        <div style="font-size:11px;color:#9CA3AF;line-height:1.7;">Today's figures are live and update through the day · Meta spend can lag a couple of hours.<br>Spend via Meta Marketing API · Leads &amp; sources via GoHighLevel · Aquoz leads counted from Facebook-sourced CRM opportunities only.</div>
       </td></tr>
     </table>
   </td></tr></table></body></html>`;
@@ -314,8 +314,8 @@ async function sendEmail(to, subject, html) {
 
 /* ── handler ──────────────────────────────────────────────────────────────── */
 export default async function handler(req, res) {
-  // When CRON_SECRET is set, only Vercel Cron (which sends the bearer) may run
-  // this. Leave it unset to test by visiting the URL.
+  // When CRON_SECRET is set, only callers that send the matching bearer (the
+  // GitHub Actions schedule) may run this. Leave it unset to test by URL.
   if (process.env.CRON_SECRET) {
     const auth = req.headers.authorization || '';
     if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -331,10 +331,10 @@ export default async function handler(req, res) {
 
   try {
     const reports = await Promise.all(ACCOUNTS.map(buildAccount));
-    const yesterday = reports[0].yesterday;
-    const dateLabel = fmtLongDate(yesterday, ACCOUNTS[0].locale);
-    const short = new Date(yesterday + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-    const subjBits = reports.map((r) => `${r.a.name} ${money(r.spendY, r.a)}/${r.leadsY}L`).join(' · ');
+    const day = reports[0].day;
+    const dateLabel = fmtLongDate(day, ACCOUNTS[0].locale);
+    const short = new Date(day + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const subjBits = reports.map((r) => `${r.a.name} ${money(r.spendDay, r.a)}/${r.leadsDay}L`).join(' · ');
     const subject = `Sailax Ads · ${short} · ${subjBits}`;
     const html = buildEmail(reports, dateLabel);
     const result = await sendEmail(recipients, subject, html);
