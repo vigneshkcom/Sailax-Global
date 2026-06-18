@@ -251,22 +251,29 @@ const state = { since:null, until:null, meta:{}, ghl:{}, cfg:null };
 let activeKey = 'au';
 
 /* ── HELPERS ──────────────────────────────────────────────────────────── */
-const iso     = d => d.toISOString().slice(0,10);
 const money   = (v,a,dec=0) => new Intl.NumberFormat(a.locale,{style:'currency',currency:a.currency,maximumFractionDigits:dec}).format(v||0);
 const fmtDay  = s => new Date(s+'T12:00:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
 const todayIn = tz => new Date().toLocaleDateString('en-CA',{timeZone:tz});
 const acctCfg = k => state.cfg?.accounts?.[k] || {ghlConfigured:false,ghlLocationId:''};
 const esc     = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
+// Calendar-safe date math on YYYY-MM-DD strings (no UTC conversion, so it never
+// shifts a day for users/accounts ahead of UTC). Anchored at local noon.
+function shiftIso(isoDate,n){
+  const d=new Date(isoDate+'T12:00:00'); d.setDate(d.getDate()+n);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
 function setPreset(days){
-  const u=new Date(), s=new Date(); s.setDate(u.getDate()-(days-1));
-  state.since=iso(s); state.until=iso(u);
+  const a=ACCOUNTS.find(x=>x.key===activeKey)||ACCOUNTS[0];
+  state.until=todayIn(a.tz);                      // today in the account's timezone
+  state.since=shiftIso(state.until,-(days-1));
   document.getElementById('d-since').value=state.since;
   document.getElementById('d-until').value=state.until;
 }
 function dateList(since,until){
-  const out=[]; let d=new Date(since+'T00:00:00'); const e=new Date(until+'T00:00:00');
-  while(d<=e){out.push(iso(d));d.setDate(d.getDate()+1);}return out;
+  const out=[]; let cur=since, guard=0;
+  while(cur<=until && guard<400){ out.push(cur); cur=shiftIso(cur,1); guard++; }
+  return out;
 }
 function cptMoney(v){
   if(v>=1000000) return (v/1000000).toFixed(1)+'M';
