@@ -69,12 +69,16 @@ section{padding:clamp(4rem,8vw,6.5rem) 2rem;}
 .btn-ghost:hover{background:var(--ink);color:#fff;border-color:var(--ink);}
 .btn-ghost-light{background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.28);color:#fff;}
 .btn-ghost-light:hover{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.6);}
+/* Hover shine sweep on primary CTAs */
+.btn-gold,.btn-form{position:relative;overflow:hidden;}
+.btn-gold::after,.btn-form::after{content:"";position:absolute;top:0;left:-130%;width:55%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,0.5),transparent);transform:skewX(-18deg);transition:left 0.65s var(--ease);pointer-events:none;}
+.btn-gold:hover::after,.btn-form:hover::after{left:155%;}
 
 /* ── Reveal ── */
 .reveal{opacity:0;transform:translateY(26px);transition:opacity 0.8s var(--ease),transform 0.8s var(--ease);}
 .reveal.in{opacity:1;transform:none;}
 .d1{transition-delay:0.08s;}.d2{transition-delay:0.16s;}.d3{transition-delay:0.24s;}.d4{transition-delay:0.32s;}.d5{transition-delay:0.4s;}
-@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}.hb-dot,.a-dot{animation:none;}.btn-gold::after,.btn-form::after{display:none;}.sv-fill,.sv-seg{transition:none;}}
 
 /* ── Stars ── */
 .stars{display:inline-flex;gap:2px;color:var(--star);}
@@ -87,7 +91,8 @@ section{padding:clamp(4rem,8vw,6.5rem) 2rem;}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(1.6);}}
 
 /* ══════ HEADER ══════ */
-.header{position:sticky;top:0;z-index:600;background:rgba(255,255,255,0.85);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-bottom:1px solid var(--line-soft);}
+.header{position:sticky;top:0;z-index:600;background:rgba(255,255,255,0.85);backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);border-bottom:1px solid var(--line-soft);transition:box-shadow 0.3s var(--ease),background 0.3s;}
+.header.scrolled{box-shadow:0 6px 24px rgba(16,40,30,0.07);background:rgba(255,255,255,0.93);}
 .header-in{max-width:var(--max);margin:0 auto;height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;gap:1rem;}
 .logo-link{display:inline-flex;align-items:center;}
 .logo-img{height:46px;width:auto;}
@@ -106,8 +111,11 @@ section{padding:clamp(4rem,8vw,6.5rem) 2rem;}
 .hero-glow{position:absolute;inset:0;pointer-events:none;z-index:0;background:radial-gradient(60% 50% at 78% 18%,rgba(63,143,108,0.14),transparent 70%),radial-gradient(50% 60% at 12% 88%,rgba(227,185,60,0.10),transparent 70%);}
 .hero-grain{position:absolute;inset:0;pointer-events:none;z-index:0;opacity:0.5;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");}
 .hero-in{position:relative;z-index:1;max-width:var(--max);margin:0 auto;display:grid;grid-template-columns:1fr minmax(0,440px);gap:clamp(2rem,4vw,4rem);align-items:center;}
-.hero-badge{display:inline-flex;align-items:center;gap:0.55rem;padding:0.4rem 0.95rem 0.4rem 0.5rem;background:#fff;border:1px solid var(--line);border-radius:999px;font-size:0.72rem;font-weight:600;letter-spacing:0.04em;color:var(--brand-600);box-shadow:var(--sh-sm);margin-bottom:1.5rem;}
-.hero-badge .hb-tag{background:var(--brand);color:#fff;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.18rem 0.5rem;border-radius:999px;}
+.hero-badge{display:inline-flex;align-items:center;gap:0.6rem;padding:0.5rem 1.05rem;background:#fff;border:1px solid var(--line);border-radius:999px;font-size:0.78rem;font-weight:600;letter-spacing:0.01em;color:var(--ink);box-shadow:var(--sh-sm);margin-bottom:1.5rem;white-space:nowrap;}
+.hero-badge strong{color:var(--brand);font-weight:700;}
+.hb-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:badgePulse 2.4s var(--ease) infinite;}
+@keyframes badgePulse{0%{box-shadow:0 0 0 0 rgba(227,185,60,0.5);}70%{box-shadow:0 0 0 8px rgba(227,185,60,0);}100%{box-shadow:0 0 0 0 rgba(227,185,60,0);}}
+@media(max-width:420px){.hero-badge{font-size:0.72rem;padding:0.45rem 0.9rem;}}
 .hero h1 em{font-style:italic;color:var(--brand);font-weight:600;}
 .hero h1 .u{position:relative;white-space:nowrap;}
 .hero h1 .u::after{content:"";position:absolute;left:0;right:0;bottom:0.04em;height:0.32em;background:rgba(227,185,60,0.42);z-index:-1;border-radius:3px;}
@@ -171,8 +179,7 @@ section{padding:clamp(4rem,8vw,6.5rem) 2rem;}
 
 /* ══════ SAVINGS / GRANT ══════ */
 .grant-sec{background:var(--white);}
-.save-panel{max-width:var(--max);margin:0 auto 3rem;background:linear-gradient(165deg,var(--forest),var(--forest-2));border-radius:var(--r-xl);padding:clamp(2rem,4vw,3.25rem);color:#fff;position:relative;overflow:hidden;box-shadow:var(--sh-lg);}
-.save-panel::before{content:"";position:absolute;top:-30%;right:-10%;width:50%;height:160%;background:radial-gradient(circle,rgba(116,179,148,0.22),transparent 65%);pointer-events:none;}
+.save-panel{max-width:var(--max);margin:0 auto 3rem;background:radial-gradient(60% 55% at 92% 6%,rgba(116,179,148,0.22),transparent 72%),linear-gradient(165deg,var(--forest),var(--forest-2));border-radius:var(--r-xl);padding:clamp(2rem,4vw,3.25rem);color:#fff;position:relative;overflow:hidden;box-shadow:var(--sh-lg);}
 .save-grid{position:relative;display:grid;grid-template-columns:1fr 1.1fr;gap:clamp(2rem,4vw,3.5rem);align-items:center;}
 .save-grid .eyebrow{color:var(--gold);}
 .save-grid .eyebrow::before{background:var(--gold);}
@@ -269,8 +276,7 @@ section{padding:clamp(4rem,8vw,6.5rem) 2rem;}
 @media(max-width:680px){.diff-grid{grid-template-columns:1fr;}}
 
 /* ══════ PROCESS ══════ */
-.process-sec{background:var(--forest);color:#fff;border-top:1px solid var(--line-soft);position:relative;overflow:hidden;}
-.process-sec::before{content:"";position:absolute;top:-20%;left:-5%;width:40%;height:140%;background:radial-gradient(circle,rgba(116,179,148,0.14),transparent 65%);pointer-events:none;}
+.process-sec{background:radial-gradient(45% 55% at 5% 10%,rgba(116,179,148,0.16),transparent 72%),var(--forest);color:#fff;border-top:1px solid var(--line-soft);position:relative;overflow:hidden;}
 .process-sec .eyebrow{color:var(--gold);}
 .process-sec .eyebrow::before{background:var(--gold);}
 .process-sec h2{color:#fff;}
@@ -348,6 +354,7 @@ footer{background:var(--forest-2);color:rgba(255,255,255,0.72);padding:clamp(3re
 .mobile-cta .mc-enquire{background:var(--gold);color:var(--ink);}
 @media(max-width:680px){.mobile-cta{display:flex;}body{padding-bottom:74px;}}
 </style>
+<noscript><style>.reveal{opacity:1!important;transform:none!important;}</style></noscript>
 </head>
 <body id="top">
 
@@ -387,8 +394,8 @@ footer{background:var(--forest-2);color:rgba(255,255,255,0.72);padding:clamp(3re
   <div class="hero-in">
     <div class="hero-content">
       <div class="hero-badge reveal">
-        <span class="hb-tag">Gov Grant</span>
-        UK Boiler Upgrade Scheme — Now Open
+        <span class="hb-dot"></span>
+        <span>Boiler Upgrade Scheme <strong>&middot; Now Open</strong></span>
       </div>
       <h1 class="reveal d1">Heat your home for <em>less</em>, with a heat pump <span class="u">from £1,500</span></h1>
       <p class="hero-sub reveal d2">The government's Boiler Upgrade Scheme covers up to <strong>£9,000</strong> of the cost. Sailax handles your eligibility, the paperwork and a fully MCS-certified installation — across London &amp; Birmingham.</p>
@@ -579,20 +586,20 @@ footer{background:var(--forest-2);color:rgba(255,255,255,0.72);padding:clamp(3re
     <div class="eyebrow center">Verified homeowner reviews</div>
     <h2>Trusted by homeowners across<br>London &amp; Birmingham</h2>
   </div>
-  <div class="rev-aggregate reveal">
+  <div class="rev-aggregate reveal" data-countgroup>
     <div class="ra-block">
-      <div class="ra-score">4.9</div>
+      <div class="ra-score countup" data-count="4.9" data-dec="1">4.9</div>
       <div class="stars"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01z"/></svg><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01z"/></svg></div>
       <div class="ra-meta">Average rating</div>
     </div>
     <div class="ra-block divider"></div>
     <div class="ra-block">
-      <div class="ra-score">127</div>
+      <div class="ra-score countup" data-count="127">127</div>
       <div class="ra-meta" style="margin-top:0.5rem">Verified installations<br>reviewed</div>
     </div>
     <div class="ra-block divider"></div>
     <div class="ra-block">
-      <div class="ra-score" style="font-size:1.9rem;margin-top:0.3rem">98%</div>
+      <div class="ra-score countup" data-count="98" data-suffix="%" style="font-size:1.9rem;margin-top:0.3rem">98%</div>
       <div class="ra-meta">would recommend<br>Sailax to a neighbour</div>
     </div>
   </div>
@@ -945,7 +952,7 @@ function toggleFaq(btn){
   }
 }
 
-/* Scroll reveal */
+/* Scroll reveal + hero entrance */
 (function(){
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
@@ -955,8 +962,41 @@ function toggleFaq(btn){
     entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
   }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
   document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
-  /* Hero shows immediately */
-  document.querySelectorAll('.hero .reveal, .cred-bar .reveal').forEach(function(el){ el.classList.add('in'); });
+  /* Animate the hero in on load — next frame so the transition plays */
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    document.querySelectorAll('.hero .reveal').forEach(function(el){ el.classList.add('in'); io.unobserve(el); });
+  }); });
+})();
+
+/* Count-up numbers */
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  function run(el){
+    var target = parseFloat(el.getAttribute('data-count')) || 0;
+    var dec = parseInt(el.getAttribute('data-dec') || '0', 10);
+    var suf = el.getAttribute('data-suffix') || '', pre = el.getAttribute('data-prefix') || '';
+    var dur = 1500, start = null;
+    function ease(t){ return 1 - Math.pow(1 - t, 4); }
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts - start) / dur, 1);
+      el.textContent = pre + (ease(p) * target).toFixed(dec) + suf;
+      if(p < 1){ requestAnimationFrame(step); } else { el.textContent = pre + target.toFixed(dec) + suf; }
+    }
+    requestAnimationFrame(step);
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.querySelectorAll('.countup').forEach(run); io.unobserve(e.target); } });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('[data-countgroup]').forEach(function(g){ io.observe(g); });
+})();
+
+/* Header shadow on scroll */
+(function(){
+  var h = document.querySelector('.header'); if(!h) return;
+  function upd(){ h.classList.toggle('scrolled', window.scrollY > 8); }
+  upd();
+  window.addEventListener('scroll', upd, { passive: true });
 })();
 
 /* Open default FAQ height on load */
