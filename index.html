@@ -457,19 +457,19 @@ footer{background:var(--forest-2);color:rgba(255,255,255,0.72);padding:clamp(3re
         <div class="lead-body">
           <form class="lead-form" data-source="hero-form" onsubmit="return handleEnquiry(this)" novalidate>
             <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <div class="field">
+              <label for="h-name">Full name</label>
+              <input id="h-name" type="text" name="full_name" placeholder="Your full name" autocomplete="name">
+            </div>
             <div class="field-row">
               <div class="field">
-                <label for="h-name">Full name</label>
-                <input id="h-name" type="text" name="full_name" placeholder="Your name" autocomplete="name">
+                <label for="h-email">Email address</label>
+                <input id="h-email" type="email" name="email" placeholder="your@email.com" autocomplete="email">
               </div>
               <div class="field">
-                <label for="h-phone">Phone</label>
+                <label for="h-phone">Phone number</label>
                 <input id="h-phone" type="tel" name="phone" placeholder="07XXX XXX XXX" autocomplete="tel">
               </div>
-            </div>
-            <div class="field">
-              <label for="h-email">Email address</label>
-              <input id="h-email" type="email" name="email" placeholder="your@email.com" autocomplete="email">
             </div>
             <div class="field-row">
               <div class="field">
@@ -488,6 +488,10 @@ footer{background:var(--forest-2);color:rgba(255,255,255,0.72);padding:clamp(3re
                   <option>Not sure</option>
                 </select>
               </div>
+            </div>
+            <div class="field">
+              <label for="h-message">Anything else? <span style="color:var(--muted);font-weight:400">(optional)</span></label>
+              <textarea id="h-message" name="message" rows="3" placeholder="Property type, system age, questions…"></textarea>
             </div>
             <button type="submit" class="btn-form">Check My Eligibility &amp; Get a Quote
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
