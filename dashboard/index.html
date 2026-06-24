@@ -480,32 +480,43 @@ function cubicPath(pts){
   }
   return d;
 }
-function buildSpendBars(days,since,until,a){
+function buildSpendLeads(days,leadsByDay,since,until,a){
   const list=dateList(since,until);
   if(!list.length) return '<div class="empty">No days in this range</div>';
-  const byDate={};
-  (days||[]).forEach(d=>{ byDate[d.date]=(byDate[d.date]||0)+(+d.spend||0); });
-  const vals=list.map(d=>byDate[d]||0);
-  const total=vals.reduce((s,v)=>s+v,0);
-  if(total<=0) return '<div class="empty">No spend recorded in this range</div>';
-  const W=800,H=220,PL=56,PR=20,PT=18,PB=42;
+  const spendByDate={};
+  (days||[]).forEach(d=>{ spendByDate[d.date]=(spendByDate[d.date]||0)+(+d.spend||0); });
+  const sVals=list.map(d=>spendByDate[d]||0);
+  const lVals=list.map(d=>(leadsByDay&&leadsByDay[d])||0);
+  if(sVals.reduce((s,v)=>s+v,0)<=0) return '<div class="empty">No spend recorded in this range</div>';
+  const leadsShown=lVals.some(v=>v>0);
+  const W=800,H=220,PL=56,PR=leadsShown?44:20,PT=18,PB=42;
   const cW=W-PL-PR, cH=H-PT-PB, n=list.length, bottom=PT+cH;
-  const maxS=Math.max(...vals,1);
+  const maxS=Math.max(...sVals,1), maxL=Math.max(...lVals,1);
   const slot=cW/n, bw=Math.min(46,slot*0.62), r=Math.min(6,bw/2);
-  // gridlines + y-axis labels (0 / mid / max spend)
+  // gridlines + left (spend) axis labels, plus right (leads) axis when shown
   const grid=[0,.5,1].map(f=>{
     const y=PT+cH*(1-f);
     return `<line x1="${PL}" y1="${y.toFixed(1)}" x2="${W-PR}" y2="${y.toFixed(1)}" stroke="#F3F4F6" stroke-width="1"/>`+
-      `<text x="${PL-8}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${cptMoney(f*maxS)}</text>`;
+      `<text x="${PL-8}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${cptMoney(f*maxS)}</text>`+
+      (leadsShown?`<text x="${W-PR+8}" y="${(y+4).toFixed(1)}" text-anchor="start" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${Math.round(f*maxL)}</text>`:'');
   }).join('');
-  // bars: top-rounded; £0 days draw nothing so the baseline stays clean
+  // spend bars: top-rounded; £0 days draw nothing so the baseline stays clean
   const bars=list.map((d,i)=>{
-    const v=vals[i]; if(v<=0) return '';
+    const v=sVals[i]; if(v<=0) return '';
     const h=Math.max((v/maxS)*cH,2);
     const x=PL+slot*i+(slot-bw)/2, y=bottom-h, rr=Math.min(r,h);
     const path=`M${x.toFixed(1)},${bottom} L${x.toFixed(1)},${(y+rr).toFixed(1)} Q${x.toFixed(1)},${y.toFixed(1)} ${(x+rr).toFixed(1)},${y.toFixed(1)} L${(x+bw-rr).toFixed(1)},${y.toFixed(1)} Q${(x+bw).toFixed(1)},${y.toFixed(1)} ${(x+bw).toFixed(1)},${(y+rr).toFixed(1)} L${(x+bw).toFixed(1)},${bottom} Z`;
     return `<path d="${path}" fill="${a.accent}"><title>${fmtDay(d)} · ${money(v,a)}</title></path>`;
   }).join('');
+  // leads line + dots on the right axis (only when there are leads in range)
+  let leadsLayer='';
+  if(leadsShown){
+    const cx=i=>PL+slot*i+slot/2, ly=v=>bottom-(v/maxL)*cH;
+    const pts=list.map((d,i)=>({x:cx(i),y:ly(lVals[i]),v:lVals[i],d}));
+    const linePath='M'+pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' L');
+    const dots=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.4" fill="#111827" stroke="#fff" stroke-width="1.5"><title>${fmtDay(p.d)} · ${p.v} lead${p.v===1?'':'s'}</title></circle>`).join('');
+    leadsLayer=`<path d="${linePath}" fill="none" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>${dots}`;
+  }
   // x-axis labels: weekdays for short ranges, thinned day numbers for long ones
   const stepN=Math.ceil(n/10);
   const xLabels=list.map((d,i)=>{
@@ -513,12 +524,13 @@ function buildSpendBars(days,since,until,a){
     let lbl;
     if(n<=10){ lbl=dt.toLocaleDateString('en-GB',{weekday:'short'}); }
     else { if(i%stepN!==0 && i!==n-1) return ''; lbl=dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'}); }
-    const cx=PL+slot*i+slot/2;
-    return `<text x="${cx.toFixed(1)}" y="${H-12}" text-anchor="middle" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${lbl}</text>`;
+    const lcx=PL+slot*i+slot/2;
+    return `<text x="${lcx.toFixed(1)}" y="${H-12}" text-anchor="middle" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${lbl}</text>`;
   }).join('');
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
     ${grid}
     ${bars}
+    ${leadsLayer}
     ${xLabels}
   </svg>`;
 }
@@ -613,11 +625,13 @@ function renderAccount(a){
     funnelCard=`<div class="card"><div class="card-hd"><h3>Lead Funnel</h3><div class="tags"><span class="tag tag-green">GHL · in range</span></div></div><div class="card-bd"><div class="funnel">${fRows}</div></div></div>`;
   }
 
-  // ── Daily Spend Chart ──
-  const chartSVG=buildSpendBars(days,state.since,state.until,a);
-  const totalSpend=(days||[]).reduce((s,d)=>s+(+d.spend||0),0);
-  const chartCard=`<div class="card"><div class="card-hd"><h3>Daily Spend</h3>
-    <div style="font-size:13px;font-weight:600;color:#111827">${money(totalSpend,a)} <span style="color:var(--muted);font-weight:500">in range</span></div>
+  // ── Daily Spend + Leads Chart ──
+  const chartSVG=buildSpendLeads(days,leadsByDay,state.since,state.until,a);
+  const chartCard=`<div class="card"><div class="card-hd"><h3>Daily Spend &amp; Leads</h3>
+    <div class="chart-legend">
+      <div class="chart-legend-item"><div class="lline" style="background:${a.accent}"></div>Spend</div>
+      <div class="chart-legend-item"><div class="ldot" style="background:#111827"></div>Leads</div>
+    </div>
   </div><div class="card-bd"><div class="chart-svg-wrap">${chartSVG}</div></div></div>`;
 
   // ── Stage Breakdown ──
