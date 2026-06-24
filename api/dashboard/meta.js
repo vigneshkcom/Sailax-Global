@@ -53,20 +53,25 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'META_TOKEN not configured in Vercel Environment Variables.' });
   }
 
-  const { account, since, until } = req.query;
+  const { account, since, until, campaign } = req.query;
   if (!account || !since || !until) {
     return res.status(400).json({ error: 'Missing required query params: account, since, until.' });
   }
   const acct = String(account).replace(/^act_/, '');
+  const camp = campaign ? String(campaign).replace(/[^0-9]/g, '') : '';
   const timeRange = encodeURIComponent(JSON.stringify({ since, until }));
   const tok = encodeURIComponent(token);
-  const base = `https://graph.facebook.com/${META_API_VERSION}/act_${acct}/insights`;
+  // When a campaign id is supplied (e.g. HWS runs as one campaign inside a
+  // shared account), query the campaign node so figures cover only that campaign.
+  const node = camp ? camp : `act_${acct}`;
+  const dayLevel = camp ? 'campaign' : 'account';
+  const base = `https://graph.facebook.com/${META_API_VERSION}/${node}/insights`;
 
   try {
-    // Fetch account-level daily breakdown and campaign totals in parallel.
+    // Fetch the daily breakdown and per-campaign totals in parallel.
     const [dayRows, campRows] = await Promise.all([
       fetchAllPages(
-        `${base}?level=account&fields=spend,impressions,clicks,actions` +
+        `${base}?level=${dayLevel}&fields=spend,impressions,clicks,actions` +
         `&time_increment=1&time_range=${timeRange}&limit=500&access_token=${tok}`
       ),
       fetchAllPages(

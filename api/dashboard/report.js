@@ -23,8 +23,11 @@ const META_API_VERSION = 'v21.0';
 const ONSITE_LEAD_TYPES = ['onsite_conversion.lead_grouped', 'leadgen_grouped', 'lead'];
 const PIXEL_LEAD_TYPE = 'offsite_conversion.fb_pixel_lead';
 
-// Mirrors the dashboard's ACCOUNTS config. Aquoz first.
+// Mirrors the dashboard's ACCOUNTS config. HWS first.
+// HWS is a single campaign inside the AU "Sailax Global" account, so it carries
+// a campaignId; the others report at account level.
 const ACCOUNTS = [
+  { key: 'hws', name: 'HWS',       sub: 'Australia',      accountId: '749874504045597',  campaignId: '120252378091870672', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#16A34A', ghlLeadSource: null },
   { key: 'au', name: 'Aquoz',     sub: 'Australia',      accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: 'facebook' },
   { key: 'uk', name: 'Sailax UK', sub: 'United Kingdom', accountId: '1220120669692442', currency: 'GBP', locale: 'en-GB', tz: 'Europe/London',    accent: '#3B82F6', ghlLeadSource: null },
 ];
@@ -66,10 +69,14 @@ async function fetchAllPages(startUrl) {
 /* ── Meta: last-7-days daily breakdown ──────────────────────────────────── */
 async function fetchMeta(a, token, since, until) {
   const tok = encodeURIComponent(token);
-  const base = `https://graph.facebook.com/${META_API_VERSION}/act_${a.accountId}/insights`;
+  // HWS runs as a single campaign inside a shared account, so query the campaign
+  // node directly; the other accounts report at account level.
+  const node = a.campaignId ? a.campaignId : `act_${a.accountId}`;
+  const level = a.campaignId ? 'campaign' : 'account';
+  const base = `https://graph.facebook.com/${META_API_VERSION}/${node}/insights`;
   const range7 = encodeURIComponent(JSON.stringify({ since, until }));
   const dayRows = await fetchAllPages(
-    `${base}?level=account&fields=spend,impressions,clicks,actions&time_increment=1&time_range=${range7}&limit=500&access_token=${tok}`
+    `${base}?level=${level}&fields=spend,impressions,clicks,actions&time_increment=1&time_range=${range7}&limit=500&access_token=${tok}`
   );
   const days = dayRows.map((d) => ({
     date: d.date_start,

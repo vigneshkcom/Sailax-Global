@@ -11,7 +11,7 @@
 //   GHL_API_KEY_UK / GHL_API_KEY_AU       (presence only — values never returned)
 //   GHL_LOCATION_ID_UK / GHL_LOCATION_ID_AU (returned — identifiers, not secret)
 
-const ACCOUNT_KEYS = ['uk', 'au'];
+const ACCOUNT_KEYS = ['hws', 'uk', 'au'];
 
 export default function handler(req, res) {
   if (req.method !== 'GET') {

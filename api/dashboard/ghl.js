@@ -6,13 +6,14 @@
 // never reach the browser and there are no CORS issues.
 //
 // Vercel Environment Variables:
-//   GHL_API_KEY_UK = UK location's Private Integration token (pit-xxxx...)
-//   GHL_API_KEY_AU = AU location's Private Integration token (pit-xxxx...)
+//   GHL_API_KEY_UK  = UK location's Private Integration token (pit-xxxx...)
+//   GHL_API_KEY_AU  = AU location's Private Integration token (pit-xxxx...)
+//   GHL_API_KEY_HWS = HWS location's Private Integration token (pit-xxxx...)
 //
 // Usage from the browser:
 //   /api/dashboard/ghl?account=uk&path=/opportunities/search?location_id=XXXX&limit=100
 
-const TOKEN_ENV = { uk: 'GHL_API_KEY_UK', au: 'GHL_API_KEY_AU' };
+const TOKEN_ENV = { uk: 'GHL_API_KEY_UK', au: 'GHL_API_KEY_AU', hws: 'GHL_API_KEY_HWS' };
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
