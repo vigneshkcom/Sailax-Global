@@ -480,61 +480,46 @@ function cubicPath(pts){
   }
   return d;
 }
-function buildSVGChart(months,spendArr,leadsArr){
-  if(!months.length) return '<div class="empty">No data in this range — try a wider range like 3M</div>';
-  const W=800,H=220,PL=60,PR=48,PT=20,PB=40;
-  const cW=W-PL-PR, cH=H-PT-PB;
-  const n=months.length;
-  const maxS=Math.max(...spendArr,1), maxL=Math.max(...leadsArr,1);
-  const xAt=i=>PL+(n===1?cW/2:i/(n-1)*cW);
-  const yS=v=>PT+cH-(v/maxS)*cH;
-  const yL=v=>PT+cH-(v/maxL)*cH;
-  const spts=spendArr.map((v,i)=>({x:xAt(i),y:yS(v),v}));
-  const lpts=leadsArr.map((v,i)=>({x:xAt(i),y:yL(v),v}));
-  const bottom=PT+cH;
-  // grid
-  const grid=[.25,.5,.75,1].map(f=>{
+function buildSpendBars(days,since,until,a){
+  const list=dateList(since,until);
+  if(!list.length) return '<div class="empty">No days in this range</div>';
+  const byDate={};
+  (days||[]).forEach(d=>{ byDate[d.date]=(byDate[d.date]||0)+(+d.spend||0); });
+  const vals=list.map(d=>byDate[d]||0);
+  const total=vals.reduce((s,v)=>s+v,0);
+  if(total<=0) return '<div class="empty">No spend recorded in this range</div>';
+  const W=800,H=220,PL=56,PR=20,PT=18,PB=42;
+  const cW=W-PL-PR, cH=H-PT-PB, n=list.length, bottom=PT+cH;
+  const maxS=Math.max(...vals,1);
+  const slot=cW/n, bw=Math.min(46,slot*0.62), r=Math.min(6,bw/2);
+  // gridlines + y-axis labels (0 / mid / max spend)
+  const grid=[0,.5,1].map(f=>{
     const y=PT+cH*(1-f);
-    return `<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#F3F4F6" stroke-width="1"/>`;
+    return `<line x1="${PL}" y1="${y.toFixed(1)}" x2="${W-PR}" y2="${y.toFixed(1)}" stroke="#F3F4F6" stroke-width="1"/>`+
+      `<text x="${PL-8}" y="${(y+4).toFixed(1)}" text-anchor="end" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${cptMoney(f*maxS)}</text>`;
   }).join('');
-  // area fill under spend
-  const areaD=spts.length>1?`${cubicPath(spts)} L${spts[spts.length-1].x},${bottom} L${spts[0].x},${bottom} Z`:'';
-  // spend y-labels
-  const syLabels=[.5,1].map(f=>{
-    const y=PT+cH*(1-f);
-    return `<text x="${PL-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${cptMoney(f*maxS)}</text>`;
+  // bars: top-rounded; £0 days draw nothing so the baseline stays clean
+  const bars=list.map((d,i)=>{
+    const v=vals[i]; if(v<=0) return '';
+    const h=Math.max((v/maxS)*cH,2);
+    const x=PL+slot*i+(slot-bw)/2, y=bottom-h, rr=Math.min(r,h);
+    const path=`M${x.toFixed(1)},${bottom} L${x.toFixed(1)},${(y+rr).toFixed(1)} Q${x.toFixed(1)},${y.toFixed(1)} ${(x+rr).toFixed(1)},${y.toFixed(1)} L${(x+bw-rr).toFixed(1)},${y.toFixed(1)} Q${(x+bw).toFixed(1)},${y.toFixed(1)} ${(x+bw).toFixed(1)},${(y+rr).toFixed(1)} L${(x+bw).toFixed(1)},${bottom} Z`;
+    return `<path d="${path}" fill="${a.accent}"><title>${fmtDay(d)} · ${money(v,a)}</title></path>`;
   }).join('');
-  // leads y-labels
-  const lyLabels=[.5,1].map(f=>{
-    const y=PT+cH*(1-f);
-    return `<text x="${W-PR+8}" y="${y+4}" text-anchor="start" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${Math.round(f*maxL)}</text>`;
+  // x-axis labels: weekdays for short ranges, thinned day numbers for long ones
+  const stepN=Math.ceil(n/10);
+  const xLabels=list.map((d,i)=>{
+    const dt=new Date(d+'T12:00:00');
+    let lbl;
+    if(n<=10){ lbl=dt.toLocaleDateString('en-GB',{weekday:'short'}); }
+    else { if(i%stepN!==0 && i!==n-1) return ''; lbl=dt.toLocaleDateString('en-GB',{day:'numeric',month:'short'}); }
+    const cx=PL+slot*i+slot/2;
+    return `<text x="${cx.toFixed(1)}" y="${H-12}" text-anchor="middle" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${lbl}</text>`;
   }).join('');
-  // x-labels
-  const xLabels=months.map((m,i)=>{
-    const d=new Date(m+'-01T12:00:00');
-    const lbl=d.toLocaleDateString('en-GB',{month:'short',year:'2-digit'});
-    return `<text x="${xAt(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="#9CA3AF" font-family="Outfit,sans-serif">${lbl}</text>`;
-  }).join('');
-  // nodes
-  const snodes=spts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="5" fill="#FF6B35" stroke="white" stroke-width="2" filter="url(#ns)"/>`).join('');
-  const lnodes=lpts.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="5" fill="#3B82F6" stroke="white" stroke-width="2" filter="url(#ns)"/>`).join('');
-
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
-    <defs>
-      <filter id="ns" x="-50%" y="-50%" width="200%" height="200%">
-        <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#000" flood-opacity="0.12"/>
-      </filter>
-      <linearGradient id="sg_fill" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#FF6B35" stop-opacity="0.13"/>
-        <stop offset="100%" stop-color="#FF6B35" stop-opacity="0.01"/>
-      </linearGradient>
-    </defs>
     ${grid}
-    ${areaD?`<path d="${areaD}" fill="url(#sg_fill)"/>`:''}
-    <path d="${cubicPath(spts)}" fill="none" stroke="#FF6B35" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="${cubicPath(lpts)}" fill="none" stroke="#3B82F6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    ${syLabels}${lyLabels}${xLabels}
-    ${snodes}${lnodes}
+    ${bars}
+    ${xLabels}
   </svg>`;
 }
 
@@ -628,18 +613,11 @@ function renderAccount(a){
     funnelCard=`<div class="card"><div class="card-hd"><h3>Lead Funnel</h3><div class="tags"><span class="tag tag-green">GHL · in range</span></div></div><div class="card-bd"><div class="funnel">${fRows}</div></div></div>`;
   }
 
-  // ── Monthly Chart ──
-  const mByMonth=metaByMonth(days);
-  const gByMonth=leadOpps!==null?ghlByMonth(leadOpps,a.tz,state.since,state.until):{};
-  const allMonths=[...new Set([...Object.keys(mByMonth),...Object.keys(gByMonth)])].sort();
-  const spendArr=allMonths.map(m=>mByMonth[m]?.spend||0);
-  const leadsArr=allMonths.map(m=>gByMonth[m]||0);
-  const chartSVG=buildSVGChart(allMonths,spendArr,leadsArr);
-  const chartCard=`<div class="card"><div class="card-hd"><h3>Monthly Spend vs Leads</h3>
-    <div class="chart-legend">
-      <div class="chart-legend-item"><div class="lline" style="background:#FF6B35"></div><div class="ldot" style="background:#FF6B35"></div>Spend</div>
-      <div class="chart-legend-item"><div class="lline" style="background:#3B82F6"></div><div class="ldot" style="background:#3B82F6"></div>Leads</div>
-    </div>
+  // ── Daily Spend Chart ──
+  const chartSVG=buildSpendBars(days,state.since,state.until,a);
+  const totalSpend=(days||[]).reduce((s,d)=>s+(+d.spend||0),0);
+  const chartCard=`<div class="card"><div class="card-hd"><h3>Daily Spend</h3>
+    <div style="font-size:13px;font-weight:600;color:#111827">${money(totalSpend,a)} <span style="color:var(--muted);font-weight:500">in range</span></div>
   </div><div class="card-bd"><div class="chart-svg-wrap">${chartSVG}</div></div></div>`;
 
   // ── Stage Breakdown ──
