@@ -28,7 +28,7 @@ const PIXEL_LEAD_TYPE = 'offsite_conversion.fb_pixel_lead';
 // a campaignId; the others report at account level.
 const ACCOUNTS = [
   { key: 'hws', name: 'HWS',       sub: 'Australia',      accountId: '749874504045597',  campaignId: '120252378091870672', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#16A34A', ghlLeadSource: 'Instant Forms', ghlLeadLabel: 'Instant Forms', ghlLeadTags: ['instant forms'], ghlLeadMatch: 'any', ghlPipeline: 'HWS' },
-  { key: 'au', name: 'Aquoz',     sub: 'Australia',      accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: 'facebook', ghlLeadLabel: 'Facebook', ghlLeadTags: null, ghlLeadMatch: 'any', ghlPipeline: null },
+  { key: 'au', name: 'Aquoz',     sub: 'Australia',      accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: ['facebook', 'landing page'], ghlLeadLabel: 'FB + Landing Page', ghlLeadTags: ['landing page'], ghlLeadMatch: 'any', ghlPipeline: null },
   { key: 'uk', name: 'Sailax UK', sub: 'United Kingdom', accountId: '1220120669692442', currency: 'GBP', locale: 'en-GB', tz: 'Europe/London',    accent: '#3B82F6', ghlLeadSource: null, ghlLeadLabel: null, ghlLeadTags: null, ghlLeadMatch: 'any', ghlPipeline: null },
 ];
 
@@ -135,14 +135,17 @@ function excludeBulk(opps) {
     return !tags.some((t) => EXCLUDE_TAGS.some((x) => t.includes(x)));
   });
 }
-// A real lead = matches the account's lead source and/or required tag(s). The HWS
-// Facebook-Instant-Forms workflow stamps both (source "Instant Forms" + tag
-// "instant forms"), so this allowlists genuine leads and drops bulk imports.
+// A real lead = matches any of the account's lead source(s) and/or required tag(s).
+// ghlLeadSource and ghlLeadTags may each be a string or a list, so an account can
+// accept several sources (e.g. Aquoz: Facebook + Landing Page).
 // match 'any' (default): source OR tag qualifies; 'all': both required.
 function leadMatches(o, a) {
-  const useSrc = !!a.ghlLeadSource, reqTags = (a.ghlLeadTags || []).map((t) => t.toLowerCase()), useTag = reqTags.length > 0;
+  const srcList = (Array.isArray(a.ghlLeadSource) ? a.ghlLeadSource : (a.ghlLeadSource ? [a.ghlLeadSource] : [])).map((s) => String(s).toLowerCase());
+  const reqTags = (Array.isArray(a.ghlLeadTags) ? a.ghlLeadTags : (a.ghlLeadTags ? [a.ghlLeadTags] : [])).map((t) => String(t).toLowerCase());
+  const useSrc = srcList.length > 0, useTag = reqTags.length > 0;
   if (!useSrc && !useTag) return true;
-  const hasSrc = useSrc && (o.source || o.leadSource || o.attributionSource || '').toLowerCase().includes(a.ghlLeadSource.toLowerCase());
+  const src = (o.source || o.leadSource || o.attributionSource || '').toLowerCase();
+  const hasSrc = useSrc && srcList.some((s) => src.includes(s));
   const hasTag = useTag && oppTags(o).some((t) => reqTags.includes(t));
   return a.ghlLeadMatch === 'all' ? ((!useSrc || hasSrc) && (!useTag || hasTag)) : ((useSrc && hasSrc) || (useTag && hasTag));
 }
@@ -368,7 +371,7 @@ function buildEmail(reports, dateLabel) {
       ${blocks}
       ${dashBtn}
       <tr><td style="background:#F9FAFB;padding:18px 24px;text-align:center;">
-        <div style="font-size:11px;color:#9CA3AF;line-height:1.7;">Today's figures are live and update through the day · Meta spend can lag a couple of hours.<br>Spend via Meta Marketing API · Leads &amp; sources via GoHighLevel · HWS counts Instant Form leads, Aquoz counts Facebook-sourced — both exclude bulk CRM imports.</div>
+        <div style="font-size:11px;color:#9CA3AF;line-height:1.7;">Today's figures are live and update through the day · Meta spend can lag a couple of hours.<br>Spend via Meta Marketing API · Leads &amp; sources via GoHighLevel · HWS counts Instant Form leads, Aquoz counts Facebook + Landing Page — both exclude bulk CRM imports.</div>
       </td></tr>
     </table>
   </td></tr></table></body></html>`;
