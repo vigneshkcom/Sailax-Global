@@ -68,8 +68,10 @@ export default async function handler(req, res) {
   const base = `https://graph.facebook.com/${META_API_VERSION}/${node}/insights`;
 
   try {
-    // Fetch the daily breakdown and per-campaign totals in parallel.
-    const [dayRows, campRows] = await Promise.all([
+    // Daily breakdown + per-campaign spend (insights only return campaigns that
+    // delivered in the range) + the list of currently-active campaigns (so a
+    // running campaign shows even before it spends in the selected window).
+    const [dayRows, campRows, activeRows] = await Promise.all([
       fetchAllPages(
         `${base}?level=${dayLevel}&fields=spend,impressions,clicks,actions` +
         `&time_increment=1&time_range=${timeRange}&limit=500&access_token=${tok}`
@@ -78,6 +80,15 @@ export default async function handler(req, res) {
         `${base}?level=campaign&fields=campaign_id,campaign_name,spend,impressions,clicks,actions` +
         `&time_range=${timeRange}&limit=500&access_token=${tok}`
       ),
+      // Account-level only — HWS targets a single campaign node directly.
+      // Fault-tolerant: any failure here falls back to the spend-based list.
+      (async () => {
+        if (camp) return [];
+        const statuses = encodeURIComponent(JSON.stringify(['ACTIVE', 'WITH_ISSUES', 'PENDING_REVIEW', 'IN_PROCESS']));
+        const url = `https://graph.facebook.com/${META_API_VERSION}/act_${acct}/campaigns` +
+          `?fields=id,name,effective_status&effective_status=${statuses}&limit=500&access_token=${tok}`;
+        try { return await fetchAllPages(url); } catch { return []; }
+      })(),
     ]);
 
     const days = dayRows.map((d) => ({
@@ -98,16 +109,30 @@ export default async function handler(req, res) {
       { spend: 0, impressions: 0, clicks: 0, leads: 0 }
     );
 
-    const campaigns = campRows
-      .map((c) => ({
-        id: c.campaign_id,
-        name: c.campaign_name,
-        spend: parseFloat(c.spend || 0),
-        impressions: parseInt(c.impressions || 0, 10),
-        clicks: parseInt(c.clicks || 0, 10),
-        leads: extractLeads(c.actions),
-      }))
-      .sort((a, b) => b.spend - a.spend);
+    // Merge: every active campaign (with its in-range spend, or 0) plus any
+    // non-active campaign that did spend in range. Sorted by spend.
+    const ACTIVE_RE = /ACTIVE|WITH_ISSUES|PENDING_REVIEW|IN_PROCESS/i;
+    const insightsById = {};
+    campRows.forEach((c) => { insightsById[c.campaign_id] = c; });
+    const mk = (id, name, status, ins) => ({
+      id,
+      name,
+      status,
+      spend: ins ? parseFloat(ins.spend || 0) : 0,
+      impressions: ins ? parseInt(ins.impressions || 0, 10) : 0,
+      clicks: ins ? parseInt(ins.clicks || 0, 10) : 0,
+      leads: ins ? extractLeads(ins.actions) : 0,
+    });
+    const campaigns = [];
+    const seen = new Set();
+    activeRows
+      .filter((c) => ACTIVE_RE.test(c.effective_status || ''))
+      .forEach((c) => { campaigns.push(mk(c.id, c.name, c.effective_status || 'ACTIVE', insightsById[c.id])); seen.add(c.id); });
+    campRows.forEach((c) => {
+      if (seen.has(c.campaign_id)) return;
+      campaigns.push(mk(c.campaign_id, c.campaign_name, 'INACTIVE', c));
+    });
+    campaigns.sort((a, b) => b.spend - a.spend);
 
     return res.status(200).json({ account: acct, since, until, days, totals, campaigns });
   } catch (err) {

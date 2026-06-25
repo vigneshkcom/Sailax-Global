@@ -752,15 +752,18 @@ function renderAccount(a){
     const rows=camps.map(c=>{
       const pct=t.spend>0?Math.round(c.spend/t.spend*100):0;
       const cpl2=c.leads>0?money(c.spend/c.leads,a):null;
+      // Active campaign with no spend in the selected range → flag it so it's
+      // clear it's running, just hasn't delivered in this window yet.
+      const zeroActive=c.spend===0&&/ACTIVE|ISSUES|REVIEW|PROCESS/i.test(c.status||'');
       return `<tr>
-        <td class="camp-name">${esc(c.name)}</td>
+        <td class="camp-name">${esc(c.name)}${zeroActive?' <span class="tag tag-green" style="font-size:10px;font-weight:600;vertical-align:middle">Active</span>':''}</td>
         <td class="r">${money(c.spend,a)}<span class="spend-pct-bar" style="width:${pct*1.5}px"></span></td>
         <td class="r"><span class="tag tag-muted">${pct}%</span></td>
         <td class="r">${c.leads||0}</td>
         <td class="r">${cpl2!==null?cpl2:'—'}</td>
       </tr>`;
     }).join('');
-    campsCard=`<div class="card mb20"><div class="card-hd"><h3>Campaigns</h3><div class="tags"><span class="tag tag-orange">Meta · by spend</span></div></div><div class="card-bd">
+    campsCard=`<div class="card mb20"><div class="card-hd"><h3>Campaigns</h3><div class="tags"><span class="tag tag-orange">Meta · active + spend</span></div></div><div class="card-bd">
       <table class="camptbl"><thead><tr><th>Campaign</th><th class="r">Spend</th><th class="r">Share</th><th class="r">Leads</th><th class="r">Cost/Lead</th></tr></thead>
       <tbody>${rows}</tbody>
       </table>
