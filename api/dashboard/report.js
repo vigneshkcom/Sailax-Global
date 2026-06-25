@@ -27,10 +27,13 @@ const PIXEL_LEAD_TYPE = 'offsite_conversion.fb_pixel_lead';
 // HWS is a single campaign inside the AU "Sailax Global" account, so it carries
 // a campaignId; the others report at account level.
 const ACCOUNTS = [
-  { key: 'hws', name: 'HWS',       sub: 'Australia',      accountId: '749874504045597',  campaignId: '120252378091870672', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#16A34A', ghlLeadSource: null },
-  { key: 'au', name: 'Aquoz',     sub: 'Australia',      accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: 'facebook' },
-  { key: 'uk', name: 'Sailax UK', sub: 'United Kingdom', accountId: '1220120669692442', currency: 'GBP', locale: 'en-GB', tz: 'Europe/London',    accent: '#3B82F6', ghlLeadSource: null },
+  { key: 'hws', name: 'HWS',       sub: 'Australia',      accountId: '749874504045597',  campaignId: '120252378091870672', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#16A34A', ghlLeadSource: 'Instant Form', ghlLeadLabel: 'Instant Forms', ghlPipeline: 'HWS' },
+  { key: 'au', name: 'Aquoz',     sub: 'Australia',      accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: 'facebook', ghlLeadLabel: 'Facebook', ghlPipeline: null },
+  { key: 'uk', name: 'Sailax UK', sub: 'United Kingdom', accountId: '1220120669692442', currency: 'GBP', locale: 'en-GB', tz: 'Europe/London',    accent: '#3B82F6', ghlLeadSource: null, ghlLeadLabel: null, ghlPipeline: null },
 ];
+
+// Leads carrying any of these tags are hidden from the report (e.g. bulk CRM imports).
+const EXCLUDE_TAGS = ['bulk'];
 
 /* ── helpers ──────────────────────────────────────────────────────────── */
 const todayIn = (tz) => new Date().toLocaleDateString('en-CA', { timeZone: tz }); // YYYY-MM-DD
@@ -119,6 +122,31 @@ function filterBySource(opps, src) {
     (o.source || o.leadSource || o.attributionSource || '').toLowerCase().includes(src.toLowerCase())
   );
 }
+// Tags may sit on the opportunity or its contact, as strings or {name}/{tag} objects.
+function oppTags(o) {
+  let raw = o.tags || o.contact?.tags || o.contactTags || [];
+  if (!Array.isArray(raw)) raw = typeof raw === 'string' ? raw.split(',') : [];
+  return raw.map((t) => (typeof t === 'string' ? t : (t && (t.name || t.tag || t.label)) || '')).map((s) => String(s).trim().toLowerCase()).filter(Boolean);
+}
+function excludeBulk(opps) {
+  if (!EXCLUDE_TAGS.length) return opps || [];
+  return (opps || []).filter((o) => {
+    const tags = oppTags(o);
+    return !tags.some((t) => EXCLUDE_TAGS.some((x) => t.includes(x)));
+  });
+}
+// Resolve a pipeline-name token (e.g. "HWS") to its id(s) so a multi-pipeline
+// location (HWS + Aircon) can be narrowed to one. null → keep all pipelines.
+function pipelineIdSet(pipelines, token) {
+  if (!token) return null;
+  const t = token.toLowerCase();
+  const ids = (pipelines || []).filter((p) => (p.name || '').toLowerCase().includes(t)).map((p) => p.id);
+  return ids.length ? new Set(ids) : null;
+}
+function filterByPipeline(opps, idSet) {
+  if (!idSet) return opps || [];
+  return (opps || []).filter((o) => idSet.has(o.pipelineId || o.pipeline_id));
+}
 const oppDate = (o, tz) => {
   const c = o.createdAt || o.created_at || o.dateAdded;
   return c ? new Date(c).toLocaleDateString('en-CA', { timeZone: tz }) : null;
@@ -190,11 +218,14 @@ async function buildAccount(a) {
   const loc = process.env[`GHL_LOCATION_ID_${a.key.toUpperCase()}`];
   if (key && loc) {
     try {
-      const [opps, pipelines] = await Promise.all([fetchAllOpps(key, loc), fetchPipelines(key, loc)]);
-      const leadOpps = filterBySource(opps, a.ghlLeadSource);
+      const [oppsRaw, pipelinesAll] = await Promise.all([fetchAllOpps(key, loc), fetchPipelines(key, loc)]);
+      const opps = excludeBulk(oppsRaw);                              // drop bulk CRM imports (tag "Bulk")
+      const pipeIds = pipelineIdSet(pipelinesAll, a.ghlPipeline);     // narrow to the account's pipeline (HWS, not Aircon)
+      const pipelines = pipeIds ? pipelinesAll.filter((p) => pipeIds.has(p.id)) : pipelinesAll;
+      const leadOpps = filterBySource(filterByPipeline(opps, pipeIds), a.ghlLeadSource);
       out.leadsDay = countOnDay(leadOpps, a.tz, today);
       out.leads7 = countInRange(leadOpps, a.tz, since7, today);
-      out.bySource = sourcesOnDay(opps, a.tz, today);
+      out.bySource = sourcesOnDay(leadOpps, a.tz, today);            // sources of the counted leads only
       out.stages = stageBreakdown(leadOpps, pipelines, a.tz, since7, today); // 7-day window for stages
       out.leadsSource = a.ghlLeadSource ? 'ghl-fb' : 'ghl';
     } catch (e) {
@@ -242,7 +273,7 @@ function accountBlock(r) {
     </td></tr><tr><td style="padding:14px 24px 6px;"><div style="border-bottom:1px solid #E5E7EB;"></div></td></tr>`;
   }
 
-  const leadTag = r.leadsSource === 'ghl-fb' ? 'CRM · Facebook' : r.leadsSource === 'ghl' ? 'CRM' : 'Meta-reported';
+  const leadTag = r.leadsSource === 'ghl-fb' ? `CRM · ${esc(a.ghlLeadLabel || 'Facebook')}` : r.leadsSource === 'ghl' ? 'CRM' : 'Meta-reported';
   const kpis = `<table width="100%" cellpadding="0" cellspacing="0">
     <tr>${kpiCell('Spend · today', money(r.spendDay, a), `7d: ${money(r.spend7, a)}`, a.accent)}${kpiCell('Leads · today', String(r.leadsDay), leadTag, '#111827')}</tr>
     <tr>${kpiCell('Cost / Lead', r.cplDay != null ? money(r.cplDay, a) : '—', r.cpl7 != null ? `7d: ${money(r.cpl7, a)}` : 'no leads', '#111827')}${kpiCell('Clicks · today', r.clicksDay.toLocaleString(), `${r.imprDay.toLocaleString()} impressions`, '#111827')}</tr>
@@ -325,7 +356,7 @@ function buildEmail(reports, dateLabel) {
       ${blocks}
       ${dashBtn}
       <tr><td style="background:#F9FAFB;padding:18px 24px;text-align:center;">
-        <div style="font-size:11px;color:#9CA3AF;line-height:1.7;">Today's figures are live and update through the day · Meta spend can lag a couple of hours.<br>Spend via Meta Marketing API · Leads &amp; sources via GoHighLevel · Aquoz leads counted from Facebook-sourced CRM opportunities only.</div>
+        <div style="font-size:11px;color:#9CA3AF;line-height:1.7;">Today's figures are live and update through the day · Meta spend can lag a couple of hours.<br>Spend via Meta Marketing API · Leads &amp; sources via GoHighLevel · HWS counts Instant Form leads, Aquoz counts Facebook-sourced — both exclude bulk CRM imports.</div>
       </td></tr>
     </table>
   </td></tr></table></body></html>`;

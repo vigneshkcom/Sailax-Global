@@ -243,10 +243,13 @@ footer{text-align:center;font-size:12px;color:var(--faint);padding:28px 32px;lin
 <script>
 /* ── CONFIG ──────────────────────────────────────────────────────────── */
 const ACCOUNTS = [
-  { key:'hws', name:'HWS',       sub:'Australia',      accountId:'749874504045597',  campaignId:'120252378091870672', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#16A34A', ghlLeadSource:null },
-  { key:'au', name:'Aquoz',     sub:'Australia',      accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#FF6B35', ghlLeadSource:'facebook' },
-  { key:'uk', name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#3B82F6', ghlLeadSource:null },
+  { key:'hws', name:'HWS',       sub:'Australia',      accountId:'749874504045597',  campaignId:'120252378091870672', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#16A34A', ghlLeadSource:'Instant Form', ghlLeadLabel:'Instant Forms', ghlPipeline:'HWS' },
+  { key:'au', name:'Aquoz',     sub:'Australia',      accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#FF6B35', ghlLeadSource:'facebook', ghlLeadLabel:'Facebook', ghlPipeline:null },
+  { key:'uk', name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#3B82F6', ghlLeadSource:null, ghlLeadLabel:null, ghlPipeline:null },
 ];
+// Leads carrying any of these tags are hidden everywhere (KPIs, funnel, stages,
+// sources, chart). Used to drop bulk CRM imports that aren't real ad leads.
+const EXCLUDE_TAGS = ['bulk'];
 const API = '/api/dashboard';
 const state = { since:null, until:null, meta:{}, ghl:{}, cfg:null };
 let activeKey = 'hws';
@@ -383,6 +386,29 @@ async function fetchAllOpps(account,locationId){
 function filterBySource(opps,src){
   if(!src) return opps||[];
   return(opps||[]).filter(o=>(o.source||o.leadSource||o.attributionSource||'').toLowerCase().includes(src.toLowerCase()));
+}
+// Tags can live on the opportunity or its contact, as strings or {name}/{tag} objects.
+function oppTags(o){
+  let raw=o.tags||o.contact?.tags||o.contactTags||[];
+  if(!Array.isArray(raw)) raw=typeof raw==='string'?raw.split(','):[];
+  return raw.map(t=>typeof t==='string'?t:(t&&(t.name||t.tag||t.label)||'')).map(s=>String(s).trim().toLowerCase()).filter(Boolean);
+}
+function excludeBulk(opps){
+  if(!EXCLUDE_TAGS.length) return opps||[];
+  return(opps||[]).filter(o=>{const tags=oppTags(o);return !tags.some(t=>EXCLUDE_TAGS.some(x=>t.includes(x)));});
+}
+// Resolve a pipeline-name token (e.g. "HWS") to the matching pipeline id(s) so a
+// location with several pipelines (HWS + Aircon) can be narrowed to just one.
+// Returns null when no token is set or nothing matches → caller keeps all pipelines.
+function pipelineIdSet(pipelines,token){
+  if(!token) return null;
+  const t=token.toLowerCase();
+  const ids=(pipelines||[]).filter(p=>(p.name||'').toLowerCase().includes(t)).map(p=>p.id);
+  return ids.length?new Set(ids):null;
+}
+function filterByPipeline(opps,idSet){
+  if(!idSet) return opps||[];
+  return(opps||[]).filter(o=>idSet.has(o.pipelineId||o.pipeline_id));
 }
 function ghlPerDay(opps,tz,since,until){
   const cnt={};
@@ -555,9 +581,13 @@ function renderAccount(a){
   const days=m.days||[], t=m.totals||{spend:0,leads:0,clicks:0,impressions:0};
   const spendZero=t.spend===0&&days.length>0;
 
-  const ghlOpps=gd&&Array.isArray(gd.opps)?gd.opps:null;
-  const ghlPipelines=gd?.pipelines||[];
-  const leadOpps=ghlOpps!==null?filterBySource(ghlOpps,a.ghlLeadSource):null;
+  const ghlOppsRaw=gd&&Array.isArray(gd.opps)?gd.opps:null;
+  const ghlOpps=ghlOppsRaw!==null?excludeBulk(ghlOppsRaw):null;         // drop bulk CRM imports (tag "Bulk")
+  const ghlPipesAll=gd?.pipelines||[];
+  const pipeIds=pipelineIdSet(ghlPipesAll,a.ghlPipeline);              // narrow to the account's pipeline (HWS, not Aircon)
+  const ghlPipelines=pipeIds?ghlPipesAll.filter(p=>pipeIds.has(p.id)):ghlPipesAll;
+  // Counted leads = bulk-excluded → restricted to the account's pipeline → matching the lead source.
+  const leadOpps=ghlOpps!==null?filterBySource(filterByPipeline(ghlOpps,pipeIds),a.ghlLeadSource):null;
 
   let leadsByDay={},leadsTotal,leadsSrc,ghlErr=null;
   if(leadOpps!==null){
@@ -574,7 +604,7 @@ function renderAccount(a){
 
   // Source tag
   const srcTag=leadsSrc==='ghl'
-    ?`<span class="tag tag-green">GHL${a.ghlLeadSource?' · Facebook':''}</span>`
+    ?`<span class="tag tag-green">GHL${a.ghlLeadLabel?' · '+esc(a.ghlLeadLabel):''}</span>`
     :'<span class="tag tag-blue">Meta</span>';
 
   // ── KPIs ──
@@ -601,6 +631,9 @@ function renderAccount(a){
     </div>
   </div>`;
 
+  // Pipeline label for the GHL cards (e.g. "HWS") when the location is narrowed.
+  const pipeLabel=pipeIds?ghlPipelines.map(p=>p.name).filter(Boolean).join(' + '):'';
+
   // ── Lead Funnel ──
   let funnelCard='';
   if(leadOpps!==null){
@@ -622,7 +655,7 @@ function renderAccount(a){
         <div class="funnel-p">${s.pct.toFixed(0)}%</div>
       </div></div>`;
     }).join('');
-    funnelCard=`<div class="card"><div class="card-hd"><h3>Lead Funnel</h3><div class="tags"><span class="tag tag-green">GHL · in range</span></div></div><div class="card-bd"><div class="funnel">${fRows}</div></div></div>`;
+    funnelCard=`<div class="card"><div class="card-hd"><h3>Lead Funnel</h3><div class="tags"><span class="tag tag-green">${pipeLabel?esc(pipeLabel)+' · ':''}GHL · in range</span></div></div><div class="card-bd"><div class="funnel">${fRows}</div></div></div>`;
   }
 
   // ── Daily Spend + Leads Chart ──
@@ -648,14 +681,16 @@ function renderAccount(a){
         <div class="stage-p">${s.pct}%</div>
       </div>`).join('');
       const diag=allUnknown&&gd?.pipelinesError?`<div class="note-red">Can't load stage names (${esc(gd.pipelinesError)}). Check the GHL Private Integration token has Opportunities scope.</div>`:'';
-      stagesCard=`<div class="card"><div class="card-hd"><h3>Stage Breakdown</h3><div class="tags"><span class="tag tag-green">GHL · in range</span></div></div><div class="card-bd"><div class="stage-list">${rows}</div>${diag}</div></div>`;
+      stagesCard=`<div class="card"><div class="card-hd"><h3>Stage Breakdown</h3><div class="tags"><span class="tag tag-green">${pipeLabel?esc(pipeLabel)+' · ':''}GHL · in range</span></div></div><div class="card-bd"><div class="stage-list">${rows}</div>${diag}</div></div>`;
     }
   }
 
-  // ── Lead Sources ──
+  // ── Lead Sources ── (breaks down the SAME leads the KPIs count: bulk-excluded,
+  // this account's pipeline, matching the lead source — so HWS shows Instant Forms only)
   let sourcesCard='';
-  if(ghlOpps!==null){
-    const srcs=leadSources(ghlOpps,a.tz,state.since,state.until);
+  if(leadOpps!==null){
+    const srcs=leadSources(leadOpps,a.tz,state.since,state.until);
+    const srcLabel=a.ghlLeadLabel||'All sources';
     if(srcs.length&&srcs.some(s=>s.src!=='Unknown')){
       const colors=['#FF6B35','#3B82F6','#10B981','#F59E0B','#8B5CF6','#EC4899'];
       const totalL=srcs.reduce((s,x)=>s+x.leads,0);
@@ -666,10 +701,10 @@ function renderAccount(a){
         <td class="r" style="color:#10B981;font-weight:700">${s.won}</td>
         <td class="r">${s.pct}%</td>
       </tr>`).join('');
-      sourcesCard=`<div class="card"><div class="card-hd"><h3>Lead Sources</h3><div class="tags"><span class="tag tag-muted">All sources · GHL</span></div></div><div class="card-bd">
+      sourcesCard=`<div class="card"><div class="card-hd"><h3>Lead Sources</h3><div class="tags"><span class="tag tag-muted">${esc(srcLabel)} · GHL</span></div></div><div class="card-bd">
         <table class="srctbl"><thead><tr><th>Source</th><th class="r">Leads</th><th class="r">Won</th><th class="r">Close %</th></tr></thead>
         <tbody>${rows}</tbody>
-        <tfoot><tr><td><strong>All sources</strong></td><td class="r">${totalL}</td><td class="r" style="color:#10B981">${totalW}</td><td class="r">${totalL>0?Math.round(totalW/totalL*100):0}%</td></tr></tfoot>
+        <tfoot><tr><td><strong>${esc(srcLabel)}</strong></td><td class="r">${totalL}</td><td class="r" style="color:#10B981">${totalW}</td><td class="r">${totalL>0?Math.round(totalW/totalL*100):0}%</td></tr></tfoot>
         </table>
       </div></div>`;
     }
