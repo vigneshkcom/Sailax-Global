@@ -27,12 +27,12 @@ const PIXEL_LEAD_TYPE = 'offsite_conversion.fb_pixel_lead';
 // HWS is a single campaign inside the AU "Sailax Global" account, so it carries
 // a campaignId; the others report at account level.
 const ACCOUNTS = [
-  { key: 'hws', name: 'HWS',       sub: 'Australia',      accountId: '749874504045597',  campaignId: '120252378091870672', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#16A34A', ghlLeadSource: 'Instant Form', ghlLeadLabel: 'Instant Forms', ghlPipeline: 'HWS' },
-  { key: 'au', name: 'Aquoz',     sub: 'Australia',      accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: 'facebook', ghlLeadLabel: 'Facebook', ghlPipeline: null },
-  { key: 'uk', name: 'Sailax UK', sub: 'United Kingdom', accountId: '1220120669692442', currency: 'GBP', locale: 'en-GB', tz: 'Europe/London',    accent: '#3B82F6', ghlLeadSource: null, ghlLeadLabel: null, ghlPipeline: null },
+  { key: 'hws', name: 'HWS',       sub: 'Australia',      accountId: '749874504045597',  campaignId: '120252378091870672', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#16A34A', ghlLeadSource: 'Instant Forms', ghlLeadLabel: 'Instant Forms', ghlLeadTags: ['instant forms'], ghlLeadMatch: 'any', ghlPipeline: 'HWS' },
+  { key: 'au', name: 'Aquoz',     sub: 'Australia',      accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: 'facebook', ghlLeadLabel: 'Facebook', ghlLeadTags: null, ghlLeadMatch: 'any', ghlPipeline: null },
+  { key: 'uk', name: 'Sailax UK', sub: 'United Kingdom', accountId: '1220120669692442', currency: 'GBP', locale: 'en-GB', tz: 'Europe/London',    accent: '#3B82F6', ghlLeadSource: null, ghlLeadLabel: null, ghlLeadTags: null, ghlLeadMatch: 'any', ghlPipeline: null },
 ];
 
-// Leads carrying any of these tags are hidden from the report (e.g. bulk CRM imports).
+// Extra guard for stray bulk CRM imports; the positive source/tag match is primary.
 const EXCLUDE_TAGS = ['bulk'];
 
 /* ── helpers ──────────────────────────────────────────────────────────── */
@@ -135,6 +135,18 @@ function excludeBulk(opps) {
     return !tags.some((t) => EXCLUDE_TAGS.some((x) => t.includes(x)));
   });
 }
+// A real lead = matches the account's lead source and/or required tag(s). The HWS
+// Facebook-Instant-Forms workflow stamps both (source "Instant Forms" + tag
+// "instant forms"), so this allowlists genuine leads and drops bulk imports.
+// match 'any' (default): source OR tag qualifies; 'all': both required.
+function leadMatches(o, a) {
+  const useSrc = !!a.ghlLeadSource, reqTags = (a.ghlLeadTags || []).map((t) => t.toLowerCase()), useTag = reqTags.length > 0;
+  if (!useSrc && !useTag) return true;
+  const hasSrc = useSrc && (o.source || o.leadSource || o.attributionSource || '').toLowerCase().includes(a.ghlLeadSource.toLowerCase());
+  const hasTag = useTag && oppTags(o).some((t) => reqTags.includes(t));
+  return a.ghlLeadMatch === 'all' ? ((!useSrc || hasSrc) && (!useTag || hasTag)) : ((useSrc && hasSrc) || (useTag && hasTag));
+}
+function filterLeads(opps, a) { return (opps || []).filter((o) => leadMatches(o, a)); }
 // Resolve a pipeline-name token (e.g. "HWS") to its id(s) so a multi-pipeline
 // location (HWS + Aircon) can be narrowed to one. null → keep all pipelines.
 function pipelineIdSet(pipelines, token) {
@@ -222,7 +234,7 @@ async function buildAccount(a) {
       const opps = excludeBulk(oppsRaw);                              // drop bulk CRM imports (tag "Bulk")
       const pipeIds = pipelineIdSet(pipelinesAll, a.ghlPipeline);     // narrow to the account's pipeline (HWS, not Aircon)
       const pipelines = pipeIds ? pipelinesAll.filter((p) => pipeIds.has(p.id)) : pipelinesAll;
-      const leadOpps = filterBySource(filterByPipeline(opps, pipeIds), a.ghlLeadSource);
+      const leadOpps = filterLeads(filterByPipeline(opps, pipeIds), a);
       out.leadsDay = countOnDay(leadOpps, a.tz, today);
       out.leads7 = countInRange(leadOpps, a.tz, since7, today);
       out.bySource = sourcesOnDay(leadOpps, a.tz, today);            // sources of the counted leads only

@@ -243,12 +243,12 @@ footer{text-align:center;font-size:12px;color:var(--faint);padding:28px 32px;lin
 <script>
 /* ── CONFIG ──────────────────────────────────────────────────────────── */
 const ACCOUNTS = [
-  { key:'hws', name:'HWS',       sub:'Australia',      accountId:'749874504045597',  campaignId:'120252378091870672', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#16A34A', ghlLeadSource:'Instant Form', ghlLeadLabel:'Instant Forms', ghlPipeline:'HWS' },
-  { key:'au', name:'Aquoz',     sub:'Australia',      accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#FF6B35', ghlLeadSource:'facebook', ghlLeadLabel:'Facebook', ghlPipeline:null },
-  { key:'uk', name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#3B82F6', ghlLeadSource:null, ghlLeadLabel:null, ghlPipeline:null },
+  { key:'hws', name:'HWS',       sub:'Australia',      accountId:'749874504045597',  campaignId:'120252378091870672', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#16A34A', ghlLeadSource:'Instant Forms', ghlLeadLabel:'Instant Forms', ghlLeadTags:['instant forms'], ghlLeadMatch:'any', ghlPipeline:'HWS' },
+  { key:'au', name:'Aquoz',     sub:'Australia',      accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#FF6B35', ghlLeadSource:'facebook', ghlLeadLabel:'Facebook', ghlLeadTags:null, ghlLeadMatch:'any', ghlPipeline:null },
+  { key:'uk', name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#3B82F6', ghlLeadSource:null, ghlLeadLabel:null, ghlLeadTags:null, ghlLeadMatch:'any', ghlPipeline:null },
 ];
-// Leads carrying any of these tags are hidden everywhere (KPIs, funnel, stages,
-// sources, chart). Used to drop bulk CRM imports that aren't real ad leads.
+// Leads carrying any of these tags are hidden everywhere (extra guard for stray
+// bulk CRM imports). The positive source/tag match below is the primary filter.
 const EXCLUDE_TAGS = ['bulk'];
 const API = '/api/dashboard';
 const state = { since:null, until:null, meta:{}, ghl:{}, cfg:null };
@@ -397,6 +397,18 @@ function excludeBulk(opps){
   if(!EXCLUDE_TAGS.length) return opps||[];
   return(opps||[]).filter(o=>{const tags=oppTags(o);return !tags.some(t=>EXCLUDE_TAGS.some(x=>t.includes(x)));});
 }
+// A real lead = matches the account's lead source and/or required tag(s). The
+// HWS Facebook-Instant-Forms workflow stamps both (source "Instant Forms" +
+// tag "instant forms"), so this allowlists genuine leads and drops bulk imports.
+// match 'any' (default): source OR tag qualifies; 'all': both required.
+function leadMatches(o,a){
+  const useSrc=!!a.ghlLeadSource, reqTags=(a.ghlLeadTags||[]).map(t=>t.toLowerCase()), useTag=reqTags.length>0;
+  if(!useSrc&&!useTag) return true;
+  const hasSrc=useSrc&&(o.source||o.leadSource||o.attributionSource||'').toLowerCase().includes(a.ghlLeadSource.toLowerCase());
+  const hasTag=useTag&&oppTags(o).some(t=>reqTags.includes(t));
+  return a.ghlLeadMatch==='all'?((!useSrc||hasSrc)&&(!useTag||hasTag)):((useSrc&&hasSrc)||(useTag&&hasTag));
+}
+function filterLeads(opps,a){return(opps||[]).filter(o=>leadMatches(o,a));}
 // Resolve a pipeline-name token (e.g. "HWS") to the matching pipeline id(s) so a
 // location with several pipelines (HWS + Aircon) can be narrowed to just one.
 // Returns null when no token is set or nothing matches → caller keeps all pipelines.
@@ -586,8 +598,8 @@ function renderAccount(a){
   const ghlPipesAll=gd?.pipelines||[];
   const pipeIds=pipelineIdSet(ghlPipesAll,a.ghlPipeline);              // narrow to the account's pipeline (HWS, not Aircon)
   const ghlPipelines=pipeIds?ghlPipesAll.filter(p=>pipeIds.has(p.id)):ghlPipesAll;
-  // Counted leads = bulk-excluded → restricted to the account's pipeline → matching the lead source.
-  const leadOpps=ghlOpps!==null?filterBySource(filterByPipeline(ghlOpps,pipeIds),a.ghlLeadSource):null;
+  // Counted leads = bulk-excluded → restricted to the account's pipeline → matching the lead source/tag.
+  const leadOpps=ghlOpps!==null?filterLeads(filterByPipeline(ghlOpps,pipeIds),a):null;
 
   let leadsByDay={},leadsTotal,leadsSrc,ghlErr=null;
   if(leadOpps!==null){
