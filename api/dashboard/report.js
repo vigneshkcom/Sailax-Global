@@ -27,9 +27,10 @@ const PIXEL_LEAD_TYPE = 'offsite_conversion.fb_pixel_lead';
 // HWS is a single campaign inside the AU "Sailax Global" account, so it carries
 // a campaignId; the others report at account level.
 const ACCOUNTS = [
-  { key: 'hws', name: 'HWS',       sub: 'Australia',      accountId: '749874504045597',  campaignId: '120252378091870672', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#16A34A', ghlLeadSource: 'Instant Forms', ghlLeadLabel: 'Instant Forms', ghlLeadTags: ['instant forms'], ghlLeadMatch: 'any', ghlPipeline: 'HWS' },
-  { key: 'au', name: 'Aquoz',     sub: 'Australia',      accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: ['facebook', 'landing page'], ghlLeadLabel: 'FB + Landing Page', ghlLeadTags: ['landing page'], ghlLeadMatch: 'any', ghlPipeline: null },
-  { key: 'uk', name: 'Sailax UK', sub: 'United Kingdom', accountId: '1220120669692442', currency: 'GBP', locale: 'en-GB', tz: 'Europe/London',    accent: '#3B82F6', ghlLeadSource: null, ghlLeadLabel: null, ghlLeadTags: null, ghlLeadMatch: 'any', ghlPipeline: null },
+  { key: 'hws',    name: 'HWS',       sub: 'Australia',       accountId: '749874504045597',  campaignId: '120252378091870672',  currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#16A34A', ghlLeadSource: 'Instant Forms', ghlLeadLabel: 'Instant Forms', ghlLeadTags: ['instant forms'], ghlLeadMatch: 'any', ghlPipeline: 'HWS' },
+  { key: 'aircon', name: 'Aircon',    sub: 'Australia (VIC)', accountId: '749874504045597',  campaignId: '120252890311900672', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#0EA5E9', ghlAccount: 'hws', ghlLeadSource: 'Instant Forms', ghlLeadLabel: 'Instant Forms', ghlLeadTags: ['instant forms'], ghlLeadMatch: 'any', ghlPipeline: 'Aircon' },
+  { key: 'au',     name: 'Aquoz',     sub: 'Australia',       accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: ['facebook', 'landing page'], ghlLeadLabel: 'FB + Landing Page', ghlLeadTags: ['landing page'], ghlLeadMatch: 'any', ghlPipeline: null },
+  { key: 'uk',     name: 'Sailax UK', sub: 'United Kingdom',  accountId: '1220120669692442', currency: 'GBP', locale: 'en-GB', tz: 'Europe/London',    accent: '#3B82F6', ghlLeadSource: null, ghlLeadLabel: null, ghlLeadTags: null, ghlLeadMatch: 'any', ghlPipeline: null },
 ];
 
 // Extra guard for stray bulk CRM imports; the positive source/tag match is primary.
@@ -229,8 +230,9 @@ async function buildAccount(a) {
   // GHL leads (preferred when configured); fall back to Meta-reported leads
   out.leadsDay = out.metaLeadsDay;
   out.leads7 = out.metaLeads7;
-  const key = process.env[`GHL_API_KEY_${a.key.toUpperCase()}`];
-  const loc = process.env[`GHL_LOCATION_ID_${a.key.toUpperCase()}`];
+  const ghlAcct = a.ghlAccount || a.key;
+  const key = process.env[`GHL_API_KEY_${ghlAcct.toUpperCase()}`];
+  const loc = process.env[`GHL_LOCATION_ID_${ghlAcct.toUpperCase()}`];
   if (key && loc) {
     try {
       const [oppsRaw, pipelinesAll] = await Promise.all([fetchAllOpps(key, loc), fetchPipelines(key, loc)]);

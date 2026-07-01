@@ -253,9 +253,10 @@ footer{text-align:center;font-size:12px;color:var(--faint);padding:28px 32px;lin
 <script>
 /* ── CONFIG ──────────────────────────────────────────────────────────── */
 const ACCOUNTS = [
-  { key:'hws', name:'HWS',       sub:'Australia',      accountId:'749874504045597',  campaignId:'120252378091870672', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#16A34A', ghlLeadSource:'Instant Forms', ghlLeadLabel:'Instant Forms', ghlLeadTags:['instant forms'], ghlLeadMatch:'any', ghlPipeline:'HWS' },
-  { key:'au', name:'Aquoz',     sub:'Australia',      accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#FF6B35', ghlLeadSource:['facebook','landing page'], ghlLeadLabel:'FB + Landing Page', ghlLeadTags:['landing page'], ghlLeadMatch:'any', ghlPipeline:null },
-  { key:'uk', name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#3B82F6', ghlLeadSource:null, ghlLeadLabel:null, ghlLeadTags:null, ghlLeadMatch:'any', ghlPipeline:null },
+  { key:'hws',    name:'HWS',       sub:'Australia',      accountId:'749874504045597',  campaignId:'120252378091870672',  currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#16A34A', ghlLeadSource:'Instant Forms', ghlLeadLabel:'Instant Forms', ghlLeadTags:['instant forms'], ghlLeadMatch:'any', ghlPipeline:'HWS' },
+  { key:'aircon', name:'Aircon',    sub:'Australia (VIC)', accountId:'749874504045597', campaignId:'120252890311900672',  currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#0EA5E9', ghlAccount:'hws', ghlLeadSource:'Instant Forms', ghlLeadLabel:'Instant Forms', ghlLeadTags:['instant forms'], ghlLeadMatch:'any', ghlPipeline:'Aircon' },
+  { key:'au',     name:'Aquoz',     sub:'Australia',      accountId:'1616113923003676', currency:'AUD', locale:'en-AU', tz:'Australia/Sydney', accent:'#FF6B35', ghlLeadSource:['facebook','landing page'], ghlLeadLabel:'FB + Landing Page', ghlLeadTags:['landing page'], ghlLeadMatch:'any', ghlPipeline:null },
+  { key:'uk',     name:'Sailax UK', sub:'United Kingdom', accountId:'1220120669692442', currency:'GBP', locale:'en-GB', tz:'Europe/London',    accent:'#3B82F6', ghlLeadSource:null, ghlLeadLabel:null, ghlLeadTags:null, ghlLeadMatch:'any', ghlPipeline:null },
 ];
 // Leads carrying any of these tags are hidden everywhere (extra guard for stray
 // bulk CRM imports). The positive source/tag match below is the primary filter.
@@ -328,7 +329,7 @@ async function init(){
   try{state.cfg=await(await fetch(API+'/config')).json();}
   catch{state.cfg={metaConfigured:false,accounts:{}};}
   setBadge('badge-meta','Meta',!!state.cfg.metaConfigured);
-  setBadge('badge-ghl','GHL',ACCOUNTS.some(a=>acctCfg(a.key).ghlConfigured));
+  setBadge('badge-ghl','GHL',ACCOUNTS.some(a=>acctCfg(a.ghlAccount||a.key).ghlConfigured));
   setPreset(7);
   await load();
 }
@@ -356,8 +357,8 @@ async function load(){
       const j=await r.json();
       state.meta[a.key]=r.ok?j:{error:j.error||'HTTP '+r.status};
     }catch(e){state.meta[a.key]={error:e.message};}
-    if(acctCfg(a.key).ghlConfigured){
-      try{state.ghl[a.key]=await loadGHL(a.key,acctCfg(a.key).ghlLocationId);}
+    if(acctCfg(a.ghlAccount||a.key).ghlConfigured){
+      try{state.ghl[a.key]=await loadGHL(a.ghlAccount||a.key,acctCfg(a.ghlAccount||a.key).ghlLocationId);}
       catch(e){state.ghl[a.key]={error:e.message};}
     }
   }));
@@ -605,7 +606,7 @@ function render(){
 function renderAccount(a){
   const m=state.meta[a.key];
   const gd=state.ghl[a.key];
-  const cfg=acctCfg(a.key);
+  const cfg=acctCfg(a.ghlAccount||a.key);
 
   if(!m||m.error){
     const hint=/permission|access|token|OAuth/i.test(m?.error||'')?
@@ -795,7 +796,7 @@ function renderAccount(a){
   let notes='';
   if(spendZero) notes+=`<div class="note-red mb20">Spend is $0 — the Meta system user token may not have access to act_${a.accountId}. Assign the ad account to your system user, revoke the old token, and generate a new one.</div>`;
   if(ghlErr) notes+=`<div class="note mb20">GHL error (${esc(ghlErr)}) — showing Meta-reported leads.</div>`;
-  if(!cfg.ghlConfigured) notes+=`<div class="note mb20">Add <strong>GHL_API_KEY_${a.key.toUpperCase()}</strong> + <strong>GHL_LOCATION_ID_${a.key.toUpperCase()}</strong> in Vercel to enable CRM leads &amp; stages.</div>`;
+  if(!cfg.ghlConfigured) notes+=`<div class="note mb20">Add <strong>GHL_API_KEY_${(a.ghlAccount||a.key).toUpperCase()}</strong> + <strong>GHL_LOCATION_ID_${(a.ghlAccount||a.key).toUpperCase()}</strong> in Vercel to enable CRM leads &amp; stages.</div>`;
 
   const row1=`<div class="grid-4-6 mb20">${funnelCard||''}${chartCard}</div>`;
   const row2=stagesCard||sourcesCard?`<div class="grid-5-5 mb20">${stagesCard||''}${sourcesCard||''}</div>`:'';
