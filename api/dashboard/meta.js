@@ -8,9 +8,10 @@
 //   META_TOKEN = a long-lived Meta access token with `ads_read` on both accounts
 //
 // Query params:
-//   account = numeric ad account id, no "act_" prefix (e.g. 1220120669692442)
-//   since   = YYYY-MM-DD
-//   until   = YYYY-MM-DD
+//   account  = numeric ad account id, no "act_" prefix (e.g. 1220120669692442)
+//   since    = YYYY-MM-DD
+//   until    = YYYY-MM-DD
+//   campaign = single campaign id, OR comma-separated ids for multi-campaign accounts
 
 const META_API_VERSION = 'v21.0';
 
@@ -43,6 +44,31 @@ async function fetchAllPages(startUrl) {
   return rows;
 }
 
+// When multiple campaigns are queried together, the API returns one row per
+// campaign per day. Aggregate them into a single row per date.
+function aggregateDayRows(rows) {
+  const byDate = {};
+  for (const r of rows) {
+    const d = r.date_start;
+    if (!byDate[d]) byDate[d] = { date_start: d, spend: 0, impressions: 0, clicks: 0, actionMap: {} };
+    byDate[d].spend += parseFloat(r.spend || 0);
+    byDate[d].impressions += parseInt(r.impressions || 0, 10);
+    byDate[d].clicks += parseInt(r.clicks || 0, 10);
+    for (const act of (r.actions || [])) {
+      byDate[d].actionMap[act.action_type] = (byDate[d].actionMap[act.action_type] || 0) + (parseInt(act.value, 10) || 0);
+    }
+  }
+  return Object.values(byDate)
+    .sort((a, b) => a.date_start.localeCompare(b.date_start))
+    .map((d) => ({
+      date_start: d.date_start,
+      spend: String(d.spend),
+      impressions: String(d.impressions),
+      clicks: String(d.clicks),
+      actions: Object.entries(d.actionMap).map(([action_type, value]) => ({ action_type, value: String(value) })),
+    }));
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -58,38 +84,56 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required query params: account, since, until.' });
   }
   const acct = String(account).replace(/^act_/, '');
-  const camp = campaign ? String(campaign).replace(/[^0-9]/g, '') : '';
+
+  // Support comma-separated campaign IDs (e.g. for Aircon which has multiple campaigns)
+  const camps = campaign
+    ? String(campaign).split(',').map((s) => s.replace(/[^0-9]/g, '')).filter(Boolean)
+    : [];
+  const singleCamp = camps.length === 1 ? camps[0] : '';
+  const multiCamp = camps.length > 1;
+
   const timeRange = encodeURIComponent(JSON.stringify({ since, until }));
   const tok = encodeURIComponent(token);
-  // When a campaign id is supplied (e.g. HWS runs as one campaign inside a
-  // shared account), query the campaign node so figures cover only that campaign.
-  const node = camp ? camp : `act_${acct}`;
-  const dayLevel = camp ? 'campaign' : 'account';
-  const base = `https://graph.facebook.com/${META_API_VERSION}/${node}/insights`;
+  const acctBase = `https://graph.facebook.com/${META_API_VERSION}/act_${acct}/insights`;
+
+  // Single campaign: query the campaign node directly (scoped, efficient).
+  // Multiple campaigns: query the account node filtered by the campaign IDs.
+  // No campaign: query at account level for full-account reports.
+  const singleBase = singleCamp
+    ? `https://graph.facebook.com/${META_API_VERSION}/${singleCamp}/insights`
+    : null;
+  const dayLevel = singleCamp ? 'campaign' : 'account';
+  const campFilter = multiCamp
+    ? `&filtering=${encodeURIComponent(JSON.stringify([{ field: 'campaign.id', operator: 'IN', value: camps }]))}`
+    : '';
 
   try {
-    // Daily breakdown + per-campaign spend (insights only return campaigns that
-    // delivered in the range) + the list of currently-active campaigns (so a
-    // running campaign shows even before it spends in the selected window).
-    const [dayRows, campRows, activeRows] = await Promise.all([
+    const [dayRowsRaw, campRows, activeRows] = await Promise.all([
+      // Daily breakdown — aggregate across campaigns when multiple are requested
       fetchAllPages(
-        `${base}?level=${dayLevel}&fields=spend,impressions,clicks,actions` +
-        `&time_increment=1&time_range=${timeRange}&limit=500&access_token=${tok}`
+        (multiCamp ? acctBase : (singleBase || acctBase)) +
+        `?level=${multiCamp ? 'campaign' : dayLevel}&fields=spend,impressions,clicks,actions` +
+        `&time_increment=1&time_range=${timeRange}&limit=500&access_token=${tok}${campFilter}`
       ),
+      // Per-campaign totals for the Campaigns table
       fetchAllPages(
-        `${base}?level=campaign&fields=campaign_id,campaign_name,spend,impressions,clicks,actions` +
-        `&time_range=${timeRange}&limit=500&access_token=${tok}`
+        (multiCamp ? acctBase : (singleBase || acctBase)) +
+        `?level=campaign&fields=campaign_id,campaign_name,spend,impressions,clicks,actions` +
+        `&time_range=${timeRange}&limit=500&access_token=${tok}${campFilter}`
       ),
-      // Account-level only — HWS targets a single campaign node directly.
-      // Fault-tolerant: any failure here falls back to the spend-based list.
+      // Active-campaign list — used to surface $0-spend campaigns still running.
+      // Skipped for single/multi campaign modes (we know exactly which campaigns we want).
       (async () => {
-        if (camp) return [];
+        if (singleCamp || multiCamp) return [];
         const statuses = encodeURIComponent(JSON.stringify(['ACTIVE', 'WITH_ISSUES', 'PENDING_REVIEW', 'IN_PROCESS']));
         const url = `https://graph.facebook.com/${META_API_VERSION}/act_${acct}/campaigns` +
           `?fields=id,name,effective_status&effective_status=${statuses}&limit=500&access_token=${tok}`;
         try { return await fetchAllPages(url); } catch { return []; }
       })(),
     ]);
+
+    // For multi-campaign queries, one row per campaign per day → aggregate by date
+    const dayRows = multiCamp ? aggregateDayRows(dayRowsRaw) : dayRowsRaw;
 
     const days = dayRows.map((d) => ({
       date: d.date_start,
@@ -125,9 +169,19 @@ export default async function handler(req, res) {
     });
     const campaigns = [];
     const seen = new Set();
-    activeRows
-      .filter((c) => ACTIVE_RE.test(c.effective_status || ''))
-      .forEach((c) => { campaigns.push(mk(c.id, c.name, c.effective_status || 'ACTIVE', insightsById[c.id])); seen.add(c.id); });
+
+    // For multi-campaign: surface each tracked campaign even with $0 spend
+    if (multiCamp) {
+      for (const id of camps) {
+        const ins = insightsById[id];
+        campaigns.push(mk(id, ins ? ins.campaign_name : id, ins ? 'ACTIVE' : 'ACTIVE', ins));
+        seen.add(id);
+      }
+    } else {
+      activeRows
+        .filter((c) => ACTIVE_RE.test(c.effective_status || ''))
+        .forEach((c) => { campaigns.push(mk(c.id, c.name, c.effective_status || 'ACTIVE', insightsById[c.id])); seen.add(c.id); });
+    }
     campRows.forEach((c) => {
       if (seen.has(c.campaign_id)) return;
       campaigns.push(mk(c.campaign_id, c.campaign_name, 'INACTIVE', c));

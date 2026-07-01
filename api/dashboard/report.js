@@ -28,7 +28,7 @@ const PIXEL_LEAD_TYPE = 'offsite_conversion.fb_pixel_lead';
 // a campaignId; the others report at account level.
 const ACCOUNTS = [
   { key: 'hws',    name: 'HWS',       sub: 'Australia',       accountId: '749874504045597',  campaignId: '120252378091870672',  currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#16A34A', ghlLeadSource: 'Instant Forms', ghlLeadLabel: 'Instant Forms', ghlLeadTags: ['instant forms'], ghlLeadMatch: 'any', ghlPipeline: 'HWS' },
-  { key: 'aircon', name: 'Aircon',    sub: 'Australia (VIC)', accountId: '749874504045597',  campaignId: '120252890311900672', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#0EA5E9', ghlAccount: 'hws', ghlLeadSource: 'Instant Forms', ghlLeadLabel: 'Instant Forms', ghlLeadTags: ['instant forms'], ghlLeadMatch: 'any', ghlPipeline: 'Aircon' },
+  { key: 'aircon', name: 'Aircon',    sub: 'Australia (VIC)', accountId: '749874504045597',  campaignId: ['120252890311900672', '120252902887110672'], currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#0EA5E9', ghlAccount: 'hws', ghlLeadSource: 'Instant Forms', ghlLeadLabel: 'Instant Forms', ghlLeadTags: ['instant forms'], ghlLeadMatch: 'any', ghlPipeline: 'Aircon' },
   { key: 'au',     name: 'Aquoz',     sub: 'Australia',       accountId: '1616113923003676', currency: 'AUD', locale: 'en-AU', tz: 'Australia/Sydney', accent: '#FF6B35', ghlLeadSource: ['facebook', 'landing page'], ghlLeadLabel: 'FB + Landing Page', ghlLeadTags: ['landing page'], ghlLeadMatch: 'any', ghlPipeline: null },
   { key: 'uk',     name: 'Sailax UK', sub: 'United Kingdom',  accountId: '1220120669692442', currency: 'GBP', locale: 'en-GB', tz: 'Europe/London',    accent: '#3B82F6', ghlLeadSource: null, ghlLeadLabel: null, ghlLeadTags: null, ghlLeadMatch: 'any', ghlPipeline: null },
 ];
@@ -70,18 +70,49 @@ async function fetchAllPages(startUrl) {
   return rows;
 }
 
-/* ── Meta: last-7-days daily breakdown ──────────────────────────────────── */
+// When multiple campaigns are queried together, aggregate per-campaign per-day rows by date.
+function aggregateDayRows(rows) {
+  const byDate = {};
+  for (const r of rows) {
+    const d = r.date_start;
+    if (!byDate[d]) byDate[d] = { date_start: d, spend: 0, impressions: 0, clicks: 0, actionMap: {} };
+    byDate[d].spend += parseFloat(r.spend || 0);
+    byDate[d].impressions += parseInt(r.impressions || 0, 10);
+    byDate[d].clicks += parseInt(r.clicks || 0, 10);
+    for (const act of (r.actions || [])) {
+      byDate[d].actionMap[act.action_type] = (byDate[d].actionMap[act.action_type] || 0) + (parseInt(act.value, 10) || 0);
+    }
+  }
+  return Object.values(byDate)
+    .sort((a, b) => a.date_start.localeCompare(b.date_start))
+    .map((d) => ({
+      date_start: d.date_start,
+      spend: String(d.spend),
+      impressions: String(d.impressions),
+      clicks: String(d.clicks),
+      actions: Object.entries(d.actionMap).map(([action_type, value]) => ({ action_type, value: String(value) })),
+    }));
+}
+
+/* ── Meta: daily breakdown for the given date range ─────────────────────── */
 async function fetchMeta(a, token, since, until) {
   const tok = encodeURIComponent(token);
-  // HWS runs as a single campaign inside a shared account, so query the campaign
-  // node directly; the other accounts report at account level.
-  const node = a.campaignId ? a.campaignId : `act_${a.accountId}`;
-  const level = a.campaignId ? 'campaign' : 'account';
-  const base = `https://graph.facebook.com/${META_API_VERSION}/${node}/insights`;
   const range7 = encodeURIComponent(JSON.stringify({ since, until }));
-  const dayRows = await fetchAllPages(
-    `${base}?level=${level}&fields=spend,impressions,clicks,actions&time_increment=1&time_range=${range7}&limit=500&access_token=${tok}`
+  const camps = Array.isArray(a.campaignId) ? a.campaignId : (a.campaignId ? [a.campaignId] : []);
+  const singleCamp = camps.length === 1 ? camps[0] : '';
+  const multiCamp = camps.length > 1;
+  const acctNode = `act_${a.accountId}`;
+  const node = singleCamp ? singleCamp : acctNode;
+  const level = singleCamp ? 'campaign' : 'account';
+  const base = `https://graph.facebook.com/${META_API_VERSION}/${multiCamp ? acctNode : node}/insights`;
+  const campFilter = multiCamp
+    ? `&filtering=${encodeURIComponent(JSON.stringify([{ field: 'campaign.id', operator: 'IN', value: camps }]))}`
+    : '';
+  const dayRowsRaw = await fetchAllPages(
+    `${base}?level=${multiCamp ? 'campaign' : level}&fields=spend,impressions,clicks,actions` +
+    `&time_increment=1&time_range=${range7}&limit=500&access_token=${tok}${campFilter}`
   );
+  const dayRows = multiCamp ? aggregateDayRows(dayRowsRaw) : dayRowsRaw;
   const days = dayRows.map((d) => ({
     date: d.date_start,
     spend: parseFloat(d.spend || 0),
